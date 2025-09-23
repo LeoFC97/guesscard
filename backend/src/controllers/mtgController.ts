@@ -132,7 +132,7 @@ export class MtgController {
 
     public async getCard(req: Request, res: Response): Promise<void> {
         try {
-            const cardName = req.params.name;
+            const cardName = req.params.name.trim();
             const card = await this.mtgService.fetchCardByParam("name", cardName);
             res.status(200).json(card);
         } catch (error) {
