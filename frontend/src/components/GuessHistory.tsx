@@ -21,39 +21,43 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
     // Mostra até 20 palpites
     const shownGuesses = guesses.slice(0, 20);
     // Função para mostrar legalidades principais e aplicar estratégia de parcialmente correta
-    const renderLegalities = (legalities?: any) => {
-        if (!legalities) return '-';
-        // Formatos principais
+    const renderLegalities = (guessedLegalities?: any, targetLegalities?: any) => {
+        if (!guessedLegalities || !targetLegalities) return '-';
         const formats = ['pauper', 'modern', 'legacy', 'vintage', 'standard'];
-        // Se vier como array de objetos [{format, legality}], transforma em objeto
-        let legalitiesObj: Record<string, string> = {};
-        if (Array.isArray(legalities)) {
-            for (const l of legalities) {
-                if (l.format && l.legality) legalitiesObj[l.format.toLowerCase()] = l.legality;
+        let guessedObj: Record<string, string> = {};
+        let targetObj: Record<string, string> = {};
+        if (Array.isArray(guessedLegalities)) {
+            for (const l of guessedLegalities) {
+                if (l.format && l.legality) guessedObj[l.format.toLowerCase()] = l.legality;
             }
         } else {
-            legalitiesObj = legalities;
+            guessedObj = guessedLegalities;
+        }
+        if (Array.isArray(targetLegalities)) {
+            for (const l of targetLegalities) {
+                if (l.format && l.legality) targetObj[l.format.toLowerCase()] = l.legality;
+            }
+        } else {
+            targetObj = targetLegalities;
         }
         return (
             <Box display="flex" flexDirection="column" gap={0.5}>
                 {formats.map(fmt => {
-                    const status = legalitiesObj[fmt];
+                    const guessed = guessedObj[fmt];
+                    const target = targetObj[fmt];
                     let color: 'success' | 'warning' | 'error' = 'error';
                     let label = '❌';
-                    if (status === 'Legal') {
+                    if (guessed === 'Legal' && target === 'Legal') {
                         color = 'success';
                         label = '✔️';
-                    } else if (status === 'Restricted' || status === 'Banned') {
-                        color = 'error';
-                        label = '❌';
-                    } else if (status) {
+                    } else if (guessed === 'Legal' || target === 'Legal') {
                         color = 'warning';
                         label = '🟡';
                     }
                     return (
                         <Chip
                             key={fmt}
-                            label={fmt[0].toUpperCase() + fmt.slice(1) + ': ' + (status || '-') + ' ' + label}
+                            label={fmt[0].toUpperCase() + fmt.slice(1) + ': ' + (target || '-') + ' ' + label}
                             color={color}
                             size="small"
                             sx={{ mb: 0.5 }}
@@ -65,9 +69,23 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
     };
     return (
         <Box mt={8} sx={{ overflowX: 'auto', width: '100%' }}>
-            <h2>Histórico de palpites</h2>
-            <TableContainer component={Paper} sx={{ minWidth: 1100 }}>
-                <Table size="small">
+            <Box sx={{ textAlign: 'center', mb: 2 }}>
+                <span style={{
+                    fontSize: '2rem',
+                    fontWeight: 600,
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                }}>
+                    <span style={{
+                        fontSize: '1.3rem',
+                        fontWeight: 500,
+                        display: 'block',
+                        marginBottom: '0.5rem',
+                    }}>Histórico de palpites</span>
+                </span>
+            </Box>
+            <TableContainer component={Paper} sx={{ minWidth: { xs: 500, sm: 900, md: 1200 }, width: '100%', maxWidth: '100vw', boxShadow: 1, overflowX: 'auto' }}>
+                <Table size="small" sx={{ width: '100%', minWidth: 900, '& td, & th': { padding: { xs: '6px', sm: '10px', md: '14px' }, fontSize: { xs: '0.8rem', sm: '0.95rem', md: '1.05rem' } } }}>
                     <TableHead>
                         <TableRow>
                             <TableCell>Carta</TableCell>
@@ -76,8 +94,8 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                             <TableCell>CMC</TableCell>
                             <TableCell>Edição</TableCell>
                             <TableCell>Raridade</TableCell>
-                            <TableCell>Artista</TableCell>
                             <TableCell>Legalidade</TableCell>
+                            <TableCell>Artista</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -85,18 +103,17 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                             <TableRow key={idx}>
                                 <TableCell style={{ fontWeight: 'bold' }}>{g.guessedCard?.name}</TableCell>
                                 <TableCell>
-                                    <Chip label={(g.guessedCard?.colors?.join(', ') || '-') + ' ' + getLabel(g.feedback.colors)} color={getColor(g.feedback.colors)} size="small" />
+                                    <Chip label={(g.guessedCard?.colors?.join(', ') || '-') + ' ' + getLabel(g.feedback.colors)} color={getColor(g.feedback.colors)} size="small" sx={{ px: 0.5 }} />
                                 </TableCell>
                                 <TableCell>
-                                    <Chip label={(g.guessedCard?.type || '-') + ' ' + getLabel(g.feedback.type)} color={getColor(g.feedback.type)} size="small" />
+                                    <Chip label={(g.guessedCard?.type || '-') + ' ' + getLabel(g.feedback.type)} color={getColor(g.feedback.type)} size="small" sx={{ px: 0.5 }} />
                                 </TableCell>
                                 <TableCell>
-                                    <Chip label={(g.guessedCard?.cmc ?? '-') + ' ' + getLabel(g.feedback.cmc)} color={getColor(g.feedback.cmc)} size="small" />
+                                    <Chip label={(g.guessedCard?.cmc ?? '-') + ' ' + getLabel(g.feedback.cmc)} color={getColor(g.feedback.cmc)} size="small" sx={{ px: 0.5 }} />
                                 </TableCell>
                                 <TableCell>
                                     <Chip
                                         label={(() => {
-                                            // Se houver printings, mostra o nome da primeira edição
                                             const printings = g.guessedCard?.printings;
                                             const allSets = g.guessedCard?.allSets;
                                             if (Array.isArray(printings) && printings.length > 0 && allSets && typeof allSets === 'object') {
@@ -108,16 +125,17 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                                         })()}
                                         color={getColor(g.feedback.edition)}
                                         size="small"
+                                        sx={{ px: 0.5 }}
                                     />
                                 </TableCell>
                                 <TableCell>
-                                    <Chip label={(g.guessedCard?.rarity || '-') + ' ' + getLabel(g.feedback.rarity)} color={getColor(g.feedback.rarity)} size="small" />
+                                    <Chip label={(g.guessedCard?.rarity || '-') + ' ' + getLabel(g.feedback.rarity)} color={getColor(g.feedback.rarity)} size="small" sx={{ px: 0.5 }} />
                                 </TableCell>
                                 <TableCell>
-                                    <Chip label={(g.guessedCard?.artist || '-') + ' ' + getLabel(g.feedback.artist)} color={getColor(g.feedback.artist)} size="small" />
+                                    {renderLegalities(g.guessedCard?.legalities, g.feedback?.legalities)}
                                 </TableCell>
                                 <TableCell>
-                                    {renderLegalities(g.guessedCard?.legalities || g.feedback?.legalities)}
+                                    <Chip label={(g.guessedCard?.artist || '-') + ' ' + getLabel(g.feedback.artist)} color={getColor(g.feedback.artist)} size="small" sx={{ px: 0.5 }} />
                                 </TableCell>
                             </TableRow>
                         )) : (

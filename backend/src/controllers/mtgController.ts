@@ -265,7 +265,7 @@ export class MtgController {
 
             feedback.text = maskCardNameInText(targetCard.text, targetCard.name);
             feedback.flavor = typeof targetCard.flavor === 'string' ? targetCard.flavor : undefined;
-            // Normaliza legalities para objeto { formato: legalidade }
+            // Sempre retorna legalities da carta alvo (targetCard)
             if (Array.isArray(targetCard.legalities)) {
                 const legalitiesObj: Record<string, string> = {};
                 for (const entry of targetCard.legalities) {
@@ -282,6 +282,8 @@ export class MtgController {
             if (typeof guessedCard.text !== 'string') {
                 guessedCard.text = undefined;
             }
+            // Garante que guessedCard.legalities também seja da carta alvo
+            guessedCard.legalities = feedback.legalities;
             res.status(200).json({
                 feedback,
                 isCorrect,
