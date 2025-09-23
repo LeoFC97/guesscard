@@ -1,8 +1,36 @@
 // Variável global para armazenar a carta alvo do jogo atual
 let targetCard: any = null;
 
+
 import { Request, Response } from 'express';
 import { MtgService } from '../services/mtgService';
+import { maskCardNameInText } from '../utils/textUtils';
+import { extractEditionsAndIcons } from '../utils/editionUtils';
+
+export interface Feedback {
+    feedback: {
+        colors: string;
+        type: string;
+        cmc: string;
+        edition: string;
+        rarity: string;
+        artist: string;
+        [key: string]: string;
+    };
+    isCorrect: boolean;
+    guessedCard: {
+        name: string;
+        colors: string[];
+        type: string;
+        cmc: number;
+        setName: string;
+        rarity: string;
+        artist: string;
+        text?: string;
+        legalities?: Record<string, string>;
+        [key: string]: any;
+    };
+}
 
 const mtgService = new MtgService();
 
@@ -52,7 +80,6 @@ const randomCardNames = [
     'Gurmag Angler',
     'Augur of Bolas',
     'Serrated Arrows',
-    'Tron',
     'Burning-Tree Emissary',
     'Skred',
     'Delver of Secrets',
@@ -61,7 +88,6 @@ const randomCardNames = [
     'Ponder',
     'Counterspell',
     'Llanowar Elves',
-    'Serra Angel',
     'Dark Ritual',
     'Giant Growth',
     'Shivan Dragon',
@@ -94,6 +120,7 @@ export interface CardInfo {
     setName: string;       // Ex: "Magic 2010"
     rarity: string;        // Ex: "Common"
     artist: string;        // Ex: "Christopher Moeller"
+    legalities?: Record<string, string>; // Ex: { modern: "Legal", legacy: "Banned", ... }
 }
 
 export class MtgController {
@@ -114,6 +141,8 @@ export class MtgController {
     }
 
     public async guessCard(req: Request, res: Response): Promise<void> {
+            // Extrai edições e ícones da carta alvo
+            // const { editions, icons } = extractEditionsAndIcons(targetCard);
         try {
             if (!targetCard) {
                 res.status(400).json({ message: 'No game in progress. Please start a new game.' });
@@ -140,7 +169,8 @@ export class MtgController {
                 cmc: targetCard.cmc || 0,
                 setName: targetCard.setName || '',
                 rarity: targetCard.rarity || '',
-                artist: targetCard.artist || ''
+                artist: targetCard.artist || '',
+                legalities: targetCard.legalities || undefined
             };
 
             console.log('Guessed Card:', guessedCard);
@@ -148,19 +178,25 @@ export class MtgController {
 
             const feedback: any = {};
 
-            if (guessedCard.colors && Array.isArray(guessedCard.colors)) {
-                const matchedColors = guessedCard.colors.filter((color: string) =>
-                    targetInfo.colors.includes(color)
+            // Corrige para considerar ambas as cartas incolores como corretas
+            const guessedColorsArr = Array.isArray(guessedCard.colors) ? guessedCard.colors : [];
+            const targetColorsArr = Array.isArray(targetInfo.colors) ? targetInfo.colors : [];
+            if ((guessedColorsArr.length === 0 && targetColorsArr.length === 0) ||
+                (!guessedCard.colors && !targetInfo.colors)) {
+                feedback.colors = "correct";
+            } else if (guessedColorsArr.length === 0 || targetColorsArr.length === 0) {
+                feedback.colors = "incorrect";
+            } else {
+                const matchedColors = guessedColorsArr.filter((color: string) =>
+                    targetColorsArr.includes(color)
                 );
-                if (matchedColors.length === targetInfo.colors.length && matchedColors.length === guessedCard.colors.length) {
+                if (matchedColors.length === targetColorsArr.length && matchedColors.length === guessedColorsArr.length) {
                     feedback.colors = "correct";
                 } else if (matchedColors.length > 0) {
                     feedback.colors = "partial";
                 } else {
                     feedback.colors = "incorrect";
                 }
-            } else {
-                feedback.colors = "incorrect";
             }
 
             // Validação de tipo (parcial se contém substring)
@@ -179,7 +215,7 @@ export class MtgController {
             // Validação de CMC
             if (guessedCard.cmc === targetInfo.cmc) {
                 feedback.cmc = "correct";
-            } else if (guessedCard.cmc > targetInfo.cmc) {
+            } else if (guessedCard.cmc < targetInfo.cmc) {
                 feedback.cmc = "higher";
             } else {
                 feedback.cmc = "lower";
@@ -224,14 +260,37 @@ export class MtgController {
                 feedback.artist = "incorrect";
             }
 
-            guessedCard.feedback = feedback;
 
             // Verifica se o palpite está correto
             const isCorrect = this.mtgService.validateGuess(guessedCard.name, targetCard.name);
-            guessedCard.isCorrect = isCorrect;
-            console.log('Guessed Card:', guessedCard);
-            console.log('Target Card:', targetCard);
-            res.status(200).json({ feedback, guessedCard });
+
+
+            feedback.text = maskCardNameInText(targetCard.text, targetCard.name);
+            feedback.flavor = typeof targetCard.flavor === 'string' ? targetCard.flavor : undefined;
+            // Normaliza legalities para objeto { formato: legalidade }
+            if (Array.isArray(targetCard.legalities)) {
+                const legalitiesObj: Record<string, string> = {};
+                for (const entry of targetCard.legalities) {
+                    if (entry.format && entry.legality) {
+                        legalitiesObj[entry.format.toLowerCase()] = entry.legality;
+                    }
+                }
+                feedback.legalities = legalitiesObj;
+            } else if (typeof targetCard.legalities === 'object') {
+                feedback.legalities = targetCard.legalities;
+            } else {
+                feedback.legalities = undefined;
+            }
+            if (typeof guessedCard.text !== 'string') {
+                guessedCard.text = undefined;
+            }
+            res.status(200).json({
+                feedback,
+                isCorrect,
+                guessedCard,
+                // editions,
+                // icons
+            });
 
         } catch (error) {
             console.log(error);
