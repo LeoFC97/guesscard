@@ -1,4 +1,4 @@
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://guesscard.onrender.com';
 
 export async function guessCard(cardName: string) {
     const response = await fetch(`${BACKEND_URL}/api/guess`, {
