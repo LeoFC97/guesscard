@@ -1,5 +1,7 @@
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+
 export async function guessCard(cardName: string) {
-    const response = await fetch('http://localhost:3001/api/guess', {
+    const response = await fetch(`${BACKEND_URL}/api/guess`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
