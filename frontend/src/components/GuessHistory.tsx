@@ -47,12 +47,18 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                     const target = targetObj[fmt];
                     let color: 'success' | 'warning' | 'error' = 'error';
                     let label = '❌';
-                    if (guessed === 'Legal' && target === 'Legal') {
+                    if (target === 'Legal') {
                         color = 'success';
                         label = '✔️';
-                    } else if (guessed === 'Legal' || target === 'Legal') {
+                    } else if (target === 'Restricted') {
                         color = 'warning';
                         label = '🟡';
+                    } else if (target === 'Banned') {
+                        color = 'error';
+                        label = '❌';
+                    } else {
+                        color = 'error';
+                        label = '❌';
                     }
                     return (
                         <Chip
@@ -131,9 +137,9 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                                 <TableCell>
                                     <Chip label={(g.guessedCard?.rarity || '-') + ' ' + getLabel(g.feedback.rarity)} color={getColor(g.feedback.rarity)} size="small" sx={{ px: 0.5 }} />
                                 </TableCell>
-                                <TableCell>
+                                {/* <TableCell>
                                     {renderLegalities(g.guessedCard?.legalities, g.feedback?.legalities)}
-                                </TableCell>
+                                </TableCell> */}
                                 <TableCell>
                                     <Chip label={(g.guessedCard?.artist || '-') + ' ' + getLabel(g.feedback.artist)} color={getColor(g.feedback.artist)} size="small" sx={{ px: 0.5 }} />
                                 </TableCell>
