@@ -1,5 +1,91 @@
+// Variável global para armazenar a carta alvo do jogo atual
+let targetCard: any = null;
+
 import { Request, Response } from 'express';
 import { MtgService } from '../services/mtgService';
+
+const mtgService = new MtgService();
+
+const randomCardNames = [
+    // Modern staples
+    'Lightning Bolt',
+    'Ragavan, Nimble Pilferer',
+    'Fury',
+    'Solitude',
+    'Wrenn and Six',
+    'Murktide Regent',
+    'Expressive Iteration',
+    'Thoughtseize',
+    'Scalding Tarn',
+    'Mishra’s Bauble',
+    'Urza’s Saga',
+    'Primeval Titan',
+    'Karn, the Great Creator',
+    'Blood Moon',
+    'Liliana of the Veil',
+    'Tarmogoyf',
+    'Snapcaster Mage',
+    'Path to Exile',
+    'Engineered Explosives',
+    'Collected Company',
+    'Archmage’s Charm',
+    'Seasoned Pyromancer',
+    'Dismember',
+    'Inquisition of Kozilek',
+    'Abrupt Decay',
+    'Teferi, Time Raveler',
+    'Force of Negation',
+    'Prismatic Ending',
+    'Yawgmoth, Thran Physician',
+    'Omnath, Locus of Creation',
+    'Consign to Memory',
+    'Nicol Bolas, the Ravager',
+    'Ugin, the Spirit Dragon',
+    'Teferi, Hero of Dominaria',
+    'Chandra, Torch of Defiance',
+    'Jace, the Mind Sculptor',
+    'Emrakul, the Aeons Torn',
+    'Karn Liberated',
+    'Gideon Jura',
+    // Pauper staples
+    'Mulldrifter',
+    'Gurmag Angler',
+    'Augur of Bolas',
+    'Serrated Arrows',
+    'Tron',
+    'Burning-Tree Emissary',
+    'Skred',
+    'Delver of Secrets',
+    'Spellstutter Sprite',
+    'Preordain',
+    'Ponder',
+    'Counterspell',
+    'Llanowar Elves',
+    'Serra Angel',
+    'Dark Ritual',
+    'Giant Growth',
+    'Shivan Dragon',
+    'Swords to Plowshares',
+    'Wrath of God',
+    'Birds of Paradise',
+    'Demonic Tutor',
+    'Sol Ring',
+    'Black Lotus',
+    'Time Walk',
+    'Ancestral Recall',
+    'Bloodbraid Elf'
+];
+
+export async function pickRandomCard() {
+    const randomIndex = Math.floor(Math.random() * randomCardNames.length);
+    const cardName = randomCardNames[randomIndex];
+    const cards = await mtgService.fetchCardByParam('name', cardName);
+    if (cards.length > 0) {
+        return cards[0];
+    } else {
+        return null;
+    }
+}
 
 export interface CardInfo {
     colors: string[];      // Ex: ["Red"]
@@ -29,38 +115,44 @@ export class MtgController {
 
     public async guessCard(req: Request, res: Response): Promise<void> {
         try {
+            if (!targetCard) {
+                res.status(400).json({ message: 'No game in progress. Please start a new game.' });
+                return;
+            }
             const { guess } = req.body;
             if (!guess || typeof guess !== 'string') {
                 res.status(400).json({ message: 'Guess must be a string (card name)' });
                 return;
             }
 
-            // Busca apenas a carta do palpite (guess)
+            
             const guessedCards = await this.mtgService.fetchCardByParam("name", guess);
             const guessedCard = guessedCards[0];
-
+            
             if (!guessedCard) {
                 res.status(404).json({ message: 'Guessed card not found' });
                 return;
             }
 
-            const hardCodedCard: CardInfo = {
-                colors: ["U"],
-                type: "Instant",
-                cmc: 3,
-                setName: "Double Masters 2022",
-                rarity: "Rare",
-                artist: "Paul Scott Canavan"
+            const targetInfo: CardInfo = {
+                colors: targetCard.colors || [],
+                type: targetCard.type || '',
+                cmc: targetCard.cmc || 0,
+                setName: targetCard.setName || '',
+                rarity: targetCard.rarity || '',
+                artist: targetCard.artist || ''
             };
+
+            console.log('Guessed Card:', guessedCard);
+            console.log('Target Card:', targetCard);
 
             const feedback: any = {};
 
-            // Validação de cores (parcial se acertar pelo menos uma cor)
             if (guessedCard.colors && Array.isArray(guessedCard.colors)) {
                 const matchedColors = guessedCard.colors.filter((color: string) =>
-                    hardCodedCard.colors.includes(color)
+                    targetInfo.colors.includes(color)
                 );
-                if (matchedColors.length === hardCodedCard.colors.length && matchedColors.length === guessedCard.colors.length) {
+                if (matchedColors.length === targetInfo.colors.length && matchedColors.length === guessedCard.colors.length) {
                     feedback.colors = "correct";
                 } else if (matchedColors.length > 0) {
                     feedback.colors = "partial";
@@ -73,9 +165,9 @@ export class MtgController {
 
             // Validação de tipo (parcial se contém substring)
             if (guessedCard.type && typeof guessedCard.type === "string") {
-                if (guessedCard.type === hardCodedCard.type) {
+                if (guessedCard.type === targetInfo.type) {
                     feedback.type = "correct";
-                } else if (guessedCard.type.includes(hardCodedCard.type) || hardCodedCard.type.includes(guessedCard.type)) {
+                } else if (guessedCard.type.includes(targetInfo.type) || targetInfo.type.includes(guessedCard.type)) {
                     feedback.type = "partial";
                 } else {
                     feedback.type = "incorrect";
@@ -85,16 +177,16 @@ export class MtgController {
             }
 
             // Validação de CMC
-            if (guessedCard.cmc === hardCodedCard.cmc) {
+            if (guessedCard.cmc === targetInfo.cmc) {
                 feedback.cmc = "correct";
-            } else if (guessedCard.cmc > hardCodedCard.cmc) {
+            } else if (guessedCard.cmc > targetInfo.cmc) {
                 feedback.cmc = "higher";
             } else {
                 feedback.cmc = "lower";
             }
 
             // Validação de edição
-            if (guessedCard.setName === hardCodedCard.setName) {
+            if (guessedCard.setName === targetInfo.setName) {
                 feedback.edition = "correct";
             } else {
                 feedback.edition = "incorrect";
@@ -103,9 +195,9 @@ export class MtgController {
             // Validação de raridade (parcial se for mais ou menos rara)
             const rarityOrder = ["Common", "Uncommon", "Rare", "Mythic Rare"];
             const guessedRarityIndex = rarityOrder.indexOf(guessedCard.rarity);
-            const targetRarityIndex = rarityOrder.indexOf(hardCodedCard.rarity);
+            const targetRarityIndex = rarityOrder.indexOf(targetInfo.rarity);
 
-            if (guessedCard.rarity === hardCodedCard.rarity) {
+            if (guessedCard.rarity === targetInfo.rarity) {
                 feedback.rarity = "correct";
             } else if (guessedRarityIndex > -1 && targetRarityIndex > -1) {
                 if (guessedRarityIndex > targetRarityIndex) {
@@ -121,9 +213,9 @@ export class MtgController {
 
             // Validação de artista (parcial se contém substring)
             if (guessedCard.artist && typeof guessedCard.artist === "string") {
-                if (guessedCard.artist === hardCodedCard.artist) {
+                if (guessedCard.artist === targetInfo.artist) {
                     feedback.artist = "correct";
-                } else if (guessedCard.artist.includes(hardCodedCard.artist) || hardCodedCard.artist.includes(guessedCard.artist)) {
+                } else if (guessedCard.artist.includes(targetInfo.artist) || targetInfo.artist.includes(guessedCard.artist)) {
                     feedback.artist = "partial";
                 } else {
                     feedback.artist = "incorrect";
@@ -135,13 +227,32 @@ export class MtgController {
             guessedCard.feedback = feedback;
 
             // Verifica se o palpite está correto
-            const isCorrect = this.mtgService.validateGuess(guessedCard.name, "Lightning Bolt");
+            const isCorrect = this.mtgService.validateGuess(guessedCard.name, targetCard.name);
             guessedCard.isCorrect = isCorrect;
-
+            console.log('Guessed Card:', guessedCard);
+            console.log('Target Card:', targetCard);
             res.status(200).json({ feedback, guessedCard });
+
         } catch (error) {
             console.log(error);
             res.status(500).json({ message: 'Error processing guess', error });
+        }
+    }
+
+    // Novo endpoint para sortear uma nova carta
+    public static async newGame(req: Request, res: Response): Promise<void> {
+        try {
+            targetCard = await pickRandomCard();
+            console.log('targetCard')
+            console.log(targetCard)
+            console.log('targetCard')
+            if (!targetCard) {
+                res.status(500).json({ message: 'Could not pick a new card' });
+                return;
+            }
+            res.status(200).json({ message: 'New game started', cardName: targetCard.name });
+        } catch (error) {
+            res.status(500).json({ message: 'Error starting new game', error });
         }
     }
 }
