@@ -14,6 +14,10 @@ app.use(cors());
 // Swagger endpoint
 setRoutes(app);
 
+app.use(cors({
+  origin: 'https://guesscard.vercel.app/' // ou a URL do seu frontend no Render/Vercel/Netlify
+}));
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
