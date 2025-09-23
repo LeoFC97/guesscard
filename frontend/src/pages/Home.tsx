@@ -14,6 +14,7 @@ const Home: React.FC = () => {
     const [guesses, setGuesses] = useState<any[]>([]);
     const [gameStarted, setGameStarted] = useState(false);
     const [targetCard, setTargetCard] = useState<string | null>(null);
+    const [gameId, setGameId] = useState<string | null>(null);
     const [cardText, setCardText] = useState<string | null>(null);
     const [textReady, setTextReady] = useState<string | null>(null);
     const [flavorReady, setFlavorReady] = useState<string | null>(null);
@@ -43,9 +44,10 @@ const Home: React.FC = () => {
         }
     };
 
-    const handleGameStarted = (cardName: string) => {
+    const handleGameStarted = (cardName: string, gameId: string) => {
         setGameStarted(true);
         setTargetCard(cardName);
+        setGameId(gameId);
         setGuesses([]);
         setTextReady(null);
         setTextShown(false);
@@ -132,7 +134,7 @@ const Home: React.FC = () => {
             {textShown && textReady && (
                 <Alert severity="info" sx={{ mb: 2 }}>{textReady}</Alert>
             )}
-            <CardGuess onGuess={handleGuess} />
+            <CardGuess onGuess={handleGuess} gameId={gameId} />
             <GuessHistory guesses={guesses} />
         </Container>
     );

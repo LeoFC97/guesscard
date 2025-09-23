@@ -1,8 +1,9 @@
-// Variável global para armazenar a carta alvo do jogo atual
-let targetCard: any = null;
+// Mapeamento em memória para partidas: { [gameId]: targetCard }
+const games: Record<string, any> = {};
 
 
 import { Request, Response } from 'express';
+import { randomUUID } from 'crypto';
 import { MtgService } from '../services/mtgService';
 import { maskCardNameInText } from '../utils/textUtils';
 import { extractEditionsAndIcons } from '../utils/editionUtils';
@@ -141,23 +142,25 @@ export class MtgController {
     }
 
     public async guessCard(req: Request, res: Response): Promise<void> {
-            // Extrai edições e ícones da carta alvo
-            // const { editions, icons } = extractEditionsAndIcons(targetCard);
         try {
-            if (!targetCard) {
-                res.status(400).json({ message: 'No game in progress. Please start a new game.' });
+            const { gameId, guess } = req.body;
+            if (!gameId || typeof gameId !== 'string') {
+                res.status(400).json({ message: 'Missing or invalid gameId.' });
                 return;
             }
-            const { guess } = req.body;
+            const targetCard = games[gameId];
+            if (!targetCard) {
+                res.status(400).json({ message: 'No game in progress for this gameId. Please start a new game.' });
+                return;
+            }
             if (!guess || typeof guess !== 'string') {
                 res.status(400).json({ message: 'Guess must be a string (card name)' });
                 return;
             }
 
-            
             const guessedCards = await this.mtgService.fetchCardByParam("name", guess);
             const guessedCard = guessedCards[0];
-            
+
             if (!guessedCard) {
                 res.status(404).json({ message: 'Guessed card not found' });
                 return;
@@ -172,9 +175,6 @@ export class MtgController {
                 artist: targetCard.artist || '',
                 legalities: targetCard.legalities || undefined
             };
-
-            console.log('Guessed Card:', guessedCard);
-            console.log('Target Card:', targetCard);
 
             const feedback: any = {};
 
@@ -260,10 +260,8 @@ export class MtgController {
                 feedback.artist = "incorrect";
             }
 
-
             // Verifica se o palpite está correto
             const isCorrect = this.mtgService.validateGuess(guessedCard.name, targetCard.name);
-
 
             feedback.text = maskCardNameInText(targetCard.text, targetCard.name);
             feedback.flavor = typeof targetCard.flavor === 'string' ? targetCard.flavor : undefined;
@@ -287,9 +285,7 @@ export class MtgController {
             res.status(200).json({
                 feedback,
                 isCorrect,
-                guessedCard,
-                // editions,
-                // icons
+                guessedCard
             });
 
         } catch (error) {
@@ -301,15 +297,15 @@ export class MtgController {
     // Novo endpoint para sortear uma nova carta
     public static async newGame(req: Request, res: Response): Promise<void> {
         try {
-            targetCard = await pickRandomCard();
-            console.log('targetCard')
-            console.log(targetCard)
-            console.log('targetCard')
+            const targetCard = await pickRandomCard();
             if (!targetCard) {
                 res.status(500).json({ message: 'Could not pick a new card' });
                 return;
             }
-            res.status(200).json({ message: 'New game started', cardName: targetCard.name });
+            // Gera um gameId único
+            const gameId = randomUUID();
+            games[gameId] = targetCard;
+            res.status(200).json({ message: 'New game started', cardName: targetCard.name, gameId });
         } catch (error) {
             res.status(500).json({ message: 'Error starting new game', error });
         }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Typography, Box, CircularProgress, Alert } from '@mui/material';
 
-export default function StartGame({ onGameStarted }: { onGameStarted: (cardName: string) => void }) {
+export default function StartGame({ onGameStarted }: { onGameStarted: (cardName: string, gameId: string) => void }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -14,7 +14,7 @@ export default function StartGame({ onGameStarted }: { onGameStarted: (cardName:
             });
             if (!response.ok) throw new Error('Erro ao iniciar novo jogo');
             const data = await response.json();
-            onGameStarted(data.cardName);
+            onGameStarted(data.cardName, data.gameId);
         } catch (err: any) {
             setError(err.message || 'Erro desconhecido');
         } finally {
