@@ -18,7 +18,6 @@ const getLabel = (status: string) => {
 };
 
 export function GuessHistory({ guesses }: { guesses: any[] }) {
-    if (!guesses.length) return null;
     // Mostra até 20 palpites
     const shownGuesses = guesses.slice(0, 20);
     // Função para mostrar legalidades principais e aplicar estratégia de parcialmente correta
@@ -65,9 +64,9 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
         );
     };
     return (
-    <Box mt={8} overflow="auto">
+        <Box mt={8} sx={{ overflowX: 'auto', width: '100%' }}>
             <h2>Histórico de palpites</h2>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{ minWidth: 1100 }}>
                 <Table size="small">
                     <TableHead>
                         <TableRow>
@@ -82,7 +81,7 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {shownGuesses.map((g, idx) => (
+                        {shownGuesses.length > 0 ? shownGuesses.map((g, idx) => (
                             <TableRow key={idx}>
                                 <TableCell style={{ fontWeight: 'bold' }}>{g.guessedCard?.name}</TableCell>
                                 <TableCell>
@@ -121,7 +120,13 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                                     {renderLegalities(g.guessedCard?.legalities || g.feedback?.legalities)}
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )) : (
+                            <TableRow>
+                                <TableCell colSpan={8} align="center" sx={{ color: 'text.secondary' }}>
+                                    Nenhum palpite ainda. Faça seu primeiro palpite!
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>

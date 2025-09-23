@@ -25,7 +25,7 @@ export default function StartGame({ onGameStarted }: { onGameStarted: (cardName:
     return (
         <Box display="flex" flexDirection="column" alignItems="center" gap={2} mt={8}>
             <Typography variant="h4" gutterBottom>
-                MTG Loldle
+                Guess the card
             </Typography>
             <Button variant="contained" color="primary" size="large" onClick={handleStart} disabled={loading}>
                 {loading ? <CircularProgress size={24} /> : 'Iniciar Novo Jogo'}
