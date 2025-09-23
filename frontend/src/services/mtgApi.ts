@@ -1,7 +1,6 @@
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://guesscard.onrender.com';
 
 export async function guessCard(cardName: string) {
-    const response = await fetch(`${BACKEND_URL}/api/guess`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/guess`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

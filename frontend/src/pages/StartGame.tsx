@@ -9,7 +9,7 @@ export default function StartGame({ onGameStarted }: { onGameStarted: (cardName:
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/new-game`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/new-game`, {
                 method: 'POST',
             });
             if (!response.ok) throw new Error('Erro ao iniciar novo jogo');
