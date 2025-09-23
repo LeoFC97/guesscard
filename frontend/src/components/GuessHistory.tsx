@@ -100,7 +100,7 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                             <TableCell>CMC</TableCell>
                             <TableCell>Edição</TableCell>
                             <TableCell>Raridade</TableCell>
-                            <TableCell>Legalidade</TableCell>
+                            {/* <TableCell>Legalidade</TableCell> */}
                             <TableCell>Artista</TableCell>
                         </TableRow>
                     </TableHead>
@@ -137,9 +137,7 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                                 <TableCell>
                                     <Chip label={(g.guessedCard?.rarity || '-') + ' ' + getLabel(g.feedback.rarity)} color={getColor(g.feedback.rarity)} size="small" sx={{ px: 0.5 }} />
                                 </TableCell>
-                                {/* <TableCell>
-                                    {renderLegalities(g.guessedCard?.legalities, g.feedback?.legalities)}
-                                </TableCell> */}
+                                {/* coluna Legalidade removida */}
                                 <TableCell>
                                     <Chip label={(g.guessedCard?.artist || '-') + ' ' + getLabel(g.feedback.artist)} color={getColor(g.feedback.artist)} size="small" sx={{ px: 0.5 }} />
                                 </TableCell>
