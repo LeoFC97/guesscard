@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
-import { Button, Typography, Box, CircularProgress, Alert } from '@mui/material';
+import { Button, Typography, Box, CircularProgress, Alert, ToggleButton, ToggleButtonGroup } from '@mui/material';
 
-export default function StartGame({ onGameStarted }: { onGameStarted: (cardName: string, gameId: string) => void }) {
+type StartGameProps = {
+    onGameStarted: (cardName: string, gameId: string) => void;
+};
+
+const StartGame: React.FC<StartGameProps> = ({ onGameStarted }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [loadingDaily, setLoadingDaily] = useState(false);
+    const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
 
     const handleStart = async () => {
         setLoading(true);
@@ -12,6 +17,8 @@ export default function StartGame({ onGameStarted }: { onGameStarted: (cardName:
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/api/new-game`, {
                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ difficulty }),
             });
             if (!response.ok) throw new Error('Erro ao iniciar novo jogo');
             const data = await response.json();
@@ -45,6 +52,16 @@ export default function StartGame({ onGameStarted }: { onGameStarted: (cardName:
             <Typography variant="h4" gutterBottom>
                 Guess the card
             </Typography>
+            <ToggleButtonGroup
+                value={difficulty}
+                exclusive
+                onChange={(_, value) => value && setDifficulty(value)}
+                sx={{ mb: 2 }}
+            >
+                <ToggleButton value="easy">Fácil</ToggleButton>
+                <ToggleButton value="medium">Intermediário</ToggleButton>
+                <ToggleButton value="hard">Difícil</ToggleButton>
+            </ToggleButtonGroup>
             <Button variant="contained" color="primary" size="large" onClick={handleStart} disabled={loading}>
                 {loading ? <CircularProgress size={24} /> : 'Iniciar Novo Jogo'}
             </Button>
@@ -54,4 +71,6 @@ export default function StartGame({ onGameStarted }: { onGameStarted: (cardName:
             {error && <Alert severity="error">{error}</Alert>}
         </Box>
     );
-}
+};
+
+export default StartGame;

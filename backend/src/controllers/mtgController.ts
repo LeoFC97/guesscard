@@ -365,18 +365,18 @@ export class MtgController {
             // Garante que guessedCard.legalities também seja da carta alvo
             guessedCard.legalities = feedback.legalities;
 
-            // Persistir partida se acertou
-            if (isCorrect) {
-                // Dados do usuário devem ser enviados pelo frontend
-                const { userId, name, email, attempts, timeSpent } = req.body;
-                try {
-                    const { saveMatch } = require('../match');
-                    saveMatch({ userId, name, email, cardName: targetCard.name, attempts, timeSpent });
-                } catch (err) {
-                    // loga erro mas não bloqueia resposta
-                    console.error('Erro ao salvar partida:', err);
-                }
-            }
+            // // Persistir partida se acertou
+            // if (isCorrect) {
+            //     // Dados do usuário devem ser enviados pelo frontend
+            //     const { userId, name, email, attempts, timeSpent } = req.body;
+            //     try {
+            //         const { saveMatch } = require('../match');
+            //         saveMatch({ userId, name, email, cardName: targetCard.name, attempts, timeSpent });
+            //     } catch (err) {
+            //         // loga erro mas não bloqueia resposta
+            //         console.error('Erro ao salvar partida:', err);
+            //     }
+            // }
 
             res.status(200).json({
                 feedback,
@@ -393,7 +393,23 @@ export class MtgController {
     // Novo endpoint para sortear uma nova carta
     public static async newGame(req: Request, res: Response): Promise<void> {
         try {
-            const targetCard = await pickRandomCard();
+            // Recebe dificuldade do body
+            const { difficulty } = req.body;
+            let cardList: string[];
+            // Importa listas de dificuldade
+            const { easyCards, mediumCards, hardCards } = require('../cardDifficulties');
+            if (difficulty === 'easy') {
+                cardList = easyCards;
+            } else if (difficulty === 'hard') {
+                cardList = hardCards;
+            } else {
+                cardList = mediumCards;
+            }
+            // Sorteia carta da lista
+            const randomIndex = Math.floor(Math.random() * cardList.length);
+            const cardName = cardList[randomIndex];
+            const cards = await mtgService.fetchCardByParam('name', cardName);
+            const targetCard = cards.length > 0 ? cards[0] : null;
             if (!targetCard) {
                 res.status(500).json({ message: 'Could not pick a new card' });
                 return;
