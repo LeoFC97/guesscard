@@ -5,9 +5,14 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 
+
 import App from './App';
 // Log do valor da variável de ambiente API_URL
 console.log('API_URL:', process.env.REACT_APP_API_URL);
+
+// Vercel Analytics
+import { inject } from '@vercel/analytics';
+inject();
 
 const theme = createTheme();
 
