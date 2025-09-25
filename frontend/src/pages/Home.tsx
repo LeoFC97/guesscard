@@ -5,7 +5,9 @@ import VictoryScreen from '../components/VictoryScreen';
 import { CardGuess } from '../components/CardGuess';
 import GuessHistory from '../components/GuessHistory';
 import StartGame from './StartGame';
-import { Container, Typography, Box } from '@mui/material';
+import { Container, Typography, Box, TextField } from '@mui/material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 const Home: React.FC = () => {
     React.useEffect(() => {
@@ -56,6 +58,31 @@ const Home: React.FC = () => {
         setEndTime(null);
     };
 
+    // Detecta modo Carta do Dia
+    const isDailyMode = gameId === 'daily';
+
+    // Calendário para modo diário
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+    const handleDateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const date = e.target.value;
+        setSelectedDate(new Date(date));
+        // Chama backend para buscar carta do dia específico
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/daily-game?date=${date}`);
+            const data = await response.json();
+            setTargetCard(data.cardName);
+            setGuesses([]);
+            setTextReady(null);
+            setTextShown(false);
+            setWrongCount(0);
+            setStartTime(Date.now());
+            setEndTime(null);
+        } catch {
+            // erro: não faz nada
+        }
+    };
+
     if (!gameStarted) {
         return <StartGame onGameStarted={handleGameStarted} />;
     }
@@ -88,56 +115,83 @@ const Home: React.FC = () => {
         if (!flavorReady) setFlavorReady('Nenhum flavor disponível para esta carta.');
     };
 
-    return (
-        <Container maxWidth="md" sx={{ py: 8 }}>
-            <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
-                <img src="https://gatherer.wizards.com/Handlers/Image.ashx?type=cardback" alt="MTG Card Back" style={{ width: 120, marginBottom: 12 }} />
-                <Typography variant="h3" align="center" color="primary" gutterBottom>
-                    Guess de Card
-                </Typography>
-            </Box>
-            <Box display="flex" gap={2} mb={2}>
-                <Tooltip
-                    title={wrongCount < 2 ? 'A dica de flavor ficará disponível após 2 erros' : ''}
-                    disableHoverListener={wrongCount >= 2}
-                >
-                    <span>
-                        <Button
-                            variant="outlined"
-                            color="secondary"
-                            onClick={handleFlavorHint}
-                            disabled={flavorShown || wrongCount < 2}
-                        >
-                            Mostrar Dica (Flavor)
-                        </Button>
-                    </span>
-                </Tooltip>
-                <Tooltip
-                    title={wrongCount < 5 ? 'A dica do efeito ficará disponível após 5 erros' : ''}
-                    disableHoverListener={wrongCount >= 5}
-                >
-                    <span>
-                        <Button
-                            variant="outlined"
-                            color="secondary"
-                            onClick={handleHint}
-                            disabled={textShown || wrongCount < 5}
-                        >
-                            Mostrar Dica (Efeito)
-                        </Button>
-                    </span>
-                </Tooltip>
-            </Box>
-            {flavorShown && flavorReady && (
-                <Alert severity="info" sx={{ mb: 2 }}>{flavorReady}</Alert>
-            )}
-            {textShown && textReady && (
-                <Alert severity="info" sx={{ mb: 2 }}>{textReady}</Alert>
-            )}
-            <CardGuess onGuess={handleGuess} gameId={gameId} />
-            <GuessHistory guesses={guesses} />
-        </Container>
-    );
-};
+    // Tela especial para modo Carta do Dia
+    if (isDailyMode) {
+        return (
+            <Container maxWidth="md" sx={{ py: 8 }}>
+                <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
+                    <Typography variant="h3" align="center" color="secondary" gutterBottom>
+                        Carta do Dia
+                    </Typography>
+                    <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                        Você está jogando o modo especial: Carta do Dia
+                    </Typography>
+                    <Box mt={2} mb={2}>
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                            Escolha uma data:
+                        </Typography>
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <DatePicker
+                                label="Data do desafio"
+                                value={selectedDate}
+                                onChange={(newValue: Date | null) => {
+                                    if (newValue) {
+                                        setSelectedDate(newValue);
+                                        const dateStr = newValue.toISOString().slice(0, 10);
+                                        handleDateChange({ target: { value: dateStr } } as any);
+                                    }
+                                }}
+                                slotProps={{ textField: { fullWidth: true } }}
+                            />
+                        </LocalizationProvider>
+                    </Box>
+                </Box>
+                <Box display="flex" gap={2} mb={2}>
+                    <Tooltip
+                        title={wrongCount < 2 ? 'A dica de flavor ficará disponível após 2 erros' : ''}
+                        disableHoverListener={wrongCount >= 2}
+                    >
+                        <span>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                onClick={handleFlavorHint}
+                                disabled={flavorShown || wrongCount < 2}
+                            >
+                                Mostrar Dica (Flavor)
+                            </Button>
+                        </span>
+                    </Tooltip>
+                    <Tooltip
+                        title={wrongCount < 5 ? 'A dica do efeito ficará disponível após 5 erros' : ''}
+                        disableHoverListener={wrongCount >= 5}
+                    >
+                        <span>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                onClick={handleHint}
+                                disabled={textShown || wrongCount < 5}
+                            >
+                                Mostrar Dica (Efeito)
+                            </Button>
+                        </span>
+                    </Tooltip>
+                </Box>
+                {flavorShown && flavorReady && (
+                    <Alert severity="info" sx={{ mb: 2 }}>{flavorReady}</Alert>
+                )}
+                {textShown && textReady && (
+                    <Alert severity="info" sx={{ mb: 2 }}>{textReady}</Alert>
+                )}
+                <CardGuess onGuess={handleGuess} gameId={gameId} />
+                <GuessHistory guesses={guesses} />
+            </Container>
+        );
+    }
+
+    // ...tela normal...
+    return null;
+}
 
 export default Home;

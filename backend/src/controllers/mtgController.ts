@@ -1,5 +1,9 @@
 // Mapeamento em memória para partidas: { [gameId]: targetCard }
 const games: Record<string, any> = {};
+// Modo diário: armazena carta do dia em memória
+
+let dailyCard: any = null;
+let dailyDate: string | null = null;
 
 
 import { Request, Response } from 'express';
@@ -179,6 +183,23 @@ export class MtgController {
         this.mtgService = new MtgService();
     }
 
+    // Endpoint para modo diário
+    public static async dailyGame(req: Request, res: Response): Promise<void> {
+        try {
+            // Sempre retorna Black Lotus como carta diária
+            const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
+            const cards = await mtgService.fetchCardByParam('name', 'Black Lotus');
+            const blackLotus = cards.length > 0 ? cards[0] : null;
+            if (!blackLotus) {
+                res.status(500).json({ message: 'Could not fetch Black Lotus' });
+                return;
+            }
+            res.status(200).json({ message: 'Daily game', cardName: blackLotus.name, date: today });
+        } catch (error) {
+            res.status(500).json({ message: 'Error starting daily game', error });
+        }
+    }
+
     public async getCard(req: Request, res: Response): Promise<void> {
         try {
             const cardName = req.params.name.trim();
@@ -196,10 +217,21 @@ export class MtgController {
                 res.status(400).json({ message: 'Missing or invalid gameId.' });
                 return;
             }
-            const targetCard = games[gameId];
-            if (!targetCard) {
-                res.status(400).json({ message: 'No game in progress for this gameId. Please start a new game.' });
-                return;
+            let targetCard;
+            if (gameId === 'daily') {
+                // Sempre retorna Black Lotus como carta do dia
+                const cards = await mtgService.fetchCardByParam('name', 'Black Lotus');
+                targetCard = cards.length > 0 ? cards[0] : null;
+                if (!targetCard) {
+                    res.status(500).json({ message: 'Could not fetch Black Lotus' });
+                    return;
+                }
+            } else {
+                targetCard = games[gameId];
+                if (!targetCard) {
+                    res.status(400).json({ message: 'No game in progress for this gameId. Please start a new game.' });
+                    return;
+                }
             }
             if (!guess || typeof guess !== 'string') {
                 res.status(400).json({ message: 'Guess must be a string (card name)' });
@@ -332,6 +364,20 @@ export class MtgController {
             }
             // Garante que guessedCard.legalities também seja da carta alvo
             guessedCard.legalities = feedback.legalities;
+
+            // Persistir partida se acertou
+            if (isCorrect) {
+                // Dados do usuário devem ser enviados pelo frontend
+                const { userId, name, email, attempts, timeSpent } = req.body;
+                try {
+                    const { saveMatch } = require('../match');
+                    saveMatch({ userId, name, email, cardName: targetCard.name, attempts, timeSpent });
+                } catch (err) {
+                    // loga erro mas não bloqueia resposta
+                    console.error('Erro ao salvar partida:', err);
+                }
+            }
+
             res.status(200).json({
                 feedback,
                 isCorrect,
