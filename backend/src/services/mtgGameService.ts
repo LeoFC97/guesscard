@@ -172,6 +172,10 @@ export async function processGuessCard(params: GuessCardParams) {
         } catch (err) {
             console.error('Erro ao salvar partida:', err);
         }
+        // Remove o gameId do objeto games para liberar memória
+        if (gameId !== 'daily' && games && games[gameId]) {
+            delete games[gameId];
+        }
     }
     // Modo diário: salvar partida diária (impede duplicidade pelo index)
     if (isCorrect && gameId === 'daily' && userId && name && email && typeof attempts === 'number' && typeof timeSpent === 'number') {
