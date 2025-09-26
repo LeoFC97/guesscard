@@ -1,3 +1,4 @@
+import { useDailyPlayedDates } from '../hooks/useDailyPlayedDates';
 
 import React, { useState } from 'react';
 import { Button, Alert, Tooltip } from '@mui/material';
@@ -6,10 +7,15 @@ import { CardGuess } from '../components/CardGuess';
 import GuessHistory from '../components/GuessHistory';
 import StartGame from './StartGame';
 import { Container, Typography, Box, TextField } from '@mui/material';
+
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { useUserInfo } from '../hooks/useUserInfo';
 
 const Home: React.FC = () => {
+    // Hooks de usuário devem ser chamados sempre no topo
+    const { userId, name, email } = useUserInfo();
+    const playedDates = useDailyPlayedDates(userId);
     React.useEffect(() => {
         console.log('API_URL:', process.env.REACT_APP_API_URL);
     }, []);
@@ -67,10 +73,14 @@ const Home: React.FC = () => {
     const handleDateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const date = e.target.value;
         setSelectedDate(new Date(date));
-        // Chama backend para buscar carta do dia específico
+        // Chama backend para buscar carta do dia específico, enviando userId
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/daily-game?date=${date}`);
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/daily-game?date=${date}&userId=${userId}`);
             const data = await response.json();
+            if (response.status === 403) {
+                alert(data.message || 'Você já jogou a daily desse dia!');
+                return;
+            }
             setTargetCard(data.cardName);
             setGuesses([]);
             setTextReady(null);
@@ -84,7 +94,7 @@ const Home: React.FC = () => {
     };
 
     if (!gameStarted) {
-        return <StartGame onGameStarted={handleGameStarted} />;
+        return <StartGame onGameStarted={handleGameStarted} userId={userId} name={name} email={email} />;
     }
     if (victory) {
         const attempts = guesses.length;
@@ -184,14 +194,78 @@ const Home: React.FC = () => {
                 {textShown && textReady && (
                     <Alert severity="info" sx={{ mb: 2 }}>{textReady}</Alert>
                 )}
-                <CardGuess onGuess={handleGuess} gameId={gameId} />
+                <CardGuess
+                    onGuess={handleGuess}
+                    gameId={gameId}
+                    userId={userId}
+                    name={name}
+                    email={email}
+                    attempts={guesses.length + 1}
+                    timeSpent={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
+                />
                 <GuessHistory guesses={guesses} />
             </Container>
         );
     }
 
-    // ...tela normal...
-    return null;
+        // Tela normal de jogo (não diário)
+        return (
+            <Container maxWidth="md" sx={{ py: 8 }}>
+                <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
+                    <Typography variant="h3" align="center" color="primary" gutterBottom>
+                        Adivinhe a carta!
+                    </Typography>
+                </Box>
+                <Box display="flex" gap={2} mb={2}>
+                    <Tooltip
+                        title={wrongCount < 2 ? 'A dica de flavor ficará disponível após 2 erros' : ''}
+                        disableHoverListener={wrongCount >= 2}
+                    >
+                        <span>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                onClick={handleFlavorHint}
+                                disabled={flavorShown || wrongCount < 2}
+                            >
+                                Mostrar Dica (Flavor)
+                            </Button>
+                        </span>
+                    </Tooltip>
+                    <Tooltip
+                        title={wrongCount < 5 ? 'A dica do efeito ficará disponível após 5 erros' : ''}
+                        disableHoverListener={wrongCount >= 5}
+                    >
+                        <span>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                onClick={handleHint}
+                                disabled={textShown || wrongCount < 5}
+                            >
+                                Mostrar Dica (Efeito)
+                            </Button>
+                        </span>
+                    </Tooltip>
+                </Box>
+                {flavorShown && flavorReady && (
+                    <Alert severity="info" sx={{ mb: 2 }}>{flavorReady}</Alert>
+                )}
+                {textShown && textReady && (
+                    <Alert severity="info" sx={{ mb: 2 }}>{textReady}</Alert>
+                )}
+                <CardGuess
+                    onGuess={handleGuess}
+                    gameId={gameId}
+                    userId={userId}
+                    name={name}
+                    email={email}
+                    attempts={guesses.length + 1}
+                    timeSpent={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
+                />
+                <GuessHistory guesses={guesses} />
+            </Container>
+        );
 }
 
 export default Home;

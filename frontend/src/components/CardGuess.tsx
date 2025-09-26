@@ -3,7 +3,17 @@ import { guessCard } from '../services/mtgApi';
 import { fetchCardNames } from '../services/mtgAutocomplete';
 import { Box, Button, Stack, Autocomplete, TextField } from '@mui/material';
 
-export function CardGuess({ onGuess, gameId }: { onGuess: (result: any) => void, gameId: string | null }) {
+type CardGuessProps = {
+  onGuess: (result: any) => void;
+  gameId: string | null;
+  userId: string;
+  name: string;
+  email: string;
+  attempts: number;
+  timeSpent: number;
+};
+
+export function CardGuess({ onGuess, gameId, userId, name, email, attempts, timeSpent }: CardGuessProps) {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState<string[]>([]);
@@ -29,7 +39,7 @@ export function CardGuess({ onGuess, gameId }: { onGuess: (result: any) => void,
         }
         setLoading(true);
         try {
-            const data = await guessCard(input, gameId);
+            const data = await guessCard(input, gameId, userId, name, email, attempts, timeSpent);
             onGuess(data);
             setInput('');
         } catch (err) {

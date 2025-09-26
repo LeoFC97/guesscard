@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { inject } from '@vercel/analytics';
+
 
 
 
@@ -11,7 +13,6 @@ import App from './App';
 console.log('API_URL:', process.env.REACT_APP_API_URL);
 
 // Vercel Analytics
-import { inject } from '@vercel/analytics';
 inject();
 
 const theme = createTheme();
