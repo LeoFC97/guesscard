@@ -10,12 +10,19 @@ import { Container, Typography, Box, TextField } from '@mui/material';
 
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { useUserInfo } from '../hooks/useUserInfo';
+// Removido useUserInfo, centralizado no contexto Auth0
 
-const Home: React.FC = () => {
-    // Hooks de usuário devem ser chamados sempre no topo
-    const { userId, name, email } = useUserInfo();
+import { useAuth0 } from '@auth0/auth0-react';
+// Novo fluxo: recebe dados do App via props
+interface HomeProps {
+    userId: string;
+    name: string;
+    email: string;
+}
+
+const Home: React.FC<HomeProps> = ({ userId, name, email }) => {
     const playedDates = useDailyPlayedDates(userId);
+
     React.useEffect(() => {
         console.log('API_URL:', process.env.REACT_APP_API_URL);
     }, []);
@@ -50,6 +57,11 @@ const Home: React.FC = () => {
             setVictory(true);
             setEndTime(Date.now());
         }
+        setTextReady(null);
+        setTextShown(false);
+        setWrongCount(0);
+        setStartTime(Date.now());
+        setEndTime(null);
     };
 
     const handleGameStarted = (cardName: string, gameId: string) => {
@@ -94,6 +106,9 @@ const Home: React.FC = () => {
     };
 
     if (!gameStarted) {
+        if (!userId) {
+            return <Box display="flex" alignItems="center" justifyContent="center" minHeight={300}><span>Carregando usuário...</span></Box>;
+        }
         return <StartGame onGameStarted={handleGameStarted} userId={userId} name={name} email={email} />;
     }
     if (victory) {
@@ -115,10 +130,10 @@ const Home: React.FC = () => {
         />;
     }
 
-    const handleHint = () => {
-        setTextShown(true);
-        if (!textReady) setTextReady('Nenhum texto disponível para esta carta.');
-    };
+const handleHint = () => {
+    setTextShown(true);
+    if (!textReady) setTextReady('Nenhum texto disponível para esta carta.');
+};
 
     const handleFlavorHint = () => {
         setFlavorShown(true);
