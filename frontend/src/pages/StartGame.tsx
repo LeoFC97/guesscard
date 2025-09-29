@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { Button, Typography, Box, CircularProgress, Alert, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { PickersDay } from '@mui/x-date-pickers/PickersDay';
+import CheckIcon from '@mui/icons-material/Check';
+import { useDailyPlayedDates } from '../hooks/useDailyPlayedDates';
 
 
 type StartGameProps = {
@@ -14,6 +19,8 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
     const [error, setError] = useState<string | null>(null);
     const [loadingDaily, setLoadingDaily] = useState(false);
     const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    const playedDates = useDailyPlayedDates(userId);
 
     const handleStart = async () => {
         setLoading(true);
@@ -35,35 +42,80 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
     };
 
     // Função para obter a data local do usuário no formato yyyy-mm-dd
-    function getLocalDateStr() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
+    function getLocalDateStr(date?: Date) {
+        const targetDate = date || new Date();
+        const year = targetDate.getFullYear();
+        const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+        const day = String(targetDate.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
+
+    // Função para renderizar dias customizados com check
+    const renderCustomDay = (date: any, selectedDates: any, pickersDayProps: any) => {
+        if (!date || typeof date.getFullYear !== 'function') {
+            return <PickersDay {...pickersDayProps} />;
+        }
+        
+        const dateStr = getLocalDateStr(date);
+        const hasPlayed = playedDates.includes(dateStr);
+        
+        return (
+            <Box position="relative" display="inline-block">
+                <PickersDay {...pickersDayProps} />
+                {hasPlayed && (
+                    <Box
+                        position="absolute"
+                        top={-2}
+                        right={-2}
+                        sx={{
+                            backgroundColor: '#00e676',
+                            borderRadius: '50%',
+                            width: 16,
+                            height: 16,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 1
+                        }}
+                    >
+                        <CheckIcon sx={{ fontSize: 10, color: '#fff' }} />
+                    </Box>
+                )}
+            </Box>
+        );
+    };
+
+
 
     const handleStartDaily = async () => {
         setLoadingDaily(true);
         setError(null);
         try {
-            const todayStr = getLocalDateStr();
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/daily-game?userId=${encodeURIComponent(userId)}&date=${todayStr}`);
+            const selectedDateStr = getLocalDateStr(selectedDate);
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/daily-game?userId=${encodeURIComponent(userId)}&date=${selectedDateStr}`);
             const data = await response.json();
+            
             if (!response.ok) {
-                setError(data.message || 'Erro ao iniciar modo diário');
+                if (response.status === 403) {
+                    setError(`Você já jogou a carta do dia ${selectedDateStr}. Escolha uma data diferente.`);
+                } else if (response.status === 404) {
+                    setError(`Nenhuma carta foi definida para o dia ${selectedDateStr}.`);
+                } else {
+                    setError(data.message || 'Erro ao iniciar modo diário');
+                }
                 return;
             }
-            // gameId pode ser null ou vazio, pois não é usado no modo diário
-            onGameStarted(data.cardName, 'daily');
+            
+            // Usa o gameId retornado pelo backend que inclui a data (daily-YYYY-MM-DD)
+            const gameId = data.gameId || 'daily';
+            onGameStarted(data.cardName, gameId);
         } catch (err: any) {
-            setError(err.message || 'Erro desconhecido');
+            setError('Erro de conexão. Verifique sua internet e tente novamente.');
         } finally {
             setLoadingDaily(false);
         }
     };
 
-    const todayStr = getLocalDateStr();
     return (
         <Box display="flex" flexDirection="column" alignItems="center" gap={2} mt={8}>
             <Typography variant="h4" gutterBottom>
@@ -82,8 +134,38 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
             <Button variant="contained" color="primary" size="large" onClick={handleStart} disabled={loading}>
                 {loading ? <CircularProgress size={24} /> : 'Iniciar Novo Jogo'}
             </Button>
+            
+            <Box sx={{ mt: 3, mb: 2, textAlign: 'center' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>
+                    Modo Carta do Dia
+                </Typography>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Escolha uma data para jogar:
+                </Typography>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DatePicker
+                        label="Data do desafio"
+                        value={selectedDate}
+                        onChange={(newValue: Date | null) => {
+                            if (newValue) {
+                                setSelectedDate(newValue);
+                            }
+                        }}
+                        slots={{
+                            day: (dayProps: any) => renderCustomDay(dayProps.day, [], dayProps)
+                        }}
+                        slotProps={{ 
+                            textField: { 
+                                fullWidth: false,
+                                sx: { maxWidth: 250, mb: 2 }
+                            }
+                        }}
+                    />
+                </LocalizationProvider>
+            </Box>
+            
             <Button variant="outlined" color="secondary" size="large" onClick={handleStartDaily} disabled={loadingDaily}>
-                {loadingDaily ? <CircularProgress size={24} /> : `Carta do dia (${todayStr})`}
+                {loadingDaily ? <CircularProgress size={24} /> : `Jogar carta do dia (${getLocalDateStr(selectedDate)})`}
             </Button>
             {error && (
                 <Box

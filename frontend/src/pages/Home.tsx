@@ -1,4 +1,3 @@
-import { useDailyPlayedDates } from '../hooks/useDailyPlayedDates';
 
 import React, { useState } from 'react';
 import { Button, Alert, Tooltip } from '@mui/material';
@@ -9,10 +8,7 @@ import VictoryScreen from '../components/VictoryScreen';
 import { CardGuess } from '../components/CardGuess';
 import GuessHistory from '../components/GuessHistory';
 import StartGame from './StartGame';
-import { Container, Typography, Box, TextField } from '@mui/material';
-
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { Container, Typography, Box } from '@mui/material';
 // Removido useUserInfo, centralizado no contexto Auth0
 
 import { useAuth0 } from '@auth0/auth0-react';
@@ -37,7 +33,6 @@ const ThemeToggle: React.FC<{ themeMode: 'light' | 'dark'; setThemeMode: React.D
     </Tooltip>
 );
 const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMode }) => {
-    const playedDates = useDailyPlayedDates(userId);
 
     React.useEffect(() => {
         console.log('API_URL:', process.env.REACT_APP_API_URL);
@@ -93,33 +88,9 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     };
 
     // Detecta modo Carta do Dia
-    const isDailyMode = gameId === 'daily';
+    const isDailyMode = gameId === 'daily' || (gameId && gameId.startsWith('daily-'));
 
-    // Calendário para modo diário
-    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-    const handleDateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const date = e.target.value;
-        setSelectedDate(new Date(date));
-        // Chama backend para buscar carta do dia específico, enviando userId
-        try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/daily-game?date=${date}&userId=${userId}`);
-            const data = await response.json();
-            if (response.status === 403) {
-                alert(data.message || 'Você já jogou a daily desse dia!');
-                return;
-            }
-            setTargetCard(data.cardName);
-            setGuesses([]);
-            setTextReady(null);
-            setTextShown(false);
-            setWrongCount(0);
-            setStartTime(Date.now());
-            setEndTime(null);
-        } catch {
-            // erro: não faz nada
-        }
-    };
 
     if (!gameStarted) {
         if (!userId) {
@@ -167,25 +138,7 @@ const handleHint = () => {
                     <Typography variant="subtitle1" color="text.secondary" gutterBottom>
                         Você está jogando o modo especial: Carta do Dia
                     </Typography>
-                    <Box mt={2} mb={2}>
-                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                            Escolha uma data:
-                        </Typography>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                            <DatePicker
-                                label="Data do desafio"
-                                value={selectedDate}
-                                onChange={(newValue: Date | null) => {
-                                    if (newValue) {
-                                        setSelectedDate(newValue);
-                                        const dateStr = newValue.toISOString().slice(0, 10);
-                                        handleDateChange({ target: { value: dateStr } } as any);
-                                    }
-                                }}
-                                slotProps={{ textField: { fullWidth: true } }}
-                            />
-                        </LocalizationProvider>
-                    </Box>
+
                 </Box>
                 <Box display="flex" gap={2} mb={2}>
                     <Tooltip

@@ -109,7 +109,7 @@ export class MtgController {
                 res.status(500).json({ message: 'Could not fetch card for this day' });
                 return;
             }
-            res.status(200).json({ message: 'Daily game', cardName: card.name, date: dateStr });
+            res.status(200).json({ message: 'Daily game', cardName: card.name, date: dateStr, gameId: `daily-${dateStr}` });
         } catch (error) {
             res.status(500).json({ message: 'Error starting daily game', error });
         }

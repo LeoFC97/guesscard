@@ -34,11 +34,18 @@ export async function processGuessCard(params: GuessCardParams) {
         name = email || 'Usuário';
     }
     let targetCard;
-    if (gameId === 'daily') {
-        const today = new Date().toISOString().slice(0, 10);
-        const dailyCard = await dailyCardRepo.getDailyCard(today);
+    if (gameId === 'daily' || gameId.startsWith('daily-')) {
+        // Extrai a data do gameId (daily-YYYY-MM-DD) ou usa hoje como fallback
+        let gameDate: string;
+        if (gameId.startsWith('daily-') && gameId.length === 16) {
+            gameDate = gameId.substring(6); // Remove "daily-" prefix
+        } else {
+            gameDate = new Date().toISOString().slice(0, 10);
+        }
+        
+        const dailyCard = await dailyCardRepo.getDailyCard(gameDate);
         if (!dailyCard) {
-            throw new Error('No daily card set for today.');
+            throw new Error(`No daily card set for ${gameDate}.`);
         }
         const cards = await mtgService.fetchCardByParam('name', dailyCard.cardName);
         targetCard = cards.length > 0 ? cards[0] : null;
@@ -46,11 +53,11 @@ export async function processGuessCard(params: GuessCardParams) {
             throw new Error(`Could not fetch card: ${dailyCard.cardName}`);
         }
 
-        // Checa se já jogou a daily hoje
+        // Checa se já jogou a daily nesta data específica
         if (userId && typeof userId === 'string') {
-            const alreadyPlayed = await dailyMatchRepo.findByUserAndDate(userId, today);
+            const alreadyPlayed = await dailyMatchRepo.findByUserAndDate(userId, gameDate);
             if (alreadyPlayed) {
-                throw new Error('Você já jogou a daily de hoje.');
+                throw new Error(`Você já jogou a daily de ${gameDate}.`);
             }
         }
     } else {
@@ -179,15 +186,21 @@ export async function processGuessCard(params: GuessCardParams) {
             console.error('Erro ao salvar partida:', err);
         }
         // Remove o gameId do objeto games para liberar memória
-        if (gameId !== 'daily' && games && games[gameId]) {
+        if (gameId !== 'daily' && !gameId.startsWith('daily-') && games && games[gameId]) {
             delete games[gameId];
         }
     }
     // Modo diário: salvar partida diária (impede duplicidade pelo index)
-    if (isCorrect && gameId === 'daily' && userId && name && email && typeof attempts === 'number' && typeof timeSpent === 'number') {
+    if (isCorrect && (gameId === 'daily' || gameId.startsWith('daily-')) && userId && name && email && typeof attempts === 'number' && typeof timeSpent === 'number') {
         try {
-            const today = new Date().toISOString().slice(0, 10);
-            await dailyMatchRepo.saveDailyMatch({ userId, name, email, date: today, cardName: targetCard.name, attempts, timeSpent });
+            // Extrai a data do gameId ou usa hoje
+            let gameDate: string;
+            if (gameId.startsWith('daily-') && gameId.length === 16) {
+                gameDate = gameId.substring(6);
+            } else {
+                gameDate = new Date().toISOString().slice(0, 10);
+            }
+            await dailyMatchRepo.saveDailyMatch({ userId, name, email, date: gameDate, cardName: targetCard.name, attempts, timeSpent });
         } catch (err: any) {
             if (err.code === 11000) {
                 // Duplicate key error: já jogou
