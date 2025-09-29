@@ -71,8 +71,11 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         }
         setTextReady(null);
         setTextShown(false);
-        setStartTime(Date.now());
-        setEndTime(null);
+        // Só reseta o tempo se não foi vitória
+        if (!result.isCorrect) {
+            setStartTime(Date.now());
+            setEndTime(null);
+        }
     };
 
     const handleGameStarted = (cardName: string, gameId: string) => {

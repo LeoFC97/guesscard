@@ -129,15 +129,51 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                                                                             )}
                                                                                                         </span>
                                                                                                     </td>
-                                                                                                    <td><span><Chip label={getLabel(g.feedback.type)} color={getColor(g.feedback.type)} size="small" sx={{ bgcolor: getColor(g.feedback.type) === 'success' ? '#388e3c' : getColor(g.feedback.type) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
-                                                                                                    <td><span><Chip label={getLabel(g.feedback.cmc)} color={getColor(g.feedback.cmc)} size="small" sx={{ bgcolor: getColor(g.feedback.cmc) === 'success' ? '#388e3c' : getColor(g.feedback.cmc) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
+                                                                                                    <td>
+                                                                                                        <span>
+                                                                                                            <Chip 
+                                                                                                                label={`${g.guessedCard?.type || '-'} ${getLabel(g.feedback.type)}`} 
+                                                                                                                color={getColor(g.feedback.type)} 
+                                                                                                                size="small" 
+                                                                                                                sx={{ bgcolor: getColor(g.feedback.type) === 'success' ? '#388e3c' : getColor(g.feedback.type) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} 
+                                                                                                            />
+                                                                                                        </span>
+                                                                                                    </td>
+                                                                                                    <td>
+                                                                                                        <span>
+                                                                                                            <Chip 
+                                                                                                                label={`${g.guessedCard?.cmc || 0} ${getLabel(g.feedback.cmc)}`} 
+                                                                                                                color={getColor(g.feedback.cmc)} 
+                                                                                                                size="small" 
+                                                                                                                sx={{ bgcolor: getColor(g.feedback.cmc) === 'success' ? '#388e3c' : getColor(g.feedback.cmc) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} 
+                                                                                                            />
+                                                                                                        </span>
+                                                                                                    </td>
                                                                                                       <td><span><Chip label={`${g.guessedCard?.setName || '-'} ${getLabel(g.feedback.edition)}`} color={getColor(g.feedback.edition)} size="small" sx={{ bgcolor: getColor(g.feedback.edition) === 'success' ? '#388e3c' : getColor(g.feedback.edition) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
-                                                                                                      <td><span><Chip label={getLabel(g.feedback.rarity)} color={getColor(g.feedback.rarity)} size="small" sx={{ bgcolor: getColor(g.feedback.rarity) === 'success' ? '#388e3c' : getColor(g.feedback.rarity) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
+                                                                                                      <td>
+                                                                                                            <span>
+                                                                                                                <Chip 
+                                                                                                                    label={`${g.guessedCard?.rarity || '-'} ${getLabel(g.feedback.rarity)}`} 
+                                                                                                                    color={getColor(g.feedback.rarity)} 
+                                                                                                                    size="small" 
+                                                                                                                    sx={{ bgcolor: getColor(g.feedback.rarity) === 'success' ? '#388e3c' : getColor(g.feedback.rarity) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} 
+                                                                                                                />
+                                                                                                            </span>
+                                                                                                        </td>
                                                                                                       <td><span><Chip label={`${g.guessedCard?.artist || '-'} ${getLabel(g.feedback.artist)}`} color={getColor(g.feedback.artist)} size="small" sx={{ bgcolor: getColor(g.feedback.artist) === 'success' ? '#388e3c' : getColor(g.feedback.artist) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
                                                                                                 </tr>
-                                                                                                <tr aria-hidden="true" style={{ height: 2 }}>
-                                                                                                    <td colSpan={7} style={{ background: 'rgba(0,0,0,0.06)', height: 2, padding: 0, border: 'none' }} />
-                                                                                                </tr>
+                                                                                                {idx < shownGuesses.length - 1 && (
+                                                                                                    <tr aria-hidden="true" style={{ height: 8 }}>
+                                                                                                        <td colSpan={7} style={{ 
+                                                                                                            background: 'linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 100%)', 
+                                                                                                            height: 8, 
+                                                                                                            padding: 0, 
+                                                                                                            border: 'none',
+                                                                                                            borderTop: '1px solid rgba(255,255,255,0.2)',
+                                                                                                            borderBottom: '1px solid rgba(255,255,255,0.1)'
+                                                                                                        }} />
+                                                                                                    </tr>
+                                                                                                )}
                                                                                             </>
                                         )) : (
                                             <tr>

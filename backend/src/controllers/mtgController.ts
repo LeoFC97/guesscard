@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
-import { MtgService } from '../services/mtgService';
+import { ScryfallService } from '../services/scryfallService';
 import matchRepo from '../repositories/matchRepository';
 import dailyMatchRepo from '../repositories/dailyMatchRepository';
 import dailyCardRepo from '../repositories/dailyCardRepository';
@@ -45,10 +45,10 @@ export interface CardInfo {
 }
 
 export class MtgController {
-    private mtgService: MtgService;
+    private scryfallService: ScryfallService;
 
     constructor() {
-        this.mtgService = new MtgService();
+        this.scryfallService = new ScryfallService();
     }
 
     // Endpoint: GET /api/user-stats/:userId
@@ -103,8 +103,8 @@ export class MtgController {
                 res.status(404).json({ message: 'Nenhuma carta definida para este dia.' });
                 return;
             }
-            const cards = await (new MtgService()).fetchCardByParam('name', dailyCardDoc.cardName);
-            const card = cards.length > 0 ? cards[0] : null;
+            const cards = await (new ScryfallService()).fetchCardByParam('name', dailyCardDoc.cardName);
+            const card = cards.length > 0 ? (new ScryfallService()).convertToLegacyFormat(cards[0]) : null;
             if (!card) {
                 res.status(500).json({ message: 'Could not fetch card for this day' });
                 return;
@@ -118,7 +118,8 @@ export class MtgController {
     public async getCard(req: Request, res: Response): Promise<void> {
         try {
             const cardName = req.params.name.trim();
-            const card = await this.mtgService.fetchCardByParam("name", cardName);
+            const cards = await this.scryfallService.fetchCardByParam("name", cardName);
+            const card = cards.map(c => this.scryfallService.convertToLegacyFormat(c));
             res.status(200).json(card);
         } catch (error) {
             res.status(500).json({ message: 'Error fetching card', error });
@@ -180,8 +181,8 @@ export class MtgController {
             }
             const randomIndex = Math.floor(Math.random() * cardList.length);
             const cardName = cardList[randomIndex];
-            const cards = await (new MtgService()).fetchCardByParam('name', cardName);
-            const targetCard = cards.length > 0 ? cards[0] : null;
+            const cards = await (new ScryfallService()).fetchCardByParam('name', cardName);
+            const targetCard = cards.length > 0 ? (new ScryfallService()).convertToLegacyFormat(cards[0]) : null;
             if (!targetCard) {
                 res.status(500).json({ message: 'Could not pick a new card' });
                 return;

@@ -2,9 +2,9 @@ import dailyMatchRepo from '../repositories/dailyMatchRepository';
 import dailyCardRepo from '../repositories/dailyCardRepository';
 import { maskCardNameInText } from '../utils/textUtils';
 import matchRepo from '../repositories/matchRepository';
-import { MtgService } from './mtgService';
+import { ScryfallService } from './scryfallService';
 
-const mtgService = new MtgService();
+const scryfallService = new ScryfallService();
 
 export interface CardInfo {
     colors: string[];
@@ -47,8 +47,8 @@ export async function processGuessCard(params: GuessCardParams) {
         if (!dailyCard) {
             throw new Error(`No daily card set for ${gameDate}.`);
         }
-        const cards = await mtgService.fetchCardByParam('name', dailyCard.cardName);
-        targetCard = cards.length > 0 ? cards[0] : null;
+        const cards = await scryfallService.fetchCardByParam('name', dailyCard.cardName);
+        targetCard = cards.length > 0 ? scryfallService.convertToLegacyFormat(cards[0]) : null;
         if (!targetCard) {
             throw new Error(`Could not fetch card: ${dailyCard.cardName}`);
         }
@@ -69,8 +69,8 @@ export async function processGuessCard(params: GuessCardParams) {
     if (!guess || typeof guess !== 'string') {
         throw new Error('Guess must be a string (card name)');
     }
-    const guessedCards = await mtgService.fetchCardByParam('name', guess);
-    const guessedCard = guessedCards[0];
+    const guessedCards = await scryfallService.fetchCardByParam('name', guess);
+    const guessedCard = guessedCards.length > 0 ? scryfallService.convertToLegacyFormat(guessedCards[0]) : null;
     if (!guessedCard) {
         throw new Error('Guessed card not found');
     }
@@ -101,14 +101,31 @@ export async function processGuessCard(params: GuessCardParams) {
             feedback.colors = 'incorrect';
         }
     }
-    // Tipo
+    // Tipo - melhorada para detectar tipos principais e subtipos
     if (guessedCard.type && typeof guessedCard.type === 'string') {
         if (guessedCard.type === targetInfo.type) {
             feedback.type = 'correct';
-        } else if (guessedCard.type.includes(targetInfo.type) || targetInfo.type.includes(guessedCard.type)) {
-            feedback.type = 'partial';
         } else {
-            feedback.type = 'incorrect';
+            // Normaliza os tipos (remove acentos, lowercase, etc.)
+            const guessedType = guessedCard.type.toLowerCase().trim();
+            const targetType = targetInfo.type.toLowerCase().trim();
+            
+            // Lista de tipos principais de Magic
+            const mainTypes = ['artifact', 'creature', 'enchantment', 'instant', 'land', 'planeswalker', 'sorcery', 'tribal'];
+            
+            // Verifica se ambas as cartas compartilham pelo menos um tipo principal
+            const guessedMainTypes = mainTypes.filter(type => guessedType.includes(type));
+            const targetMainTypes = mainTypes.filter(type => targetType.includes(type));
+            
+            const hasMatchingMainType = guessedMainTypes.some(type => targetMainTypes.includes(type));
+            
+            if (hasMatchingMainType) {
+                feedback.type = 'partial';
+            } else if (guessedCard.type.includes(targetInfo.type) || targetInfo.type.includes(guessedCard.type)) {
+                feedback.type = 'partial';
+            } else {
+                feedback.type = 'incorrect';
+            }
         }
     } else {
         feedback.type = 'incorrect';
@@ -129,14 +146,23 @@ export async function processGuessCard(params: GuessCardParams) {
     }
     // Raridade
     const rarityOrder = ['Common', 'Uncommon', 'Rare', 'Mythic Rare'];
-    const guessedRarityIndex = rarityOrder.indexOf(guessedCard.rarity);
-    const targetRarityIndex = rarityOrder.indexOf(targetInfo.rarity);
+    
+    // Normaliza raridades (Scryfall usa "Mythic" mas queremos "Mythic Rare")
+    const normalizeRarity = (rarity: string) => {
+        if (rarity === 'Mythic') return 'Mythic Rare';
+        return rarity;
+    };
+    
+    const guessedRarityIndex = rarityOrder.indexOf(normalizeRarity(guessedCard.rarity));
+    const targetRarityIndex = rarityOrder.indexOf(normalizeRarity(targetInfo.rarity));
     if (guessedCard.rarity === targetInfo.rarity) {
         feedback.rarity = 'correct';
     } else if (guessedRarityIndex > -1 && targetRarityIndex > -1) {
-        if (guessedRarityIndex > targetRarityIndex) {
+        if (guessedRarityIndex < targetRarityIndex) {
+            // Carta palpite é menos rara que a correta -> precisa de mais rara (seta para cima)
             feedback.rarity = 'more rare';
-        } else if (guessedRarityIndex < targetRarityIndex) {
+        } else if (guessedRarityIndex > targetRarityIndex) {
+            // Carta palpite é mais rara que a correta -> precisa de menos rara (seta para baixo)
             feedback.rarity = 'less rare';
         } else {
             feedback.rarity = 'incorrect';
@@ -157,7 +183,7 @@ export async function processGuessCard(params: GuessCardParams) {
         feedback.artist = 'incorrect';
     }
     // Verifica se acertou
-    const isCorrect = mtgService.validateGuess(guessedCard.name, targetCard.name);
+    const isCorrect = scryfallService.validateGuess(guessedCard.name, targetCard.name);
     feedback.text = maskCardNameInText(targetCard.text, targetCard.name);
     feedback.flavor = typeof targetCard.flavor === 'string' ? targetCard.flavor : undefined;
     // Legalities
