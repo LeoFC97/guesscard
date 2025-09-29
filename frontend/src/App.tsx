@@ -1,17 +1,125 @@
 import React, { useState } from 'react';
-import { Auth0Provider } from '@auth0/auth0-react';
 import Home from './pages/Home';
-import { IconButton, Dialog, Box } from '@mui/material';
+import { Dialog, Box } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MeuPerfil from './components/MeuPerfil';
+import { ThemeProvider, createTheme, CssBaseline, IconButton, Tooltip } from '@mui/material';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Login from './components/Login';
-import { useAuth0 } from '@auth0/auth0-react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
+const getTheme = (mode: 'light' | 'dark') => createTheme({
+    palette: {
+        mode,
+        background: {
+            default: mode === 'dark' ? '#181c24' : '#f5f5f5',
+            paper: mode === 'dark' ? '#23283a' : '#fff',
+        },
+        primary: {
+            main: mode === 'dark' ? '#a78bfa' : '#1976d2', // lilás mais claro
+            contrastText: '#fff',
+        },
+        secondary: {
+            main: mode === 'dark' ? '#ffd54f' : '#ff9800',
+            contrastText: mode === 'dark' ? '#23283a' : '#fff',
+        },
+        error: {
+            main: '#ff1744',
+            contrastText: '#fff',
+        },
+        success: {
+            main: '#00e676',
+            contrastText: '#fff',
+        },
+        warning: {
+            main: '#ffeb3b',
+            contrastText: '#23283a',
+        },
+        info: {
+            main: '#29b6f6',
+            contrastText: '#fff',
+        },
+        text: {
+            primary: mode === 'dark' ? '#e0e0e0' : '#23283a',
+            secondary: mode === 'dark' ? '#bdbdbd' : '#555',
+        },
+    },
+    typography: {
+        fontFamily: 'Montserrat, Roboto, Arial',
+        h5: { fontWeight: 700, color: mode === 'dark' ? '#fff' : '#23283a' },
+        h6: { fontWeight: 600, color: mode === 'dark' ? '#fff' : '#23283a' },
+        subtitle1: { color: mode === 'dark' ? '#fff' : '#23283a' },
+        subtitle2: { color: mode === 'dark' ? '#bdbdbd' : '#555' },
+    },
+    components: {
+        MuiChip: {
+            styleOverrides: {
+                root: {
+                    fontWeight: 600,
+                    fontSize: '1rem',
+                    color: '#fff',
+                },
+                colorSuccess: {
+                    backgroundColor: '#00e676',
+                    color: '#fff',
+                },
+                colorError: {
+                    backgroundColor: '#ff1744',
+                    color: '#fff',
+                },
+                colorWarning: {
+                    backgroundColor: '#ffeb3b',
+                    color: '#23283a',
+                },
+                colorInfo: {
+                    backgroundColor: '#29b6f6',
+                    color: '#fff',
+                },
+            },
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    fontWeight: 700,
+                    borderRadius: 8,
+                },
+            },
+        },
+        MuiTableCell: {
+            styleOverrides: {
+                head: {
+                    color: mode === 'dark' ? '#fff' : '#23283a',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                },
+                body: {
+                    color: mode === 'dark' ? '#e0e0e0' : '#23283a',
+                },
+            },
+        },
+        MuiOutlinedInput: {
+            styleOverrides: {
+                root: {
+                    background: mode === 'dark' ? '#23283a' : '#fff',
+                    color: mode === 'dark' ? '#fff' : '#23283a',
+                    borderRadius: 8,
+                },
+                notchedOutline: {
+                    borderColor: mode === 'dark' ? '#7c4dff' : '#1976d2',
+                },
+            },
+        },
+    },
+});
 
 const domain = process.env.REACT_APP_AUTH0_DOMAIN || '';
 const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID || '';
 
 const App: React.FC = () => {
+    // Estado do tema
+    const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
+    const theme = getTheme(themeMode);
     // Se guest, não persiste no localStorage
     const getInitial = (key: string) => {
         const value = localStorage.getItem(key);
@@ -56,40 +164,78 @@ const App: React.FC = () => {
         }, [perfilOpen, userId, token]);
     // Renderiza tela de login se não estiver logado
     if (!token || !userId) {
-        return <Login onLoginSuccess={handleLoginSuccess} />;
+        return (
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <Box minHeight="100vh" sx={{
+                    background: themeMode === 'dark'
+                        ? 'linear-gradient(135deg, #23283a 0%, #181c24 100%)'
+                        : 'linear-gradient(135deg, #e3e6f3 0%, #f5f5f5 100%)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
+                }}>
+                    <Tooltip title={themeMode === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+                        <IconButton
+                            sx={{ position: 'absolute', top: 16, right: 24, zIndex: 2100 }}
+                            color="secondary"
+                            onClick={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')}
+                        >
+                            {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+                        </IconButton>
+                    </Tooltip>
+                    <Login onLoginSuccess={handleLoginSuccess} />
+                </Box>
+            </ThemeProvider>
+        );
     }
 
     // Renderiza botão de perfil e modal apenas se usuário estiver logado e não for guest
     const isGuest = userId === 'guest';
     return (
-        <>
-            {!isGuest && (
-                <Box position="fixed" top={16} right={24} zIndex={2000}>
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Box minHeight="100vh" sx={{
+                background: themeMode === 'dark'
+                    ? 'linear-gradient(135deg, #23283a 0%, #181c24 100%)'
+                    : 'linear-gradient(135deg, #e3e6f3 0%, #f5f5f5 100%)',
+                position: 'relative'
+            }}>
+                <Tooltip title={themeMode === 'dark' ? 'Modo claro' : 'Modo escuro'}>
                     <IconButton
-                        color="primary"
-                        onClick={() => setPerfilOpen(true)}
-                        size="large"
-                        disabled={!userId}
+                        sx={{ position: 'fixed', top: 16, left: 24, zIndex: 2100 }}
+                        color="secondary"
+                        onClick={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')}
                     >
-                        <AccountCircleIcon fontSize="inherit" />
+                        {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>
-                </Box>
-            )}
-            <Dialog open={perfilOpen} onClose={() => setPerfilOpen(false)}>
-                {isGuest ? (
-                    <Box minWidth={320} maxWidth={400} p={3} borderRadius={3} bgcolor="#fff" boxShadow={4} display="flex" alignItems="center" justifyContent="center" height={200}>
-                        <span>Você está jogando como visitante. Nenhum dado de perfil será salvo.</span>
+                </Tooltip>
+                {!isGuest && (
+                    <Box position="fixed" top={16} right={24} zIndex={2000}>
+                        <IconButton
+                            color="primary"
+                            onClick={() => setPerfilOpen(true)}
+                            size="large"
+                            disabled={!userId}
+                        >
+                            <AccountCircleIcon fontSize="inherit" />
+                        </IconButton>
                     </Box>
-                ) : (
-                    <MeuPerfil userId={userId} name={name} email={email} dailyDates={perfilStats.dailyDates || []} stats={perfilStats.stats || {}} />
                 )}
-            </Dialog>
-            <Router>
-                <Routes>
-                    <Route path="/" element={<Home userId={userId} name={name} email={email} />} />
-                </Routes>
-            </Router>
-        </>
+                <Dialog open={perfilOpen} onClose={() => setPerfilOpen(false)}>
+                    {isGuest ? (
+                        <Box minWidth={320} maxWidth={400} p={3} borderRadius={3} bgcolor="background.paper" boxShadow={4} display="flex" alignItems="center" justifyContent="center" height={200}>
+                            <span>Você está jogando como visitante. Nenhum dado de perfil será salvo.</span>
+                        </Box>
+                    ) : (
+                        <MeuPerfil userId={userId} name={name} email={email} dailyDates={perfilStats.dailyDates || []} stats={perfilStats.stats || {}} />
+                    )}
+                </Dialog>
+                <Router>
+                    <Routes>
+                        <Route path="/" element={<Home userId={userId} name={name} email={email} themeMode={themeMode} setThemeMode={setThemeMode} />} />
+                    </Routes>
+                </Router>
+            </Box>
+        </ThemeProvider>
     );
 };
 
