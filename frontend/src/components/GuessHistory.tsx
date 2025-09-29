@@ -114,8 +114,19 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                                                                     <td style={{ fontWeight: 900, color: isDark ? '#fff' : '#fff', fontSize: isDark ? '1.25rem' : '1.1rem', maxWidth: 220, whiteSpace: 'normal', wordBreak: 'break-word', textShadow: isDark ? '0 2px 12px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial' }}>{g.guessedCard?.name}</td>
                                                                                                     <td>
                                                                                                         <span>
-                                                                                                            <Chip label={getLabel(g.feedback.colors)} color={getColor(g.feedback.colors)} size="small" sx={{ bgcolor: getColor(g.feedback.colors) === 'success' ? '#388e3c' : getColor(g.feedback.colors) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, mr: 1 }} />
-                                                                                                            <span style={{ fontWeight: 800, color: isDark ? '#fff' : '#fff', fontSize: '0.95rem', textShadow: isDark ? '0 1px 6px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial' }}>{getColorInitials(g.guessedCard?.colors)}</span>
+                                                                                                            {g.feedback.colors === 'correct' || g.feedback.colors === 'partial' ? (
+                                                                                                                <>
+                                                                                                                    <Chip label={getLabel(g.feedback.colors)} color={getColor(g.feedback.colors)} size="small" sx={{ bgcolor: getColor(g.feedback.colors) === 'success' ? '#388e3c' : getColor(g.feedback.colors) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, mr: 1 }} />
+                                                                                                                    <span style={{ fontWeight: 800, color: isDark ? '#fff' : '#fff', fontSize: '0.95rem', textShadow: isDark ? '0 1px 6px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial' }}>{getColorInitials(g.guessedCard?.colors)}</span>
+                                                                                                                </>
+                                                                                                            ) : (
+                                                                                                                <Chip 
+                                                                                                                    label={`${getColorInitials(g.guessedCard?.colors)} ❌`} 
+                                                                                                                    color="error" 
+                                                                                                                    size="small" 
+                                                                                                                    sx={{ bgcolor: '#c62828', color: '#fff', fontWeight: 700 }} 
+                                                                                                                />
+                                                                                                            )}
                                                                                                         </span>
                                                                                                     </td>
                                                                                                     <td><span><Chip label={getLabel(g.feedback.type)} color={getColor(g.feedback.type)} size="small" sx={{ bgcolor: getColor(g.feedback.type) === 'success' ? '#388e3c' : getColor(g.feedback.type) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
