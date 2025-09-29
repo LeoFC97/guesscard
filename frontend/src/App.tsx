@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Home from './pages/Home';
+import LeaderboardsPage from './pages/LeaderboardsPage';
 import { Dialog, Box } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MeuPerfil from './components/MeuPerfil';
@@ -256,6 +257,7 @@ const App: React.FC = () => {
                 <Router>
                     <Routes>
                         <Route path="/" element={<Home userId={userId} name={name} email={email} themeMode={themeMode} setThemeMode={setThemeMode} />} />
+                        <Route path="/leaderboards" element={<LeaderboardsPage themeMode={themeMode} />} />
                     </Routes>
                 </Router>
             </Box>

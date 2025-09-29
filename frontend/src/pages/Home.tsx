@@ -2,12 +2,14 @@
 import React, { useState } from 'react';
 import { Button, Alert, Tooltip } from '@mui/material';
 import { IconButton } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import VictoryScreen from '../components/VictoryScreen';
 import { CardGuess } from '../components/CardGuess';
 import GuessHistory from '../components/GuessHistory';
 import StartGame from './StartGame';
+import Leaderboards from '../components/Leaderboards';
 import { Container, Typography, Box } from '@mui/material';
 // Removido useUserInfo, centralizado no contexto Auth0
 
@@ -50,6 +52,7 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     const [victory, setVictory] = useState(false);
     const [startTime, setStartTime] = useState<number | null>(null);
     const [endTime, setEndTime] = useState<number | null>(null);
+    const [showLeaderboards, setShowLeaderboards] = useState(false);
 
     const handleGuess = (result: any) => {
         setGuesses(prev => [result, ...prev]);
@@ -95,11 +98,46 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
 
 
 
+    // Se deve mostrar leaderboards
+    if (showLeaderboards) {
+        return (
+            <Box position="relative">
+                <ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} />
+                <Container maxWidth="lg" sx={{ py: 4 }}>
+                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
+                        <Typography variant="h4" component="h1" color="primary">
+                            🏆 Leaderboards
+                        </Typography>
+                        <Button
+                            variant="outlined"
+                            onClick={() => setShowLeaderboards(false)}
+                            sx={{ ml: 2 }}
+                        >
+                            Voltar ao Jogo
+                        </Button>
+                    </Box>
+                    <Leaderboards />
+                </Container>
+            </Box>
+        );
+    }
+
     if (!gameStarted) {
         if (!userId) {
             return <Box display="flex" alignItems="center" justifyContent="center" minHeight={300}><ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} /><span>Carregando usuário...</span></Box>;
         }
-    return <Box position="relative"><ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} /><StartGame onGameStarted={handleGameStarted} userId={userId} name={name} email={email} /></Box>;
+    return (
+        <Box position="relative">
+            <ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} />
+            <StartGame 
+                onGameStarted={handleGameStarted} 
+                userId={userId} 
+                name={name} 
+                email={email}
+                onShowLeaderboards={() => setShowLeaderboards(true)}
+            />
+        </Box>
+    );
     }
     if (victory) {
         const attempts = guesses.length;
@@ -191,6 +229,43 @@ const handleHint = () => {
                     timeSpent={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
                 />
                 <GuessHistory guesses={guesses} themeMode={themeMode} />
+                
+                {/* Botões de ação */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4, mb: 2 }}>
+                    <Button
+                        variant="outlined"
+                        color="success"
+                        onClick={() => setShowLeaderboards(true)}
+                        size="medium"
+                        sx={{ 
+                            px: 3,
+                            py: 1,
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            borderRadius: 2
+                        }}
+                    >
+                        🏆 Ver Rankings
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => {
+                            setGameStarted(false);
+                            setVictory(false);
+                        }}
+                        size="medium"
+                        sx={{ 
+                            px: 3,
+                            py: 1,
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            borderRadius: 2
+                        }}
+                    >
+                        🏠 Menu Inicial
+                    </Button>
+                </Box>
             </Container>
         );
     }
@@ -251,6 +326,43 @@ const handleHint = () => {
                     timeSpent={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
                 />
                 <GuessHistory guesses={guesses} />
+                
+                {/* Botões de ação */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4, mb: 2 }}>
+                    <Button
+                        variant="outlined"
+                        color="success"
+                        onClick={() => setShowLeaderboards(true)}
+                        size="medium"
+                        sx={{ 
+                            px: 3,
+                            py: 1,
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            borderRadius: 2
+                        }}
+                    >
+                        🏆 Ver Rankings
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => {
+                            setGameStarted(false);
+                            setVictory(false);
+                        }}
+                        size="medium"
+                        sx={{ 
+                            px: 3,
+                            py: 1,
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            borderRadius: 2
+                        }}
+                    >
+                        🏠 Menu Inicial
+                    </Button>
+                </Box>
             </Container>
         );
 }

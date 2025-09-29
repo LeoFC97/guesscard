@@ -12,9 +12,10 @@ type StartGameProps = {
     userId: string;
     name: string;
     email: string;
+    onShowLeaderboards?: () => void;
 };
 
-const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, email }) => {
+const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, email, onShowLeaderboards }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [loadingDaily, setLoadingDaily] = useState(false);
@@ -87,7 +88,20 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
 
 
 
+    // Função para verificar se a data é futura
+    const isDateInFuture = (date: Date) => {
+        const today = new Date();
+        today.setHours(23, 59, 59, 999); // Fim do dia atual
+        return date > today;
+    };
+
     const handleStartDaily = async () => {
+        // Validação no frontend para datas futuras
+        if (isDateInFuture(selectedDate)) {
+            setError('Não é possível jogar cartas do futuro. Escolha uma data de hoje ou anterior.');
+            return;
+        }
+
         setLoadingDaily(true);
         setError(null);
         try {
@@ -149,24 +163,64 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         onChange={(newValue: Date | null) => {
                             if (newValue) {
                                 setSelectedDate(newValue);
+                                // Limpar erro quando selecionar uma data válida
+                                if (!isDateInFuture(newValue)) {
+                                    setError(null);
+                                }
                             }
                         }}
+                        maxDate={new Date()} // Não permite seleção de datas futuras
                         slots={{
                             day: (dayProps: any) => renderCustomDay(dayProps.day, [], dayProps)
                         }}
                         slotProps={{ 
                             textField: { 
                                 fullWidth: false,
-                                sx: { maxWidth: 250, mb: 2 }
+                                sx: { maxWidth: 250, mb: 2 },
+                                error: isDateInFuture(selectedDate),
+                                helperText: isDateInFuture(selectedDate) ? 'Não é possível selecionar datas futuras' : ''
                             }
                         }}
                     />
                 </LocalizationProvider>
             </Box>
             
-            <Button variant="outlined" color="secondary" size="large" onClick={handleStartDaily} disabled={loadingDaily}>
+            <Button 
+                variant="outlined" 
+                color="secondary" 
+                size="large" 
+                onClick={handleStartDaily} 
+                disabled={loadingDaily || isDateInFuture(selectedDate)}
+                sx={{ 
+                    opacity: isDateInFuture(selectedDate) ? 0.5 : 1,
+                    cursor: isDateInFuture(selectedDate) ? 'not-allowed' : 'pointer'
+                }}
+            >
                 {loadingDaily ? <CircularProgress size={24} /> : `Jogar carta do dia (${getLocalDateStr(selectedDate)})`}
             </Button>
+
+            {/* Botão de Leaderboards */}
+            {onShowLeaderboards && (
+                <Box sx={{ mt: 4 }}>
+                    <Button
+                        variant="contained"
+                        color="success"
+                        size="large"
+                        onClick={onShowLeaderboards}
+                        sx={{ 
+                            px: 4,
+                            py: 1.5,
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                            borderRadius: 3,
+                            boxShadow: 3
+                        }}
+                    >
+                        🏆 Ver Rankings
+                    </Button>
+                </Box>
+            )}
+
             {error && (
                 <Box
                     sx={{

@@ -111,7 +111,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                         {shownGuesses.length > 0 ? shownGuesses.map((g, idx) => (
                                                                                             <>
                                                                                                 <tr key={idx}>
-                                                                                                    <td style={{ fontWeight: 900, color: isDark ? '#fff' : '#fff', fontSize: isDark ? '1.25rem' : '1.1rem', maxWidth: 220, whiteSpace: 'normal', wordBreak: 'break-word', textShadow: isDark ? '0 2px 12px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial' }}>{g.guessedCard?.name}</td>
+                                                                                                    <td style={{ fontWeight: 700, color: isDark ? '#fff' : '#fff', fontSize: '0.9rem', maxWidth: 180, whiteSpace: 'normal', wordBreak: 'break-word', textShadow: isDark ? '0 2px 12px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial', lineHeight: '1.2' }}>{g.guessedCard?.name}</td>
                                                                                                     <td>
                                                                                                         <span>
                                                                                                             {g.feedback.colors === 'correct' || g.feedback.colors === 'partial' ? (

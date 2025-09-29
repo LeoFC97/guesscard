@@ -5,6 +5,7 @@ import matchRepo from '../repositories/matchRepository';
 import dailyMatchRepo from '../repositories/dailyMatchRepository';
 import dailyCardRepo from '../repositories/dailyCardRepository';
 import { getUserStatsService } from '../services/userStatsService';
+import leaderboardService from '../services/leaderboardService';
 
 // Mapeamento em memória para partidas: { [gameId]: targetCard }
 const games: Record<string, any> = {};
@@ -91,6 +92,20 @@ export class MtgController {
             }
             if (!dateStr) {
                 res.status(400).json({ message: 'date é obrigatório para jogar a daily.' });
+                return;
+            }
+
+            // Validação: não permitir datas futuras
+            const requestedDate = new Date(dateStr + 'T00:00:00.000Z');
+            const today = new Date();
+            today.setUTCHours(0, 0, 0, 0); // Zerar horário para comparar apenas a data
+
+            if (requestedDate > today) {
+                res.status(400).json({ 
+                    message: 'Não é possível jogar cartas do futuro. Escolha uma data de hoje ou anterior.',
+                    requestedDate: dateStr,
+                    todayDate: today.toISOString().slice(0, 10)
+                });
                 return;
             }
             const alreadyPlayed = await dailyMatchRepo.findByUserAndDate(userId as string, dateStr);
@@ -192,6 +207,61 @@ export class MtgController {
             res.status(200).json({ message: 'New game started', cardName: targetCard.name, gameId });
         } catch (error) {
             res.status(500).json({ message: 'Error starting new game', error });
+        }
+    }
+
+    // Leaderboard endpoints
+    public static async getNormalLeaderboard(req: Request, res: Response): Promise<void> {
+        try {
+            const limit = parseInt(req.query.limit as string) || 50;
+            const leaderboard = await leaderboardService.getNormalLeaderboard(limit);
+            res.status(200).json(leaderboard);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching normal leaderboard', error });
+        }
+    }
+
+    public static async getDailyLeaderboard(req: Request, res: Response): Promise<void> {
+        try {
+            const limit = parseInt(req.query.limit as string) || 50;
+            const leaderboard = await leaderboardService.getDailyLeaderboard(limit);
+            res.status(200).json(leaderboard);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching daily leaderboard', error });
+        }
+    }
+
+    public static async getSpeedLeaderboard(req: Request, res: Response): Promise<void> {
+        try {
+            const gameType = req.params.gameType as 'normal' | 'daily';
+            const limit = parseInt(req.query.limit as string) || 50;
+            
+            if (gameType !== 'normal' && gameType !== 'daily') {
+                res.status(400).json({ message: 'Invalid game type. Must be "normal" or "daily"' });
+                return;
+            }
+            
+            const leaderboard = await leaderboardService.getSpeedLeaderboard(gameType, limit);
+            res.status(200).json(leaderboard);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching speed leaderboard', error });
+        }
+    }
+
+    public static async getPerfectLeaderboard(req: Request, res: Response): Promise<void> {
+        try {
+            const gameType = req.params.gameType as 'normal' | 'daily';
+            const limit = parseInt(req.query.limit as string) || 50;
+            
+            if (gameType !== 'normal' && gameType !== 'daily') {
+                res.status(400).json({ message: 'Invalid game type. Must be "normal" or "daily"' });
+                return;
+            }
+            
+            const leaderboard = await leaderboardService.getPerfectLeaderboard(gameType, limit);
+            res.status(200).json(leaderboard);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching perfect leaderboard', error });
         }
     }
 }
