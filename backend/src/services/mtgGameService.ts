@@ -1,4 +1,5 @@
 import dailyMatchRepo from '../repositories/dailyMatchRepository';
+import dailyCardRepo from '../repositories/dailyCardRepository';
 import { maskCardNameInText } from '../utils/textUtils';
 import matchRepo from '../repositories/matchRepository';
 import { MtgService } from './mtgService';
@@ -34,14 +35,19 @@ export async function processGuessCard(params: GuessCardParams) {
     }
     let targetCard;
     if (gameId === 'daily') {
-        const cards = await mtgService.fetchCardByParam('name', 'Black Lotus');
+        const today = new Date().toISOString().slice(0, 10);
+        const dailyCard = await dailyCardRepo.getDailyCard(today);
+        if (!dailyCard) {
+            throw new Error('No daily card set for today.');
+        }
+        const cards = await mtgService.fetchCardByParam('name', dailyCard.cardName);
         targetCard = cards.length > 0 ? cards[0] : null;
         if (!targetCard) {
-            throw new Error('Could not fetch Black Lotus');
+            throw new Error(`Could not fetch card: ${dailyCard.cardName}`);
         }
+
         // Checa se já jogou a daily hoje
         if (userId && typeof userId === 'string') {
-            const today = new Date().toISOString().slice(0, 10);
             const alreadyPlayed = await dailyMatchRepo.findByUserAndDate(userId, today);
             if (alreadyPlayed) {
                 throw new Error('Você já jogou a daily de hoje.');

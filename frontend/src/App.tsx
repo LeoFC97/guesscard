@@ -8,6 +8,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Login from './components/Login';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { fetchUserProfile } from './services/mtgApi';
 
 const getTheme = (mode: 'light' | 'dark') => createTheme({
     palette: {
@@ -118,7 +119,10 @@ const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID || '';
 
 const App: React.FC = () => {
     // Estado do tema
-    const [themeMode, setThemeMode] = useState<'light' | 'dark'>('dark');
+    const [themeMode, setThemeMode] = useState<'light' | 'dark'>(() => {
+        // Sempre inicia como dark
+        return 'dark';
+    });
     const theme = getTheme(themeMode);
     // Se guest, não persiste no localStorage
     const getInitial = (key: string) => {
@@ -135,8 +139,18 @@ const App: React.FC = () => {
     // Exemplo: buscar perfil quando modal abrir e userId existir
     React.useEffect(() => {
         if (!perfilOpen || !userId) return;
-        // ...buscar perfil do usuário usando userId e token...
-    }, [perfilOpen, userId]);
+
+        const fetchProfile = async () => {
+            try {
+                const profileData = await fetchUserProfile(userId, token);
+                setPerfilStats(profileData);
+            } catch (error) {
+                console.error('Erro ao buscar perfil do usuário:', error);
+            }
+        };
+
+        fetchProfile();
+    }, [perfilOpen, userId, token]);
 
         // Salva dados no localStorage após login
         const handleLoginSuccess = (newToken: string, newUserId: string, newName: string, newEmail: string) => {
@@ -160,7 +174,17 @@ const App: React.FC = () => {
         // Exemplo: buscar perfil quando modal abrir e userId existir
         React.useEffect(() => {
             if (!perfilOpen || !userId) return;
-            // ...buscar perfil do usuário usando userId e token...
+
+            const fetchProfile = async () => {
+                try {
+                    const profileData = await fetchUserProfile(userId, token);
+                    setPerfilStats(profileData);
+                } catch (error) {
+                    console.error('Erro ao buscar perfil do usuário:', error);
+                }
+            };
+
+            fetchProfile();
         }, [perfilOpen, userId, token]);
     // Renderiza tela de login se não estiver logado
     if (!token || !userId) {
@@ -226,7 +250,7 @@ const App: React.FC = () => {
                             <span>Você está jogando como visitante. Nenhum dado de perfil será salvo.</span>
                         </Box>
                     ) : (
-                        <MeuPerfil userId={userId} name={name} email={email} dailyDates={perfilStats.dailyDates || []} stats={perfilStats.stats || {}} />
+                        <MeuPerfil userId={userId} name={name} email={email} dailyDates={perfilStats.dailyDates || []} stats={perfilStats.stats || {}} themeMode={themeMode} />
                     )}
                 </Dialog>
                 <Router>

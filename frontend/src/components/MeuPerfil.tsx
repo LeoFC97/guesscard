@@ -6,6 +6,7 @@ interface PerfilProps {
   name: string;
   email: string;
   dailyDates: string[];
+  themeMode?: 'light' | 'dark';
   stats: {
     totalNormal: number;
     totalDaily: number;
@@ -22,7 +23,7 @@ interface PerfilProps {
   };
 }
 
-const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, stats }) => {
+const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, themeMode = 'dark', stats }) => {
   // DEBUG: Mostrar userId e API URL no modal
   const apiUrl = process.env.REACT_APP_API_URL;
   // Fallbacks para stats
@@ -41,70 +42,91 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, sta
     cardsGuessed: stats?.cardsGuessed ?? [],
   };
   return (
-    <Box minWidth={320} maxWidth={400} p={3} borderRadius={3} bgcolor="#fff" boxShadow={4}>
+    <Box 
+      minWidth={320} 
+      maxWidth={400} 
+      p={3} 
+      borderRadius={3} 
+      bgcolor={themeMode === 'dark' ? '#23283a' : '#fff'} 
+      boxShadow={4}
+      sx={{
+        color: themeMode === 'dark' ? '#e0e0e0' : '#23283a'
+      }}
+    >
       {/* DEBUG INFO */}
-      <Box mb={2} p={1} bgcolor="#f5f5f5" borderRadius={2}>
-        <Typography variant="caption" color="secondary">userId: {userId || '-'}</Typography><br />
-        <Typography variant="caption" color="secondary">API URL: {apiUrl || '-'}</Typography>
-      </Box>
-      <Typography variant="h5" fontWeight={700} mb={1} color="primary">Meu Perfil</Typography>
-      <Divider sx={{ mb: 2 }} />
-      <Typography variant="subtitle1"><b>Nome:</b> {name || '-'}</Typography>
-      <Typography variant="subtitle2" color="text.secondary" mb={2}>{email || '-'}</Typography>
-      <Divider sx={{ mb: 2 }} />
-      <Typography variant="subtitle1" fontWeight={600}>Dias que acertou a daily:</Typography>
+      <Typography variant="h5" fontWeight={700} mb={1} sx={{ color: themeMode === 'dark' ? '#a78bfa' : '#1976d2' }}>Meu Perfil</Typography>
+      <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
+      <Typography variant="subtitle1" sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}><b>Nome:</b> {name || '-'}</Typography>
+      <Typography variant="subtitle2" sx={{ color: themeMode === 'dark' ? '#bdbdbd' : '#555' }} mb={2}>{email || '-'}</Typography>
+      <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Dias que acertou a carta do dia:</Typography>
       <Stack direction="row" flexWrap="wrap" gap={1} mb={2}>
         {dailyDates && dailyDates.length === 0 ? <Chip label="Nenhum dia ainda" color="default" /> : (dailyDates || []).map(date => (
           <Chip key={date} label={date} color="success" size="small" />
         ))}
       </Stack>
-      <Divider sx={{ mb: 2 }} />
-      <Typography variant="subtitle1" fontWeight={600}>Recorde pessoal</Typography>
+      <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Recorde pessoal</Typography>
       <List dense>
         <ListItem>
-          <ListItemText primary={`Menor número de tentativas: ${safeStats.bestTries}`} />
+          <ListItemText 
+            primary={`Menor número de tentativas: ${safeStats.bestTries}`}
+            sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
+          />
         </ListItem>
         <ListItem>
-          <ListItemText primary={`Menor tempo: ${safeStats.bestTime !== '-' ? `${safeStats.bestTime}s` : '-'}`} />
+          <ListItemText 
+            primary={`Menor tempo: ${safeStats.bestTime !== '-' ? `${safeStats.bestTime}s` : '-'}`}
+            sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
+          />
         </ListItem>
       </List>
-      <Divider sx={{ mb: 2 }} />
-      <Typography variant="subtitle1" fontWeight={600}>Estatísticas</Typography>
+      <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Estatísticas</Typography>
       <List dense>
         <ListItem>
-          <ListItemText primary={`Partidas normais: ${safeStats.totalNormal}`} />
+          <ListItemText 
+            primary={`Partidas normais: ${safeStats.totalNormal}`}
+            sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
+          />
         </ListItem>
         <ListItem>
-          <ListItemText primary={`Partidas diárias: ${safeStats.totalDaily}`} />
+          <ListItemText 
+            primary={`Partidas diárias: ${safeStats.totalDaily}`}
+            sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
+          />
         </ListItem>
         <ListItem>
-          <ListItemText primary={`Média tentativas (normal): ${safeStats.avgTriesNormal}`} />
+          <ListItemText 
+            primary={`Média tentativas (normal): ${safeStats.avgTriesNormal}`}
+            sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
+          />
         </ListItem>
         <ListItem>
-          <ListItemText primary={`Média tempo (normal): ${safeStats.avgTimeNormal !== '-' ? `${safeStats.avgTimeNormal}s` : '-'}`} />
+          <ListItemText 
+            primary={`Média tempo (normal): ${safeStats.avgTimeNormal !== '-' ? `${safeStats.avgTimeNormal}s` : '-'}`}
+            sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
+          />
         </ListItem>
         <ListItem>
-          <ListItemText primary={`Média tentativas (daily): ${safeStats.avgTriesDaily}`} />
+          <ListItemText 
+            primary={`Média tentativas (daily): ${safeStats.avgTriesDaily}`}
+            sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
+          />
         </ListItem>
         <ListItem>
-          <ListItemText primary={`Média tempo (daily): ${safeStats.avgTimeDaily !== '-' ? `${safeStats.avgTimeDaily}s` : '-'}`} />
+          <ListItemText 
+            primary={`Média tempo (daily): ${safeStats.avgTimeDaily !== '-' ? `${safeStats.avgTimeDaily}s` : '-'}`}
+            sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
+          />
         </ListItem>
       </List>
-      <Divider sx={{ mb: 2 }} />
-      <Typography variant="subtitle1" fontWeight={600}>Última carta jogada</Typography>
-      <Typography variant="body2" mb={2}>{safeStats.lastCard !== '-' ? `${safeStats.lastCard} (${safeStats.lastDate ? new Date(safeStats.lastDate).toLocaleDateString() : ''})` : '-'}</Typography>
-      <Divider sx={{ mb: 2 }} />
-      <Typography variant="subtitle1" fontWeight={600}>Streak (dias seguidos jogando daily)</Typography>
-      <Typography variant="body2" mb={2}>{safeStats.streak}</Typography>
-      <Divider sx={{ mb: 2 }} />
-      <Typography variant="subtitle1" fontWeight={600}>Cartas já acertadas</Typography>
-      <List dense>
-        {safeStats.cardsGuessed && safeStats.cardsGuessed.length > 0 ? safeStats.cardsGuessed.map((c: any, i: number) => (
-          <ListItem key={i}>
-            <ListItemText primary={`${c.cardName} (${c.date ? new Date(c.date).toLocaleDateString() : '-'})`} />
-          </ListItem>
-        )) : <ListItem><ListItemText primary="Nenhuma carta ainda" /></ListItem>}
-      </List>
+      <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Última carta jogada</Typography>
+      <Typography variant="body2" mb={2} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{safeStats.lastCard !== '-' ? `${safeStats.lastCard} (${safeStats.lastDate ? new Date(safeStats.lastDate).toLocaleDateString() : ''})` : '-'}</Typography>
+      <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Sequencia de acertos da carta diária:</Typography>
+      <Typography variant="body2" mb={2} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{safeStats.streak}</Typography>
     </Box>
   );
 };

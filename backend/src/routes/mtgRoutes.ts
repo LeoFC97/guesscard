@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { MtgController } from '../controllers/mtgController';
 
