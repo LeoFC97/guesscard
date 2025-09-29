@@ -17,9 +17,24 @@ const getLabel = (status: string) => {
     return '❌';
 };
 
-export function GuessHistory({ guesses }: { guesses: any[] }) {
+export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode?: 'light' | 'dark' }) {
     // Mostra até 10 palpites (mais compacto)
     const shownGuesses = guesses.slice(0, 10);
+    // Usa themeMode para cor da fonte
+    const isDark = themeMode === 'dark';
+    // Função para converter array de cores em iniciais
+    const getColorInitials = (colors: string[] | undefined) => {
+        if (!Array.isArray(colors) || colors.length === 0) return '-';
+        // Magic: U=Azul, R=Vermelho, B=Preto, G=Verde, W=Branco
+        const colorMap: Record<string, string> = {
+            'Blue': 'U',
+            'Red': 'R',
+            'Black': 'B',
+            'Green': 'G',
+            'White': 'W',
+        };
+        return colors.map(c => colorMap[c] || c[0]).join(',');
+    };
     // Função para mostrar legalidades principais e aplicar estratégia de parcialmente correta
     const renderLegalities = (guessedLegalities?: any, targetLegalities?: any) => {
         if (!guessedLegalities || !targetLegalities) return '-';
@@ -83,7 +98,7 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                     <thead>
                                         <tr>
-                                            <th style={{ textAlign: 'left', padding: 6, fontWeight: 700, color: '#222', fontSize: '1rem' }}>Carta</th>
+                                            <th style={{ textAlign: 'left', padding: 6, fontWeight: 700, color: isDark ? '#222' : '#fff', fontSize: '1rem' }}>Carta</th>
                                             <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Cor</span></th>
                                             <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Tipo</span></th>
                                             <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>CMC</span></th>
@@ -96,8 +111,13 @@ export function GuessHistory({ guesses }: { guesses: any[] }) {
                                         {shownGuesses.length > 0 ? shownGuesses.map((g, idx) => (
                                                                                             <>
                                                                                                 <tr key={idx}>
-                                                                                                    <td style={{ fontWeight: 700, color: '#111', fontSize: '1.1rem', maxWidth: 220, whiteSpace: 'normal', wordBreak: 'break-word' }}>{g.guessedCard?.name}</td>
-                                                                                                    <td><span><Chip label={getLabel(g.feedback.colors)} color={getColor(g.feedback.colors)} size="small" sx={{ bgcolor: getColor(g.feedback.colors) === 'success' ? '#388e3c' : getColor(g.feedback.colors) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
+                                                                                                    <td style={{ fontWeight: 900, color: isDark ? '#fff' : '#fff', fontSize: isDark ? '1.25rem' : '1.1rem', maxWidth: 220, whiteSpace: 'normal', wordBreak: 'break-word', textShadow: isDark ? '0 2px 12px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial' }}>{g.guessedCard?.name}</td>
+                                                                                                    <td>
+                                                                                                        <span>
+                                                                                                            <Chip label={getLabel(g.feedback.colors)} color={getColor(g.feedback.colors)} size="small" sx={{ bgcolor: getColor(g.feedback.colors) === 'success' ? '#388e3c' : getColor(g.feedback.colors) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, mr: 1 }} />
+                                                                                                            <span style={{ fontWeight: 800, color: isDark ? '#fff' : '#fff', fontSize: '0.95rem', textShadow: isDark ? '0 1px 6px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial' }}>{getColorInitials(g.guessedCard?.colors)}</span>
+                                                                                                        </span>fff
+                                                                                                    </td>
                                                                                                     <td><span><Chip label={getLabel(g.feedback.type)} color={getColor(g.feedback.type)} size="small" sx={{ bgcolor: getColor(g.feedback.type) === 'success' ? '#388e3c' : getColor(g.feedback.type) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
                                                                                                     <td><span><Chip label={getLabel(g.feedback.cmc)} color={getColor(g.feedback.cmc)} size="small" sx={{ bgcolor: getColor(g.feedback.cmc) === 'success' ? '#388e3c' : getColor(g.feedback.cmc) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
                                                                                                       <td><span><Chip label={`${g.guessedCard?.setName || '-'} ${getLabel(g.feedback.edition)}`} color={getColor(g.feedback.edition)} size="small" sx={{ bgcolor: getColor(g.feedback.edition) === 'success' ? '#388e3c' : getColor(g.feedback.edition) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>

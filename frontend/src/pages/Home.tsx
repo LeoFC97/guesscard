@@ -2,6 +2,9 @@ import { useDailyPlayedDates } from '../hooks/useDailyPlayedDates';
 
 import React, { useState } from 'react';
 import { Button, Alert, Tooltip } from '@mui/material';
+import { IconButton } from '@mui/material';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import VictoryScreen from '../components/VictoryScreen';
 import { CardGuess } from '../components/CardGuess';
 import GuessHistory from '../components/GuessHistory';
@@ -18,9 +21,22 @@ interface HomeProps {
     userId: string;
     name: string;
     email: string;
+    themeMode: 'light' | 'dark';
+    setThemeMode: React.Dispatch<React.SetStateAction<'light' | 'dark'>>;
 }
 
-const Home: React.FC<HomeProps> = ({ userId, name, email }) => {
+const ThemeToggle: React.FC<{ themeMode: 'light' | 'dark'; setThemeMode: React.Dispatch<React.SetStateAction<'light' | 'dark'>> }> = ({ themeMode, setThemeMode }) => (
+    <Tooltip title={themeMode === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+        <IconButton
+            sx={{ position: 'fixed', top: 16, left: 24, zIndex: 2100 }}
+            color="secondary"
+            onClick={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')}
+        >
+            {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
+    </Tooltip>
+);
+const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMode }) => {
     const playedDates = useDailyPlayedDates(userId);
 
     React.useEffect(() => {
@@ -56,10 +72,10 @@ const Home: React.FC<HomeProps> = ({ userId, name, email }) => {
             // Se acertou, mostra tela de vitória
             setVictory(true);
             setEndTime(Date.now());
+            setWrongCount(0); // Só zera ao acertar
         }
         setTextReady(null);
         setTextShown(false);
-        setWrongCount(0);
         setStartTime(Date.now());
         setEndTime(null);
     };
@@ -107,9 +123,9 @@ const Home: React.FC<HomeProps> = ({ userId, name, email }) => {
 
     if (!gameStarted) {
         if (!userId) {
-            return <Box display="flex" alignItems="center" justifyContent="center" minHeight={300}><span>Carregando usuário...</span></Box>;
+            return <Box display="flex" alignItems="center" justifyContent="center" minHeight={300}><ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} /><span>Carregando usuário...</span></Box>;
         }
-        return <StartGame onGameStarted={handleGameStarted} userId={userId} name={name} email={email} />;
+    return <Box position="relative"><ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} /><StartGame onGameStarted={handleGameStarted} userId={userId} name={name} email={email} /></Box>;
     }
     if (victory) {
         const attempts = guesses.length;
@@ -118,16 +134,16 @@ const Home: React.FC<HomeProps> = ({ userId, name, email }) => {
         const lastGuess = guesses.find(g => g.isCorrect) || guesses[0];
         const cardName = lastGuess?.guessedCard?.name || '-';
         const cardImage = lastGuess?.guessedCard?.imageUrl || '';
-        return <VictoryScreen 
-            onRestart={() => {
-                setVictory(false);
-                setGameStarted(false);
-            }} 
-            attempts={attempts}
-            timeSpent={timeSpent}
-            cardName={cardName}
-            cardImage={cardImage}
-        />;
+        return <Box position="relative"><ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} /><VictoryScreen 
+                onRestart={() => {
+                    setVictory(false);
+                    setGameStarted(false);
+                }} 
+                attempts={attempts}
+                timeSpent={timeSpent}
+                cardName={cardName}
+                cardImage={cardImage}
+            /></Box>;
     }
 
 const handleHint = () => {
@@ -204,10 +220,10 @@ const handleHint = () => {
                     </Tooltip>
                 </Box>
                 {flavorShown && flavorReady && (
-                    <Alert severity="info" sx={{ mb: 2 }}>{flavorReady}</Alert>
+                    <Alert severity="info" sx={{ mb: 2, color: '#fff', background: themeMode === 'dark' ? '#23283a' : undefined }}>{flavorReady}</Alert>
                 )}
                 {textShown && textReady && (
-                    <Alert severity="info" sx={{ mb: 2 }}>{textReady}</Alert>
+                    <Alert severity="info" sx={{ mb: 2, color: '#fff', background: themeMode === 'dark' ? '#23283a' : undefined }}>{textReady}</Alert>
                 )}
                 <CardGuess
                     onGuess={handleGuess}
@@ -218,7 +234,7 @@ const handleHint = () => {
                     attempts={guesses.length + 1}
                     timeSpent={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
                 />
-                <GuessHistory guesses={guesses} />
+                <GuessHistory guesses={guesses} themeMode={themeMode} />
             </Container>
         );
     }
