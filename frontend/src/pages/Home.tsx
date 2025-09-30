@@ -10,6 +10,7 @@ import { CardGuess } from '../components/CardGuess';
 import GuessHistory from '../components/GuessHistory';
 import StartGame from './StartGame';
 import Leaderboards from '../components/Leaderboards';
+import BlurredCard from '../components/BlurredCard';
 import { Container, Typography, Box } from '@mui/material';
 // Removido useUserInfo, centralizado no contexto Auth0
 
@@ -53,6 +54,10 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     const [startTime, setStartTime] = useState<number | null>(null);
     const [endTime, setEndTime] = useState<number | null>(null);
     const [showLeaderboards, setShowLeaderboards] = useState(false);
+    const [isBlurMode, setIsBlurMode] = useState(false);
+    const [cardImageUrl, setCardImageUrl] = useState<string | null>(null);
+    const [maxBlurAttempts, setMaxBlurAttempts] = useState(-1); // Sem limite
+    const [currentBlurLevel, setCurrentBlurLevel] = useState<number>(5); // Começa com 5px
 
     const handleGuess = (result: any) => {
         setGuesses(prev => [result, ...prev]);
@@ -63,6 +68,12 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         if (result.feedback && typeof result.feedback.flavor === 'string') {
             setFlavorReady(result.feedback.flavor);
         }
+        
+        // Atualizar informações específicas do modo blur
+        if (result.feedback && result.feedback.blurInfo) {
+            setCurrentBlurLevel(result.feedback.blurInfo.blurLevel || 0);
+        }
+        
         // Conta erro se o palpite não for correto
         if (!result.isCorrect) {
             setWrongCount(prev => prev + 1);
@@ -81,16 +92,32 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         }
     };
 
-    const handleGameStarted = (cardName: string, gameId: string) => {
+    const handleGameStarted = (cardName: string, gameId: string, gameData?: any) => {
         setGameStarted(true);
         setTargetCard(cardName);
         setGameId(gameId);
         setGuesses([]);
         setTextReady(null);
         setTextShown(false);
+        setFlavorReady(null);
+        setFlavorShown(false);
         setWrongCount(0);
         setStartTime(Date.now());
         setEndTime(null);
+        
+        // Detectar modo blur
+        const blurMode = gameId.startsWith('blur-') || gameData?.gameMode === 'blur';
+        setIsBlurMode(blurMode);
+        
+        if (blurMode && gameData) {
+            setCardImageUrl(gameData.cardImage || null);
+            setMaxBlurAttempts(gameData.maxBlurAttempts || -1);
+            setCurrentBlurLevel(gameData.initialBlur || 5); // Reinicia com blur inicial mais fraco
+        } else {
+            setCardImageUrl(null);
+            setIsBlurMode(false);
+            setCurrentBlurLevel(5);
+        }
     };
 
     // Detecta modo Carta do Dia
@@ -219,6 +246,87 @@ const handleHint = () => {
                 {textShown && textReady && (
                     <Alert severity="info" sx={{ mb: 2, color: '#fff', background: themeMode === 'dark' ? '#23283a' : undefined }}>{textReady}</Alert>
                 )}
+                <CardGuess
+                    onGuess={handleGuess}
+                    gameId={gameId}
+                    userId={userId}
+                    name={name}
+                    email={email}
+                    attempts={guesses.length + 1}
+                    timeSpent={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
+                />
+                <GuessHistory guesses={guesses} themeMode={themeMode} />
+                
+                {/* Botões de ação */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4, mb: 2 }}>
+                    <Button
+                        variant="outlined"
+                        color="success"
+                        onClick={() => setShowLeaderboards(true)}
+                        size="medium"
+                        sx={{ 
+                            px: 3,
+                            py: 1,
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            borderRadius: 2
+                        }}
+                    >
+                        🏆 Ver Rankings
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => {
+                            setGameStarted(false);
+                            setVictory(false);
+                        }}
+                        size="medium"
+                        sx={{ 
+                            px: 3,
+                            py: 1,
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            borderRadius: 2
+                        }}
+                    >
+                        🏠 Menu Inicial
+                    </Button>
+                </Box>
+            </Container>
+        );
+    }
+
+    // Tela especial para modo Blur
+    if (isBlurMode) {
+        return (
+            <Container maxWidth="md" sx={{ py: 8 }}>
+                <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
+                    <Typography variant="h3" align="center" sx={{ 
+                        background: 'linear-gradient(45deg, #9c27b0 30%, #673ab7 90%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                    }} gutterBottom>
+                        🔍 Modo Blur
+                    </Typography>
+                    <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                        A carta vai ficando mais nítida a cada palpite! (Reduz 10% do blur por erro)
+                    </Typography>
+                </Box>
+
+                {/* Componente da carta borrada */}
+                {cardImageUrl && (
+                    <BlurredCard
+                        imageUrl={cardImageUrl}
+                        attempts={wrongCount}
+                        maxAttempts={maxBlurAttempts}
+                        cardName={targetCard || undefined}
+                        showCard={victory}
+                        blurLevel={currentBlurLevel}
+                    />
+                )}
+
                 <CardGuess
                     onGuess={handleGuess}
                     gameId={gameId}

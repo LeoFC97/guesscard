@@ -8,7 +8,7 @@ import { useDailyPlayedDates } from '../hooks/useDailyPlayedDates';
 
 
 type StartGameProps = {
-    onGameStarted: (cardName: string, gameId: string) => void;
+    onGameStarted: (cardName: string, gameId: string, gameData?: any) => void;
     userId: string;
     name: string;
     email: string;
@@ -19,6 +19,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [loadingDaily, setLoadingDaily] = useState(false);
+    const [loadingBlur, setLoadingBlur] = useState(false);
     const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const playedDates = useDailyPlayedDates(userId);
@@ -39,6 +40,25 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
             setError(err.message || 'Erro desconhecido');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleStartBlur = async () => {
+        setLoadingBlur(true);
+        setError(null);
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/new-blur-game`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ difficulty }),
+            });
+            if (!response.ok) throw new Error('Erro ao iniciar novo jogo blur');
+            const data = await response.json();
+            onGameStarted(data.cardName, data.gameId, data);
+        } catch (err: any) {
+            setError(err.message || 'Erro desconhecido');
+        } finally {
+            setLoadingBlur(false);
         }
     };
 
@@ -145,9 +165,41 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                 <ToggleButton value="medium">Intermediário</ToggleButton>
                 <ToggleButton value="hard">Difícil</ToggleButton>
             </ToggleButtonGroup>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+                <span style={{ color: '#9c27b0', fontWeight: 700 }}>
+                    A dificuldade escolhida vale para todos os modos, inclusive o modo Blur!
+                </span>
+            </Typography>
             <Button variant="contained" color="primary" size="large" onClick={handleStart} disabled={loading}>
                 {loading ? <CircularProgress size={24} /> : 'Iniciar Novo Jogo'}
             </Button>
+
+            {/* Modo Blur */}
+            <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'secondary.main' }}>
+                    🔍 Modo Blur
+                </Typography>
+                <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
+                    A carta começa levemente borrada e vai ficando mais nítida a cada palpite!
+                    <br />
+                    <span style={{ color: '#9c27b0', fontWeight: 700 }}>
+                        Sem limite de tentativas - o blur reduz 10% a cada palpite.
+                    </span>
+                </Typography>
+                <Button 
+                    variant="contained" 
+                    color="secondary" 
+                    size="large" 
+                    onClick={handleStartBlur} 
+                    disabled={loadingBlur}
+                    sx={{
+                        background: 'linear-gradient(45deg, #9c27b0 30%, #673ab7 90%)',
+                        boxShadow: '0 3px 5px 2px rgba(156, 39, 176, .3)',
+                    }}
+                >
+                    {loadingBlur ? <CircularProgress size={24} /> : '🎯 Jogar Modo Blur'}
+                </Button>
+            </Box>
             
             <Box sx={{ mt: 3, mb: 2, textAlign: 'center' }}>
                 <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>

@@ -46,6 +46,36 @@ export interface PerfectLeaderboardEntry {
     totalGames: number;
 }
 
+export interface BlurLeaderboardEntry {
+    _id: string;
+    name: string;
+    email: string;
+    totalAttempts: number;
+    totalBlurAttempts: number;
+    games: number;
+    avgTimeSpent: number;
+    avgAttemptsPerGame: number;
+    avgBlurAttemptsPerGame: number;
+}
+
+export interface BlurSpeedLeaderboardEntry {
+    _id: string;
+    name: string;
+    email: string;
+    fastestTime: number;
+    avgTime: number;
+    games: number;
+}
+
+export interface BlurPerfectLeaderboardEntry {
+    _id: string;
+    name: string;
+    email: string;
+    perfectGames: number;
+    avgTimeSpent: number;
+    fastestPerfect: number;
+}
+
 /**
  * Obtém leaderboard de jogos normais (geral)
  */
@@ -112,6 +142,54 @@ export const getPerfectLeaderboard = async (
         return await response.json();
     } catch (error) {
         console.error('Error fetching perfect leaderboard:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtém leaderboard geral do modo blur
+ */
+export const getBlurLeaderboard = async (limit: number = 50): Promise<BlurLeaderboardEntry[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/leaderboards/blur?limit=${limit}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch blur leaderboard');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching blur leaderboard:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtém leaderboard de velocidade do modo blur
+ */
+export const getBlurSpeedLeaderboard = async (limit: number = 50): Promise<BlurSpeedLeaderboardEntry[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/leaderboards/blur-speed?limit=${limit}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch blur speed leaderboard');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching blur speed leaderboard:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtém leaderboard de jogos perfeitos do modo blur
+ */
+export const getBlurPerfectLeaderboard = async (limit: number = 50): Promise<BlurPerfectLeaderboardEntry[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/leaderboards/blur-perfect?limit=${limit}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch blur perfect leaderboard');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching blur perfect leaderboard:', error);
         return [];
     }
 };

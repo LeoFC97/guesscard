@@ -1,5 +1,6 @@
 import dailyMatchRepo from '../repositories/dailyMatchRepository';
 import dailyCardRepo from '../repositories/dailyCardRepository';
+import blurMatchRepo from '../repositories/blurMatchRepository';
 import { maskCardNameInText } from '../utils/textUtils';
 import matchRepo from '../repositories/matchRepository';
 import { ScryfallService } from './scryfallService';
@@ -64,6 +65,11 @@ export async function processGuessCard(params: GuessCardParams) {
         targetCard = games[gameId];
         if (!targetCard) {
             throw new Error('No game in progress for this gameId. Please start a new game.');
+        }
+        
+        // Se é modo blur, atualizar tentativas de blur
+        if (targetCard.gameMode === 'blur' && gameId.startsWith('blur-')) {
+            targetCard.currentBlurAttempts = (targetCard.currentBlurAttempts || 0) + 1;
         }
     }
     if (!guess || typeof guess !== 'string') {
@@ -186,6 +192,25 @@ export async function processGuessCard(params: GuessCardParams) {
     const isCorrect = scryfallService.validateGuess(guessedCard.name, targetCard.name);
     feedback.text = maskCardNameInText(targetCard.text, targetCard.name);
     feedback.flavor = typeof targetCard.flavor === 'string' ? targetCard.flavor : undefined;
+    
+    // Adicionar informações específicas do modo blur
+    if (targetCard.gameMode === 'blur') {
+        const initialBlur = targetCard.initialBlur || 5;
+        const blurReduction = targetCard.blurReduction || 0.10;
+        const currentAttempts = targetCard.currentBlurAttempts || 0;
+        
+        // Cálculo: blur inicial * (1 - redução)^tentativas
+        // Exemplo: 5 * (0.9)^3 = 5 * 0.729 = 3.645px
+        const currentBlurLevel = Math.max(0, initialBlur * Math.pow(1 - blurReduction, currentAttempts));
+        
+        feedback.blurInfo = {
+            currentAttempts: currentAttempts,
+            maxAttempts: -1, // Sem limite
+            blurLevel: currentBlurLevel,
+            initialBlur: initialBlur,
+            blurReduction: blurReduction
+        };
+    }
     // Legalities
     if (Array.isArray(targetCard.legalities)) {
         const legalitiesObj: Record<string, string> = {};
@@ -207,7 +232,22 @@ export async function processGuessCard(params: GuessCardParams) {
     // Persistir partida se acertou
     if (isCorrect && userId && name && email && typeof attempts === 'number' && typeof timeSpent === 'number') {
         try {
-            await matchRepo.saveMatch({ userId, name, email, cardName: targetCard.name, attempts, timeSpent } as any);
+            // Se é modo blur, salvar no repositório específico
+            if (targetCard.gameMode === 'blur') {
+                await blurMatchRepo.saveBlurMatch({ 
+                    userId, 
+                    name, 
+                    email, 
+                    cardName: targetCard.name, 
+                    attempts, 
+                    timeSpent,
+                    blurAttempts: targetCard.currentBlurAttempts || 0,
+                    maxBlurAttempts: targetCard.maxBlurAttempts || -1
+                } as any);
+            } else {
+                // Modo normal
+                await matchRepo.saveMatch({ userId, name, email, cardName: targetCard.name, attempts, timeSpent } as any);
+            }
         } catch (err) {
             console.error('Erro ao salvar partida:', err);
         }
