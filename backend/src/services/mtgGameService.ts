@@ -5,6 +5,7 @@ import textMatchRepo from '../repositories/textMatchRepository';
 import { maskCardNameInText } from '../utils/textUtils';
 import matchRepo from '../repositories/matchRepository';
 import { ScryfallService } from './scryfallService';
+import coinsRepository from '../repositories/coinsRepository';
 
 const scryfallService = new ScryfallService();
 
@@ -27,6 +28,40 @@ export interface GuessCardParams {
     attempts?: number;
     timeSpent?: number;
     games: Record<string, any>;
+    difficulty?: 'easy' | 'medium' | 'hard';
+}
+
+// Função para calcular recompensas baseada na dificuldade
+function getCoinReward(difficulty: string = 'medium', gameMode: string = 'normal', attempts: number = 1): number {
+    let baseReward = 0;
+    
+    // Recompensa base por dificuldade no modo normal
+    switch (difficulty) {
+        case 'easy':
+            baseReward = 1;
+            break;
+        case 'hard':
+            baseReward = 10;
+            break;
+        case 'medium':
+        default:
+            baseReward = 3;
+            break;
+    }
+    
+    // Multiplicadores por modo de jogo (exceto daily que tem lógica própria)
+    const modeMultipliers: Record<string, number> = {
+        'normal': 1,
+        'blur': 1.5,    // Modo blur é mais difícil
+        'text': 1.2     // Modo texto é moderadamente difícil
+    };
+    
+    const multiplier = modeMultipliers[gameMode] || 1;
+    
+    // Bônus por acertar na primeira tentativa
+    const perfectBonus = attempts === 1 ? Math.ceil(baseReward * 0.5) : 0;
+    
+    return Math.ceil(baseReward * multiplier) + perfectBonus;
 }
 
 export async function processGuessCard(params: GuessCardParams) {
@@ -233,6 +268,10 @@ export async function processGuessCard(params: GuessCardParams) {
     // Persistir partida se acertou
     if (isCorrect && userId && name && email && typeof attempts === 'number' && typeof timeSpent === 'number') {
         try {
+            // Determinar dificuldade e modo do jogo
+            const gameDifficulty = targetCard.difficulty || params.difficulty || 'medium';
+            const gameMode = targetCard.gameMode || 'normal';
+            
             // Salvar no repositório específico baseado no modo
             if (targetCard.gameMode === 'blur') {
                 await blurMatchRepo.saveBlurMatch({ 
@@ -258,6 +297,33 @@ export async function processGuessCard(params: GuessCardParams) {
                 // Modo normal
                 await matchRepo.saveMatch({ userId, name, email, cardName: targetCard.name, attempts, timeSpent } as any);
             }
+            
+            // Sistema de recompensas de moedas
+            try {
+                const coinReward = getCoinReward(gameDifficulty, gameMode, attempts);
+                const rewardReason = `${gameMode}_win`;
+                const description = `Vitória no modo ${gameMode} (${gameDifficulty}) - ${attempts} tentativa${attempts > 1 ? 's' : ''}`;
+                
+                await coinsRepository.addCoins(
+                    userId,
+                    coinReward,
+                    rewardReason,
+                    description,
+                    {
+                        gameId,
+                        cardName: targetCard.name,
+                        attempts,
+                        timeSpent,
+                        difficulty: gameDifficulty,
+                        gameMode
+                    }
+                );
+                
+                console.log(`💰 Usuário ${userId} ganhou ${coinReward} moedas por vitória em ${gameMode} (${gameDifficulty})`);
+            } catch (coinError) {
+                console.error('Erro ao adicionar moedas:', coinError);
+                // Não falha o jogo se houve erro nas moedas
+            }
         } catch (err) {
             console.error('Erro ao salvar partida:', err);
         }
@@ -277,6 +343,45 @@ export async function processGuessCard(params: GuessCardParams) {
                 gameDate = new Date().toISOString().slice(0, 10);
             }
             await dailyMatchRepo.saveDailyMatch({ userId, name, email, date: gameDate, cardName: targetCard.name, attempts, timeSpent });
+            
+            // Sistema de recompensas específico para modo diário
+            try {
+                // Verificar se está jogando no mesmo dia
+                const today = new Date().toISOString().slice(0, 10);
+                const isPlayingToday = gameDate === today;
+                
+                // Recompensa baseada se é mesmo dia ou retroativo
+                const dailyCoinReward = isPlayingToday ? 30 : 1;
+                const rewardType = isPlayingToday ? 'daily_current' : 'daily_retroactive';
+                const description = isPlayingToday 
+                    ? `Vitória no modo diário (mesmo dia) - ${attempts} tentativa${attempts > 1 ? 's' : ''} (${gameDate})`
+                    : `Vitória no modo diário (retroativo) - ${attempts} tentativa${attempts > 1 ? 's' : ''} (${gameDate})`;
+                
+                await coinsRepository.addCoins(
+                    userId,
+                    dailyCoinReward,
+                    rewardType,
+                    description,
+                    {
+                        gameId,
+                        cardName: targetCard.name,
+                        attempts,
+                        timeSpent,
+                        gameDate,
+                        gameMode: 'daily',
+                        isRetroactive: !isPlayingToday,
+                        playedOn: today
+                    }
+                );
+                
+                if (isPlayingToday) {
+                    console.log(`🌟 Usuário ${userId} ganhou ${dailyCoinReward} moedas por vitória diária (MESMO DIA) em ${gameDate}`);
+                } else {
+                    console.log(`📅 Usuário ${userId} ganhou ${dailyCoinReward} moeda por vitória diária (RETROATIVO) em ${gameDate}`);
+                }
+            } catch (coinError) {
+                console.error('Erro ao adicionar moedas diárias:', coinError);
+            }
         } catch (err: any) {
             if (err.code === 11000) {
                 // Duplicate key error: já jogou

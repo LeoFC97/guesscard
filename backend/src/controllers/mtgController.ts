@@ -157,6 +157,10 @@ export class MtgController {
                 return;
             }
             const { processGuessCard } = require('../services/mtgGameService');
+            // Obter dificuldade do jogo em andamento
+            const gameData = games[gameId];
+            const difficulty = gameData?.difficulty || 'medium';
+            
             const result = await processGuessCard({
                 gameId,
                 guess,
@@ -165,7 +169,8 @@ export class MtgController {
                 email,
                 attempts,
                 timeSpent,
-                games
+                games,
+                difficulty
             });
             res.status(200).json(result);
         } catch (error) {
@@ -211,8 +216,13 @@ export class MtgController {
                 return;
             }
             const gameId = randomUUID();
-            games[gameId] = targetCard;
-            res.status(200).json({ message: 'New game started', cardName: targetCard.name, gameId });
+            games[gameId] = { 
+                ...targetCard, 
+                difficulty,
+                gameMode: 'normal',
+                startTime: Date.now()
+            };
+            res.status(200).json({ message: 'New game started', cardName: targetCard.name, gameId, difficulty });
         } catch (error) {
             res.status(500).json({ message: 'Error starting new game', error });
         }
@@ -243,6 +253,7 @@ export class MtgController {
             // Armazenar carta com informação de que é modo texto
             games[gameId] = { 
                 ...targetCard, 
+                difficulty,
                 gameMode: 'text',
                 startTime: Date.now() // Timestamp do início do jogo
             };
@@ -292,6 +303,7 @@ export class MtgController {
             // Armazenar carta com informação de que é modo blur
             games[gameId] = { 
                 ...targetCard, 
+                difficulty,
                 gameMode: 'blur',
                 maxBlurAttempts: -1, // Sem limite de tentativas
                 currentBlurAttempts: 0, // Rastrear tentativas atuais do modo blur

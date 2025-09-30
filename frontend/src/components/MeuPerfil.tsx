@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Divider, Chip, List, ListItem, ListItemText, Stack } from '@mui/material';
+import coinsApi, { CoinStats } from '../services/coinsApi';
 
 interface PerfilProps {
   userId: string;
@@ -24,6 +25,37 @@ interface PerfilProps {
 }
 
 const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, themeMode = 'dark', stats }) => {
+  const [coinStats, setCoinStats] = useState<CoinStats | null>(null);
+  const [loadingCoins, setLoadingCoins] = useState(true);
+
+  // Carregar estatísticas de moedas
+  useEffect(() => {
+    const loadCoinStats = async () => {
+      if (!userId) return;
+      
+      try {
+        setLoadingCoins(true);
+        const coinData = await coinsApi.getUserCoinStats(userId);
+        setCoinStats(coinData);
+      } catch (error) {
+        console.error('Error loading coin stats:', error);
+        // Em caso de erro, definir valores padrão
+        setCoinStats({
+          balance: 0,
+          totalEarned: 0,
+          totalSpent: 0,
+          earnedToday: 0,
+          spentToday: 0,
+          lastUpdated: new Date()
+        });
+      } finally {
+        setLoadingCoins(false);
+      }
+    };
+
+    loadCoinStats();
+  }, [userId]);
+
   // DEBUG: Mostrar userId e API URL no modal
   const apiUrl = process.env.REACT_APP_API_URL;
   // Fallbacks para stats
@@ -56,6 +88,38 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, the
       {/* DEBUG INFO */}
       <Typography variant="h5" fontWeight={700} mb={1} sx={{ color: themeMode === 'dark' ? '#a78bfa' : '#1976d2' }}>Meu Perfil</Typography>
       <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
+      
+      {/* Seção de Moedas */}
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          p: 1.5,
+          mb: 2,
+          borderRadius: 2,
+          backgroundColor: themeMode === 'dark' ? '#2a2f42' : '#f5f5f5',
+          border: `2px solid ${themeMode === 'dark' ? '#ffd700' : '#ff9800'}`
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="h6" sx={{ fontSize: '1.5rem', color: '#ffd700' }}>🪙</Typography>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>
+            Moedas
+          </Typography>
+        </Box>
+        <Typography 
+          variant="h6" 
+          fontWeight={700} 
+          sx={{ 
+            color: '#ffd700',
+            textShadow: '0 0 8px rgba(255, 215, 0, 0.3)'
+          }}
+        >
+          {loadingCoins ? '...' : coinStats?.balance?.toLocaleString() || '0'}
+        </Typography>
+      </Box>
+
       <Typography variant="subtitle1" sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}><b>Nome:</b> {name || '-'}</Typography>
       <Typography variant="subtitle2" sx={{ color: themeMode === 'dark' ? '#bdbdbd' : '#555' }} mb={2}>{email || '-'}</Typography>
       <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
@@ -127,6 +191,46 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, the
       <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
       <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Sequencia de acertos da carta diária:</Typography>
       <Typography variant="body2" mb={2} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{safeStats.streak}</Typography>
+      
+      {/* Estatísticas detalhadas das moedas */}
+      {coinStats && (
+        <>
+          <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
+          <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Estatísticas de Moedas</Typography>
+          <List dense>
+            <ListItem>
+              <ListItemText 
+                primary={`💰 Saldo atual: ${coinStats.balance.toLocaleString()} moedas`}
+                sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#ffd700' : '#ff9800', fontWeight: 600 } }}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText 
+                primary={`📈 Total ganho: ${coinStats.totalEarned.toLocaleString()}`}
+                sx={{ '& .MuiListItemText-primary': { color: '#4caf50' } }}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText 
+                primary={`📉 Total gasto: ${coinStats.totalSpent.toLocaleString()}`}
+                sx={{ '& .MuiListItemText-primary': { color: '#f44336' } }}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText 
+                primary={`🌟 Ganho hoje: ${coinStats.earnedToday.toLocaleString()}`}
+                sx={{ '& .MuiListItemText-primary': { color: '#2196f3' } }}
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText 
+                primary={`💸 Gasto hoje: ${coinStats.spentToday.toLocaleString()}`}
+                sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
+              />
+            </ListItem>
+          </List>
+        </>
+      )}
     </Box>
   );
 };

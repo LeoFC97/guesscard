@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Button, Alert, Tooltip } from '@mui/material';
 import { IconButton } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import VictoryScreen from '../components/VictoryScreen';

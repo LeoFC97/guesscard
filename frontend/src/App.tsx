@@ -4,6 +4,8 @@ import LeaderboardsPage from './pages/LeaderboardsPage';
 import { Dialog, Box } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MeuPerfil from './components/MeuPerfil';
+import CoinDisplay from './components/CoinDisplay';
+import CoinStatement from './components/CoinStatement';
 import { ThemeProvider, createTheme, CssBaseline, IconButton, Tooltip } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -136,6 +138,7 @@ const App: React.FC = () => {
     const [name, setName] = useState<string>(getInitial('user_name'));
     const [email, setEmail] = useState<string>(getInitial('user_email'));
     const [perfilOpen, setPerfilOpen] = useState(false);
+    const [coinStatementOpen, setCoinStatementOpen] = useState(false);
     const [perfilStats, setPerfilStats] = useState<any>({ dailyDates: [], stats: {} });
     // Exemplo: buscar perfil quando modal abrir e userId existir
     React.useEffect(() => {
@@ -233,6 +236,13 @@ const App: React.FC = () => {
                         {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>
                 </Tooltip>
+                {/* Exibir moedas para usuários logados */}
+                <CoinDisplay 
+                    userId={userId} 
+                    themeMode={themeMode} 
+                    onClick={() => setCoinStatementOpen(true)}
+                />
+                
                 {!isGuest && (
                     <Box position="fixed" top={16} right={24} zIndex={2000}>
                         <IconButton
@@ -253,6 +263,22 @@ const App: React.FC = () => {
                     ) : (
                         <MeuPerfil userId={userId} name={name} email={email} dailyDates={perfilStats.dailyDates || []} stats={perfilStats.stats || {}} themeMode={themeMode} />
                     )}
+                </Dialog>
+
+                {/* Modal do Extrato de Moedas */}
+                <Dialog 
+                    open={coinStatementOpen} 
+                    onClose={() => setCoinStatementOpen(false)}
+                    maxWidth="lg"
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            backgroundColor: themeMode === 'dark' ? '#181c24' : '#f5f5f5',
+                            maxHeight: '90vh'
+                        }
+                    }}
+                >
+                    <CoinStatement userId={userId} themeMode={themeMode} />
                 </Dialog>
                 <Router>
                     <Routes>
