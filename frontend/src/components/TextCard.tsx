@@ -8,6 +8,7 @@ interface TextCardProps {
     manaCost: number;
     cardName?: string; // Para debug ou quando acertar
     showCard?: boolean; // Se deve mostrar a carta sem censura (quando acerta)
+    hasCensoredContent?: boolean; // Se o texto contém conteúdo censurado
 }
 
 const TextCard: React.FC<TextCardProps> = ({ 
@@ -16,27 +17,20 @@ const TextCard: React.FC<TextCardProps> = ({
     cardType,
     manaCost,
     cardName, 
-    showCard = false 
+    showCard = false,
+    hasCensoredContent = false
 }) => {
     // Função para censurar o nome da carta no texto
     const censorCardName = (text: string, name: string): string => {
         if (!name || !text) return text;
         
-        // Remove caracteres especiais do nome para criar regex mais flexível
-        const cleanName = name.replace(/[^a-zA-Z0-9\s]/g, '');
-        const words = cleanName.split(/\s+/).filter(word => word.length > 2); // Só palavras com mais de 2 caracteres
-        
-        let censoredText = text;
-        words.forEach(word => {
-            const regex = new RegExp(`\\b${word}\\b`, 'gi');
-            const censored = '█'.repeat(word.length);
-            censoredText = censoredText.replace(regex, censored);
-        });
-        
-        return censoredText;
+        // Substituir o nome exato da carta por <card_name>
+        const regex = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+        return text.replace(regex, '<card_name>');
     };
 
-    // Função para censurar o nome na imagem (criar overlay)
+    // O texto já vem censurado do backend quando não showCard
+    // Aplica censura local para substituir por <card_name> se necessário
     const displayText = showCard ? cardText : censorCardName(cardText, cardName || '');
 
     return (
@@ -76,28 +70,44 @@ const TextCard: React.FC<TextCardProps> = ({
                         }}
                     />
                     
-                    {/* Overlay para censurar o nome na imagem */}
+                    {/* Overlays para censurar informações na imagem */}
                     {!showCard && (
-                        <Box
-                            sx={{
-                                position: 'absolute',
-                                top: 12,
-                                left: 12,
-                                right: 12,
-                                height: 24,
-                                background: 'linear-gradient(45deg, #333 25%, #555 25%, #555 50%, #333 50%, #333 75%, #555 75%)',
-                                backgroundSize: '8px 8px',
-                                border: '2px solid #000',
-                                borderRadius: 1,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Typography variant="caption" sx={{ color: '#fff', fontWeight: 'bold' }}>
-                                NOME CENSURADO
-                            </Typography>
-                        </Box>
+                        <>
+                            {/* Overlay no nome da carta (topo) */}
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    top: 12,
+                                    left: 12,
+                                    right: 12,
+                                    height: 24,
+                                    background: 'linear-gradient(45deg, #333 25%, #555 25%, #555 50%, #333 50%, #333 75%, #555 75%)',
+                                    backgroundSize: '8px 8px',
+                                    border: '2px solid #000',
+                                    borderRadius: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <Typography variant="caption" sx={{ color: '#fff', fontWeight: 'bold' }}>
+                                    NOME CENSURADO
+                                </Typography>
+                            </Box>
+
+                            {/* Blur overlay sobre toda a área de texto da carta */}
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    bottom: 40, // Posição aproximada onde fica o texto de habilidades
+                                    left: 12,
+                                    right: 12,
+                                    height: 100,
+                                    backdropFilter: 'blur(8px)',
+                                    borderRadius: 1
+                                }}
+                            />
+                        </>
                     )}
                 </Box>
 
@@ -126,21 +136,43 @@ const TextCard: React.FC<TextCardProps> = ({
                     {/* Texto da Carta */}
                     <Paper sx={{ p: 2, backgroundColor: '#f9f9f9' }}>
                         <Typography variant="subtitle2" color="primary" gutterBottom>
-                            📖 Texto da Carta
+                            📖 Texto da Carta {!showCard && '(Censurado)'}
                         </Typography>
+                        
+                        {!showCard && hasCensoredContent && (
+                            <Box sx={{ mb: 1, p: 1, backgroundColor: '#ffecb3', borderRadius: 1, border: '1px solid #ffc107' }}>
+                                <Typography variant="caption" sx={{ color: '#e65100', fontWeight: 'bold' }}>
+                                    ⚠️ Referências ao nome da carta foram censuradas com █
+                                </Typography>
+                            </Box>
+                        )}
+                        
                         <Typography 
                             variant="body2" 
                             sx={{ 
                                 lineHeight: 1.6,
                                 fontFamily: 'monospace',
-                                backgroundColor: showCard ? 'transparent' : '#fff3cd',
-                                padding: 1,
+                                backgroundColor: showCard ? 'transparent' : '#ffffff',
+                                color: showCard ? 'inherit' : '#1a1a1a',
+                                fontWeight: showCard ? 'normal' : 'bold',
+                                padding: 1.5,
                                 borderRadius: 1,
-                                border: showCard ? 'none' : '1px solid #ffeaa7'
+                                border: showCard ? 'none' : '2px solid #2196f3',
+                                fontSize: '0.9rem',
+                                whiteSpace: 'pre-wrap', // Preserva quebras de linha
+                                textShadow: showCard ? 'none' : '0 0 1px rgba(0,0,0,0.1)'
                             }}
                         >
                             {displayText || 'Esta carta não possui texto de habilidade.'}
                         </Typography>
+                        
+                        {!showCard && (
+                            <Box sx={{ mt: 1, p: 1, backgroundColor: '#e3f2fd', borderRadius: 1 }}>
+                                <Typography variant="caption" sx={{ color: '#1565c0', fontStyle: 'italic' }}>
+                                    💡 Dica: Use as informações de tipo, custo de mana e habilidades para adivinhar a carta!
+                                </Typography>
+                            </Box>
+                        )}
                     </Paper>
                 </Box>
             </Box>

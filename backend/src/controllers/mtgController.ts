@@ -6,6 +6,7 @@ import dailyMatchRepo from '../repositories/dailyMatchRepository';
 import dailyCardRepo from '../repositories/dailyCardRepository';
 import { getUserStatsService } from '../services/userStatsService';
 import leaderboardService from '../services/leaderboardService';
+import { maskCardNameInText } from '../utils/textUtils';
 
 // Mapeamento em memória para partidas: { [gameId]: targetCard }
 const games: Record<string, any> = {};
@@ -245,15 +246,21 @@ export class MtgController {
                 gameMode: 'text',
                 startTime: Date.now() // Timestamp do início do jogo
             };
+            // Censurar o texto que será enviado
+            const originalText = targetCard.text || '';
+            const censoredText = maskCardNameInText(originalText, targetCard.name);
+            
             res.status(200).json({ 
                 message: 'New text game started', 
                 cardName: targetCard.name, 
                 gameId,
                 gameMode: 'text',
                 cardImage: targetCard.imageUrl || targetCard.image_uris?.normal,
-                cardText: targetCard.text || '',
+                cardText: censoredText,
+                originalText: originalText, // Para debug (remover em produção)
                 cardType: targetCard.type || '',
-                manaCost: targetCard.cmc || 0
+                manaCost: targetCard.cmc || 0,
+                hasCensoredContent: originalText !== censoredText
             });
         } catch (error) {
             res.status(500).json({ message: 'Error starting new text game', error });
@@ -383,6 +390,7 @@ export class MtgController {
         }
     }
 
+    // Text mode leaderboards
     public static async getTextLeaderboard(req: Request, res: Response): Promise<void> {
         try {
             const limit = parseInt(req.query.limit as string) || 50;

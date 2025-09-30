@@ -58,7 +58,7 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     const [isBlurMode, setIsBlurMode] = useState(false);
     const [isTextMode, setIsTextMode] = useState(false);
     const [cardImageUrl, setCardImageUrl] = useState<string | null>(null);
-    const [cardTextData, setCardTextData] = useState<{text: string, type: string, manaCost: number} | null>(null);
+    const [cardTextData, setCardTextData] = useState<{text: string, type: string, manaCost: number, hasCensoredContent?: boolean} | null>(null);
     const [maxBlurAttempts, setMaxBlurAttempts] = useState(-1); // Sem limite
     const [currentBlurLevel, setCurrentBlurLevel] = useState<number>(5); // Começa com 5px
 
@@ -126,7 +126,8 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
             setCardTextData({
                 text: gameData.cardText || '',
                 type: gameData.cardType || '',
-                manaCost: gameData.manaCost || 0
+                manaCost: gameData.manaCost || 0,
+                hasCensoredContent: gameData.hasCensoredContent || false
             });
             setMaxBlurAttempts(-1);
             setCurrentBlurLevel(5);
@@ -343,6 +344,7 @@ const handleHint = () => {
                         manaCost={cardTextData.manaCost}
                         cardName={targetCard || undefined}
                         showCard={victory}
+                        hasCensoredContent={cardTextData.hasCensoredContent}
                     />
                 )}
 
