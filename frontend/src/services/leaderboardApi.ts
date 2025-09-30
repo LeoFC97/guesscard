@@ -76,6 +76,34 @@ export interface BlurPerfectLeaderboardEntry {
     fastestPerfect: number;
 }
 
+export interface TextLeaderboardEntry {
+    _id: string;
+    name: string;
+    email: string;
+    totalAttempts: number;
+    games: number;
+    avgTimeSpent: number;
+    avgAttemptsPerGame: number;
+}
+
+export interface TextSpeedLeaderboardEntry {
+    _id: string;
+    name: string;
+    email: string;
+    fastestTime: number;
+    avgTime: number;
+    games: number;
+}
+
+export interface TextPerfectLeaderboardEntry {
+    _id: string;
+    name: string;
+    email: string;
+    perfectGames: number;
+    avgTimeSpent: number;
+    fastestPerfect: number;
+}
+
 /**
  * Obtém leaderboard de jogos normais (geral)
  */
@@ -190,6 +218,54 @@ export const getBlurPerfectLeaderboard = async (limit: number = 50): Promise<Blu
         return await response.json();
     } catch (error) {
         console.error('Error fetching blur perfect leaderboard:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtém leaderboard geral do modo texto
+ */
+export const getTextLeaderboard = async (limit: number = 50): Promise<TextLeaderboardEntry[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/leaderboards/text?limit=${limit}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch text leaderboard');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching text leaderboard:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtém leaderboard de velocidade do modo texto
+ */
+export const getTextSpeedLeaderboard = async (limit: number = 50): Promise<TextSpeedLeaderboardEntry[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/leaderboards/text-speed?limit=${limit}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch text speed leaderboard');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching text speed leaderboard:', error);
+        return [];
+    }
+};
+
+/**
+ * Obtém leaderboard de jogos perfeitos do modo texto
+ */
+export const getTextPerfectLeaderboard = async (limit: number = 50): Promise<TextPerfectLeaderboardEntry[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/leaderboards/text-perfect?limit=${limit}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch text perfect leaderboard');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching text perfect leaderboard:', error);
         return [];
     }
 };

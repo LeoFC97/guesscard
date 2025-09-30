@@ -11,6 +11,7 @@ import GuessHistory from '../components/GuessHistory';
 import StartGame from './StartGame';
 import Leaderboards from '../components/Leaderboards';
 import BlurredCard from '../components/BlurredCard';
+import TextCard from '../components/TextCard';
 import { Container, Typography, Box } from '@mui/material';
 // Removido useUserInfo, centralizado no contexto Auth0
 
@@ -55,7 +56,9 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     const [endTime, setEndTime] = useState<number | null>(null);
     const [showLeaderboards, setShowLeaderboards] = useState(false);
     const [isBlurMode, setIsBlurMode] = useState(false);
+    const [isTextMode, setIsTextMode] = useState(false);
     const [cardImageUrl, setCardImageUrl] = useState<string | null>(null);
+    const [cardTextData, setCardTextData] = useState<{text: string, type: string, manaCost: number} | null>(null);
     const [maxBlurAttempts, setMaxBlurAttempts] = useState(-1); // Sem limite
     const [currentBlurLevel, setCurrentBlurLevel] = useState<number>(5); // Começa com 5px
 
@@ -109,13 +112,29 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         const blurMode = gameId.startsWith('blur-') || gameData?.gameMode === 'blur';
         setIsBlurMode(blurMode);
         
+        // Detectar modo texto
+        const textMode = gameId.startsWith('text-') || gameData?.gameMode === 'text';
+        setIsTextMode(textMode);
+        
         if (blurMode && gameData) {
             setCardImageUrl(gameData.cardImage || null);
             setMaxBlurAttempts(gameData.maxBlurAttempts || -1);
             setCurrentBlurLevel(gameData.initialBlur || 5); // Reinicia com blur inicial mais fraco
+            setCardTextData(null);
+        } else if (textMode && gameData) {
+            setCardImageUrl(gameData.cardImage || null);
+            setCardTextData({
+                text: gameData.cardText || '',
+                type: gameData.cardType || '',
+                manaCost: gameData.manaCost || 0
+            });
+            setMaxBlurAttempts(-1);
+            setCurrentBlurLevel(5);
         } else {
             setCardImageUrl(null);
+            setCardTextData(null);
             setIsBlurMode(false);
+            setIsTextMode(false);
             setCurrentBlurLevel(5);
         }
     };
@@ -291,6 +310,67 @@ const handleHint = () => {
                         }}
                     >
                         🏠 Menu Inicial
+                    </Button>
+                </Box>
+            </Container>
+        );
+    }
+
+    // Tela especial para modo Texto
+    if (isTextMode) {
+        return (
+            <Container maxWidth="lg" sx={{ py: 8 }}>
+                <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
+                    <Typography variant="h3" align="center" sx={{ 
+                        background: 'linear-gradient(45deg, #ed6c02 30%, #ff9800 90%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                    }} gutterBottom>
+                        📜 Modo Texto
+                    </Typography>
+                    <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                        Adivinhe a carta pelo texto e habilidades! Nome censurado.
+                    </Typography>
+                </Box>
+
+                {/* Componente da carta com texto */}
+                {cardImageUrl && cardTextData && (
+                    <TextCard
+                        imageUrl={cardImageUrl}
+                        cardText={cardTextData.text}
+                        cardType={cardTextData.type}
+                        manaCost={cardTextData.manaCost}
+                        cardName={targetCard || undefined}
+                        showCard={victory}
+                    />
+                )}
+
+                <CardGuess
+                    onGuess={handleGuess}
+                    gameId={gameId}
+                    userId={userId}
+                    name={name}
+                    email={email}
+                    attempts={wrongCount + 1}
+                    timeSpent={endTime && startTime ? Math.floor((endTime - startTime) / 1000) : 0}
+                />
+
+                {victory && <VictoryScreen
+                    cardName={targetCard || ''}
+                    attempts={wrongCount + 1}
+                    timeSpent={endTime && startTime ? Math.floor((endTime - startTime) / 1000) : 0}
+                    onRestart={() => setGameStarted(false)}
+                    cardImage={cardImageUrl || ''}
+                />}
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setGameStarted(false)}
+                        sx={{ mr: 2 }}
+                    >
+                        Voltar ao Menu
                     </Button>
                 </Box>
             </Container>

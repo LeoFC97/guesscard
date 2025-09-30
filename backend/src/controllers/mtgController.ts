@@ -217,6 +217,49 @@ export class MtgController {
         }
     }
 
+    // Novo endpoint para modo texto - carta com nome censurado
+    public static async newTextGame(req: Request, res: Response): Promise<void> {
+        try {
+            const { difficulty } = req.body;
+            let cardList: string[];
+            const { easyCards, mediumCards, hardCards } = require('../cardDifficulties');
+            if (difficulty === 'easy') {
+                cardList = easyCards;
+            } else if (difficulty === 'hard') {
+                cardList = hardCards;
+            } else {
+                cardList = mediumCards;
+            }
+            const randomIndex = Math.floor(Math.random() * cardList.length);
+            const cardName = cardList[randomIndex];
+            const cards = await (new ScryfallService()).fetchCardByParam('name', cardName);
+            const targetCard = cards.length > 0 ? (new ScryfallService()).convertToLegacyFormat(cards[0]) : null;
+            if (!targetCard) {
+                res.status(500).json({ message: 'Could not pick a new card' });
+                return;
+            }
+            const gameId = `text-${randomUUID()}`;
+            // Armazenar carta com informação de que é modo texto
+            games[gameId] = { 
+                ...targetCard, 
+                gameMode: 'text',
+                startTime: Date.now() // Timestamp do início do jogo
+            };
+            res.status(200).json({ 
+                message: 'New text game started', 
+                cardName: targetCard.name, 
+                gameId,
+                gameMode: 'text',
+                cardImage: targetCard.imageUrl || targetCard.image_uris?.normal,
+                cardText: targetCard.text || '',
+                cardType: targetCard.type || '',
+                manaCost: targetCard.cmc || 0
+            });
+        } catch (error) {
+            res.status(500).json({ message: 'Error starting new text game', error });
+        }
+    }
+
     // Novo endpoint para modo blur - carta começa borrada
     public static async newBlurGame(req: Request, res: Response): Promise<void> {
         try {
@@ -337,6 +380,50 @@ export class MtgController {
             res.status(200).json(leaderboard);
         } catch (error) {
             res.status(500).json({ message: 'Error fetching blur perfect leaderboard', error });
+        }
+    }
+
+    public static async getTextLeaderboard(req: Request, res: Response): Promise<void> {
+        try {
+            const limit = parseInt(req.query.limit as string) || 50;
+            const textMatchRepo = require('../repositories/textMatchRepository').default;
+            const leaderboard = await textMatchRepo.getTextLeaderboard(limit);
+            res.status(200).json(leaderboard);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching text leaderboard', error });
+        }
+    }
+
+    public static async getTextSpeedLeaderboard(req: Request, res: Response): Promise<void> {
+        try {
+            const limit = parseInt(req.query.limit as string) || 50;
+            const textMatchRepo = require('../repositories/textMatchRepository').default;
+            const leaderboard = await textMatchRepo.getTextSpeedLeaderboard(limit);
+            res.status(200).json(leaderboard);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching text speed leaderboard', error });
+        }
+    }
+
+    public static async getTextPerfectLeaderboard(req: Request, res: Response): Promise<void> {
+        try {
+            const limit = parseInt(req.query.limit as string) || 50;
+            const textMatchRepo = require('../repositories/textMatchRepository').default;
+            const leaderboard = await textMatchRepo.getTextPerfectLeaderboard(limit);
+            res.status(200).json(leaderboard);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching text perfect leaderboard', error });
+        }
+    }
+
+    public static async getUserTextStats(req: Request, res: Response): Promise<void> {
+        try {
+            const { userId } = req.params;
+            const textMatchRepo = require('../repositories/textMatchRepository').default;
+            const textStats = await textMatchRepo.getUserTextStats(userId);
+            res.status(200).json(textStats);
+        } catch (error) {
+            res.status(500).json({ message: 'Error fetching user text stats', error });
         }
     }
 

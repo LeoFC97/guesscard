@@ -20,6 +20,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
     const [error, setError] = useState<string | null>(null);
     const [loadingDaily, setLoadingDaily] = useState(false);
     const [loadingBlur, setLoadingBlur] = useState(false);
+    const [loadingText, setLoadingText] = useState(false);
     const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const playedDates = useDailyPlayedDates(userId);
@@ -59,6 +60,25 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
             setError(err.message || 'Erro desconhecido');
         } finally {
             setLoadingBlur(false);
+        }
+    };
+
+    const handleStartText = async () => {
+        setLoadingText(true);
+        setError(null);
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/new-text-game`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ difficulty }),
+            });
+            if (!response.ok) throw new Error('Erro ao iniciar novo jogo texto');
+            const data = await response.json();
+            onGameStarted(data.cardName, data.gameId, data);
+        } catch (err: any) {
+            setError(err.message || 'Erro desconhecido');
+        } finally {
+            setLoadingText(false);
         }
     };
 
@@ -173,6 +193,33 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
             <Button variant="contained" color="primary" size="large" onClick={handleStart} disabled={loading}>
                 {loading ? <CircularProgress size={24} /> : 'Iniciar Novo Jogo'}
             </Button>
+
+            {/* Modo Texto */}
+            <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'warning.main' }}>
+                    📜 Modo Texto
+                </Typography>
+                <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
+                    Adivinhe a carta pelo seu texto e habilidades! O nome fica censurado.
+                    <br />
+                    <span style={{ color: '#ed6c02', fontWeight: 700 }}>
+                        Desafio para conhecedores das mecânicas de MTG!
+                    </span>
+                </Typography>
+                <Button 
+                    variant="contained" 
+                    color="warning" 
+                    size="large" 
+                    onClick={handleStartText} 
+                    disabled={loadingText}
+                    sx={{
+                        background: 'linear-gradient(45deg, #ed6c02 30%, #ff9800 90%)',
+                        boxShadow: '0 3px 5px 2px rgba(237, 108, 2, .3)',
+                    }}
+                >
+                    {loadingText ? <CircularProgress size={24} /> : '📖 Jogar Modo Texto'}
+                </Button>
+            </Box>
 
             {/* Modo Blur */}
             <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>

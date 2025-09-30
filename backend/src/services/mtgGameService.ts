@@ -1,6 +1,7 @@
 import dailyMatchRepo from '../repositories/dailyMatchRepository';
 import dailyCardRepo from '../repositories/dailyCardRepository';
 import blurMatchRepo from '../repositories/blurMatchRepository';
+import textMatchRepo from '../repositories/textMatchRepository';
 import { maskCardNameInText } from '../utils/textUtils';
 import matchRepo from '../repositories/matchRepository';
 import { ScryfallService } from './scryfallService';
@@ -232,7 +233,7 @@ export async function processGuessCard(params: GuessCardParams) {
     // Persistir partida se acertou
     if (isCorrect && userId && name && email && typeof attempts === 'number' && typeof timeSpent === 'number') {
         try {
-            // Se é modo blur, salvar no repositório específico
+            // Salvar no repositório específico baseado no modo
             if (targetCard.gameMode === 'blur') {
                 await blurMatchRepo.saveBlurMatch({ 
                     userId, 
@@ -243,6 +244,15 @@ export async function processGuessCard(params: GuessCardParams) {
                     timeSpent,
                     blurAttempts: targetCard.currentBlurAttempts || 0,
                     maxBlurAttempts: targetCard.maxBlurAttempts || -1
+                } as any);
+            } else if (targetCard.gameMode === 'text') {
+                await textMatchRepo.saveTextMatch({
+                    userId,
+                    name,
+                    email,
+                    cardName: targetCard.name,
+                    attempts,
+                    timeSpent
                 } as any);
             } else {
                 // Modo normal

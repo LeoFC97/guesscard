@@ -22,34 +22,44 @@ import {
     EmojiEvents as TrophyIcon,
     Speed as SpeedIcon,
     Stars as PerfectIcon,
-    CalendarToday as DailyIcon
+    CalendarToday as DailyIcon,
+    Visibility as BlurIcon
 } from '@mui/icons-material';
 import {
     getNormalLeaderboard,
     getDailyLeaderboard,
     getSpeedLeaderboard,
     getPerfectLeaderboard,
+    getBlurLeaderboard,
+    getBlurSpeedLeaderboard,
+    getBlurPerfectLeaderboard,
     LeaderboardEntry,
     DailyLeaderboardEntry,
     SpeedLeaderboardEntry,
-    PerfectLeaderboardEntry
+    PerfectLeaderboardEntry,
+    BlurLeaderboardEntry,
+    BlurSpeedLeaderboardEntry,
+    BlurPerfectLeaderboardEntry
 } from '../services/leaderboardApi';
 
 interface LeaderboardsProps {
     themeMode?: 'light' | 'dark';
 }
 
-type LeaderboardType = 'normal' | 'daily' | 'speed' | 'perfect';
+type LeaderboardType = 'normal' | 'daily' | 'speed' | 'perfect' | 'blur' | 'blur-speed' | 'blur-perfect';
 type GameType = 'normal' | 'daily';
 
 const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
-    const [selectedType, setSelectedType] = useState<LeaderboardType>('daily');
+    const [selectedType, setSelectedType] = useState<LeaderboardType>('blur');
     const [gameType, setGameType] = useState<GameType>('daily');
     const [loading, setLoading] = useState(false);
     const [normalData, setNormalData] = useState<LeaderboardEntry[]>([]);
     const [dailyData, setDailyData] = useState<DailyLeaderboardEntry[]>([]);
     const [speedData, setSpeedData] = useState<SpeedLeaderboardEntry[]>([]);
     const [perfectData, setPerfectData] = useState<PerfectLeaderboardEntry[]>([]);
+    const [blurData, setBlurData] = useState<BlurLeaderboardEntry[]>([]);
+    const [blurSpeedData, setBlurSpeedData] = useState<BlurSpeedLeaderboardEntry[]>([]);
+    const [blurPerfectData, setBlurPerfectData] = useState<BlurPerfectLeaderboardEntry[]>([]);
 
     const isDark = themeMode === 'dark';
 
@@ -76,6 +86,18 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
                 case 'perfect':
                     const perfect = await getPerfectLeaderboard(gameType, 50);
                     setPerfectData(perfect);
+                    break;
+                case 'blur':
+                    const blur = await getBlurLeaderboard(50);
+                    setBlurData(blur);
+                    break;
+                case 'blur-speed':
+                    const blurSpeed = await getBlurSpeedLeaderboard(50);
+                    setBlurSpeedData(blurSpeed);
+                    break;
+                case 'blur-perfect':
+                    const blurPerfect = await getBlurPerfectLeaderboard(50);
+                    setBlurPerfectData(blurPerfect);
                     break;
             }
         } catch (error) {
@@ -257,10 +279,111 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
         </TableContainer>
     );
 
+    const renderBlurLeaderboard = () => (
+        <TableContainer component={Paper} sx={{ maxHeight: 600, backgroundColor: isDark ? '#2a2a2a' : '#fff' }}>
+            <Table stickyHeader>
+                <TableHead>
+                    <TableRow>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogos Blur</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Média Tentativas</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Média Blur</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Tempo Médio</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {blurData.map((entry, index) => (
+                        <TableRow key={entry._id} sx={{ '&:nth-of-type(odd)': { backgroundColor: isDark ? '#333' : '#f9f9f9' } }}>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
+                                <Typography variant="h6">{getRankIcon(index + 1)}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
+                                <Typography variant="body2" fontWeight={600}>{entry.name}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
+                                <Chip label={entry.games} color="secondary" size="small" />
+                            </TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{entry.avgAttemptsPerGame?.toFixed(1)}</TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{entry.avgBlurAttemptsPerGame?.toFixed(1)}</TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{formatTime(Math.round(entry.avgTimeSpent))}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    );
+
+    const renderBlurSpeedLeaderboard = () => (
+        <TableContainer component={Paper} sx={{ maxHeight: 600, backgroundColor: isDark ? '#2a2a2a' : '#fff' }}>
+            <Table stickyHeader>
+                <TableHead>
+                    <TableRow>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Melhor Tempo</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Tempo Médio</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogos Blur</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {blurSpeedData.map((entry, index) => (
+                        <TableRow key={entry._id} sx={{ '&:nth-of-type(odd)': { backgroundColor: isDark ? '#333' : '#f9f9f9' } }}>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
+                                <Typography variant="h6">{getRankIcon(index + 1)}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
+                                <Typography variant="body2" fontWeight={600}>{entry.name}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
+                                <Chip label={formatTime(entry.fastestTime)} color="error" size="small" />
+                            </TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{formatTime(Math.round(entry.avgTime))}</TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{entry.games}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    );
+
+    const renderBlurPerfectLeaderboard = () => (
+        <TableContainer component={Paper} sx={{ maxHeight: 600, backgroundColor: isDark ? '#2a2a2a' : '#fff' }}>
+            <Table stickyHeader>
+                <TableHead>
+                    <TableRow>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogos Perfeitos</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Melhor Tempo</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Tempo Médio</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {blurPerfectData.map((entry, index) => (
+                        <TableRow key={entry._id} sx={{ '&:nth-of-type(odd)': { backgroundColor: isDark ? '#333' : '#f9f9f9' } }}>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
+                                <Typography variant="h6">{getRankIcon(index + 1)}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
+                                <Typography variant="body2" fontWeight={600}>{entry.name}</Typography>
+                            </TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
+                                <Chip label={entry.perfectGames} color="success" size="small" />
+                            </TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{formatTime(entry.fastestPerfect)}</TableCell>
+                            <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{formatTime(Math.round(entry.avgTimeSpent))}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    );
+
     return (
         <Box sx={{ p: 3, backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', minHeight: '100vh' }}>
             <Typography variant="h4" gutterBottom sx={{ color: isDark ? '#fff' : '#000', textAlign: 'center', mb: 4 }}>
-                🏆 Leaderboards
+                🏆 Leaderboards {selectedType.includes('blur') && '🔍'}
             </Typography>
 
             <Card sx={{ mb: 3, backgroundColor: isDark ? '#2a2a2a' : '#fff' }}>
@@ -273,6 +396,9 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
                     >
                         <Tab label="Jogos Normais" value="normal" icon={<TrophyIcon />} />
                         <Tab label="Jogos Diários" value="daily" icon={<DailyIcon />} />
+                        <Tab label="Modo Blur" value="blur" icon={<BlurIcon />} />
+                        <Tab label="Blur - Velocidade" value="blur-speed" icon={<SpeedIcon />} />
+                        <Tab label="Blur - Perfeitos" value="blur-perfect" icon={<PerfectIcon />} />
                         <Tab label="Melhores Tempos" value="speed" icon={<SpeedIcon />} />
                         <Tab label="Menos Tentativas" value="perfect" />
                     </Tabs>
@@ -299,8 +425,18 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
                 </Box>
             ) : (
                 <Box>
+                    {selectedType.includes('blur') && (
+                        <Box sx={{ mb: 2, p: 2, backgroundColor: isDark ? '#2a2a4a' : '#f0f0ff', borderRadius: 2 }}>
+                            <Typography variant="body2" sx={{ color: isDark ? '#bb86fc' : '#6200ea', textAlign: 'center' }}>
+                                🔍 Rankings do Modo Blur - Cartas que ficam mais nítidas a cada palpite!
+                            </Typography>
+                        </Box>
+                    )}
                     {selectedType === 'normal' && renderNormalLeaderboard()}
                     {selectedType === 'daily' && renderDailyLeaderboard()}
+                    {selectedType === 'blur' && renderBlurLeaderboard()}
+                    {selectedType === 'blur-speed' && renderBlurSpeedLeaderboard()}
+                    {selectedType === 'blur-perfect' && renderBlurPerfectLeaderboard()}
                     {selectedType === 'speed' && renderSpeedLeaderboard()}
                     {selectedType === 'perfect' && renderPerfectLeaderboard()}
                 </Box>
