@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Box, Typography, CircularProgress, Tooltip, Chip } from '@mui/material';
 import coinsApi, { UserCoins } from '../services/coinsApi';
+import { useCoins } from '../contexts/CoinsContext';
 
 interface CoinDisplayProps {
     userId: string;
@@ -9,42 +10,53 @@ interface CoinDisplayProps {
 }
 
 const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', onClick }) => {
-    const [userCoins, setUserCoins] = useState<UserCoins | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { balance, loading, setUserId, refreshBalance, coinAnimation } = useCoins();
+    const [localUserCoins, setLocalUserCoins] = useState<UserCoins | null>(null);
 
+    // Quando o userId mudar, atualizar o contexto
+    useEffect(() => {
+        if (userId && userId !== 'guest') {
+            setUserId(userId);
+            refreshBalance();
+        }
+    }, [userId, setUserId, refreshBalance]);
+
+    // Fallback para modo guest ou quando contexto ainda não carregou
     useEffect(() => {
         const loadUserCoins = async () => {
             if (!userId || userId === 'guest') {
-                setLoading(false);
                 return;
             }
 
             try {
-                setLoading(true);
                 const coinData = await coinsApi.getUserCoins(userId);
-                setUserCoins(coinData);
+                setLocalUserCoins(coinData);
             } catch (error) {
                 console.error('Error loading user coins:', error);
                 // Em caso de erro, definir saldo como 0
-                setUserCoins({
+                setLocalUserCoins({
                     userId,
                     balance: 0,
                     totalEarned: 0,
                     totalSpent: 0,
                     lastUpdated: new Date()
                 });
-            } finally {
-                setLoading(false);
             }
         };
 
-        loadUserCoins();
-    }, [userId]);
+        // Só carrega dados localmente se não estiver usando o contexto
+        if (balance === 0 && !loading) {
+            loadUserCoins();
+        }
+    }, [userId, balance, loading]);
 
     // Se for guest, não mostra nada
     if (!userId || userId === 'guest') {
         return null;
     }
+
+    // Usar saldo do contexto ou fallback local
+    const displayBalance = balance || localUserCoins?.balance || 0;
 
     return (
         <Box 
@@ -59,7 +71,7 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', o
             }}
         >
             <Tooltip 
-                title={loading ? 'Carregando moedas...' : `Clique para ver extrato - Saldo: ${userCoins?.balance?.toLocaleString() || '0'} moedas`}
+                title={loading ? 'Carregando moedas...' : `Clique para ver extrato - Saldo: ${displayBalance?.toLocaleString() || '0'} moedas`}
                 placement="bottom"
             >
                 <Chip
@@ -68,7 +80,7 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', o
                         <CircularProgress size={16} sx={{ color: '#ffd700' }} /> : 
                         <Typography sx={{ fontSize: '1.2rem' }}>🪙</Typography>
                     }
-                    label={loading ? '...' : userCoins?.balance?.toLocaleString() || '0'}
+                    label={loading ? '...' : displayBalance?.toLocaleString() || '0'}
                     onClick={onClick}
                     clickable={!loading}
                     sx={{
@@ -95,6 +107,43 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', o
                     }}
                 />
             </Tooltip>
+            
+            {/* Animação de moedas ganhas */}
+            {coinAnimation.show && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        color: '#ffd700',
+                        fontWeight: 'bold',
+                        fontSize: '1.2rem',
+                        animation: 'coinGain 3s ease-out forwards',
+                        '@keyframes coinGain': {
+                            '0%': {
+                                opacity: 1,
+                                transform: 'translateX(-50%) translateY(0px) scale(1.3)',
+                            },
+                            '30%': {
+                                opacity: 1,
+                                transform: 'translateX(-50%) translateY(-20px) scale(1.1)',
+                            },
+                            '70%': {
+                                opacity: 0.8,
+                                transform: 'translateX(-50%) translateY(-40px) scale(0.9)',
+                            },
+                            '100%': {
+                                opacity: 0,
+                                transform: 'translateX(-50%) translateY(-50px) scale(0.8)',
+                            },
+                        },
+                        zIndex: 2001,
+                    }}
+                >
+                    +{coinAnimation.amount} 🪙
+                </Box>
+            )}
         </Box>
     );
 };

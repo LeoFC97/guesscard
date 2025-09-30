@@ -9,6 +9,7 @@ import { CardGuess } from '../components/CardGuess';
 import GuessHistory from '../components/GuessHistory';
 import StartGame from './StartGame';
 import Leaderboards from '../components/Leaderboards';
+import { useCoins } from '../contexts/CoinsContext';
 import BlurredCard from '../components/BlurredCard';
 import TextCard from '../components/TextCard';
 import { Container, Typography, Box } from '@mui/material';
@@ -36,6 +37,7 @@ const ThemeToggle: React.FC<{ themeMode: 'light' | 'dark'; setThemeMode: React.D
     </Tooltip>
 );
 const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMode }) => {
+    const { animateCoinsGain, refreshBalance } = useCoins();
 
     React.useEffect(() => {
         console.log('API_URL:', process.env.REACT_APP_API_URL);
@@ -84,6 +86,12 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
             setVictory(true);
             setEndTime(Date.now());
             setWrongCount(0); // Só zera ao acertar
+            
+            // Processar recompensa de moedas se houver
+            if (result.coinReward && userId && userId !== 'guest') {
+                console.log('🪙 Moedas ganhas:', result.coinReward);
+                animateCoinsGain(result.coinReward);
+            }
         }
         setTextReady(null);
         setTextShown(false);

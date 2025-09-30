@@ -156,6 +156,10 @@ export class MtgController {
                 res.status(400).json({ message: 'Missing or invalid gameId.' });
                 return;
             }
+            
+            // Log da carta tentada pelo usuário
+            console.log(`🎯 Usuário ${userId || 'anônimo'} (${name || 'sem nome'}) tentou a carta: "${guess}" no jogo ${gameId}`);
+            
             const { processGuessCard } = require('../services/mtgGameService');
             // Obter dificuldade do jogo em andamento
             const gameData = games[gameId];

@@ -12,6 +12,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Login from './components/Login';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { fetchUserProfile } from './services/mtgApi';
+import { CoinsProvider } from './contexts/CoinsContext';
 
 const getTheme = (mode: 'light' | 'dark') => createTheme({
     palette: {
@@ -219,8 +220,9 @@ const App: React.FC = () => {
     // Renderiza botão de perfil e modal apenas se usuário estiver logado e não for guest
     const isGuest = userId === 'guest';
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
+        <CoinsProvider>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
             <Box minHeight="100vh" sx={{
                 background: themeMode === 'dark'
                     ? 'linear-gradient(135deg, #23283a 0%, #181c24 100%)'
@@ -288,6 +290,7 @@ const App: React.FC = () => {
                 </Router>
             </Box>
         </ThemeProvider>
+        </CoinsProvider>
     );
 };
 

@@ -320,6 +320,22 @@ export async function processGuessCard(params: GuessCardParams) {
                 );
                 
                 console.log(`💰 Usuário ${userId} ganhou ${coinReward} moedas por vitória em ${gameMode} (${gameDifficulty})`);
+                
+                // Buscar novo saldo para retornar na resposta
+                const userCoins = await coinsRepository.getUserCoins(userId);
+                const coinInfo = {
+                    coinsEarned: coinReward,
+                    rewardType: rewardReason,
+                    newBalance: userCoins?.balance || 0,
+                    rewardDescription: description
+                };
+                
+                return {
+                    feedback,
+                    isCorrect,
+                    guessedCard,
+                    coinReward: coinInfo
+                };
             } catch (coinError) {
                 console.error('Erro ao adicionar moedas:', coinError);
                 // Não falha o jogo se houve erro nas moedas
@@ -379,6 +395,22 @@ export async function processGuessCard(params: GuessCardParams) {
                 } else {
                     console.log(`📅 Usuário ${userId} ganhou ${dailyCoinReward} moeda por vitória diária (RETROATIVO) em ${gameDate}`);
                 }
+                
+                // Buscar novo saldo para retornar na resposta
+                const userCoins = await coinsRepository.getUserCoins(userId);
+                const coinInfo = {
+                    coinsEarned: dailyCoinReward,
+                    rewardType,
+                    newBalance: userCoins?.balance || 0,
+                    rewardDescription: description
+                };
+                
+                return {
+                    feedback,
+                    isCorrect,
+                    guessedCard,
+                    coinReward: coinInfo
+                };
             } catch (coinError) {
                 console.error('Erro ao adicionar moedas diárias:', coinError);
             }
