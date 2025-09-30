@@ -296,7 +296,7 @@ export class MtgController {
                 maxBlurAttempts: -1, // Sem limite de tentativas
                 currentBlurAttempts: 0, // Rastrear tentativas atuais do modo blur
                 initialBlur: 20, // Começa com blur mais fraco (20px)
-                blurReduction: 0.15, // Reduz 15% a cada palpite
+                blurReduction: 0.25, // Reduz 15% a cada palpite
                 startTime: Date.now() // Timestamp do início do jogo
             };
             res.status(200).json({ 
@@ -307,7 +307,7 @@ export class MtgController {
                 cardImage: targetCard.imageUrl || targetCard.image_uris?.normal,
                 maxBlurAttempts: -1, // Sem limite
                 initialBlur: 20, // Blur inicial mais fraco
-                blurReduction: 0.15 // Redução de 15% por palpite
+                blurReduction: 0.25 // Redução de 15% por palpite
             });
         } catch (error) {
             res.status(500).json({ message: 'Error starting new blur game', error });
