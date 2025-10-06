@@ -12,6 +12,7 @@ import Leaderboards from '../components/Leaderboards';
 import { useCoins } from '../contexts/CoinsContext';
 import BlurredCard from '../components/BlurredCard';
 import TextCard from '../components/TextCard';
+import AdButton from '../components/AdButton';
 import { Container, Typography, Box } from '@mui/material';
 // Removido useUserInfo, centralizado no contexto Auth0
 
@@ -58,6 +59,8 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     const [showLeaderboards, setShowLeaderboards] = useState(false);
     const [isBlurMode, setIsBlurMode] = useState(false);
     const [isTextMode, setIsTextMode] = useState(false);
+    const [textManaCostShown, setTextManaCostShown] = useState(false);
+    const [textCardTypeShown, setTextCardTypeShown] = useState(false);
     const [cardImageUrl, setCardImageUrl] = useState<string | null>(null);
     const [cardTextData, setCardTextData] = useState<{text: string, type: string, manaCost: number, hasCensoredContent?: boolean} | null>(null);
     const [maxBlurAttempts, setMaxBlurAttempts] = useState(-1); // Sem limite
@@ -114,6 +117,9 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         setWrongCount(0);
         setStartTime(Date.now());
         setEndTime(null);
+        // Resetar estados das dicas do modo texto
+        setTextManaCostShown(false);
+        setTextCardTypeShown(false);
         
         // Detectar modo blur
         const blurMode = gameId.startsWith('blur-') || gameData?.gameMode === 'blur';
@@ -150,6 +156,14 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     // Detecta modo Carta do Dia
     const isDailyMode = gameId === 'daily' || (gameId && gameId.startsWith('daily-'));
 
+    // Callback para quando uma dica é comprada
+    const handleHintPurchased = () => {
+        // Recarregar as dicas do backend ou atualizar estados conforme necessário
+        // Por enquanto, as dicas são reveladas via resposta da API
+        setTextManaCostShown(true);
+        setTextCardTypeShown(true);
+    };
+
 
 
     // Se deve mostrar leaderboards
@@ -181,7 +195,13 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
             return <Box display="flex" alignItems="center" justifyContent="center" minHeight={300}><ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} /><span>Carregando usuário...</span></Box>;
         }
     return (
-        <Box position="relative">
+        <Box 
+            position="relative" 
+            sx={{ 
+                padding: { xs: 1, sm: 2 },
+                minHeight: '100vh' 
+            }}
+        >
             <ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} />
             <StartGame 
                 onGameStarted={handleGameStarted} 
@@ -190,6 +210,9 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
                 email={email}
                 onShowLeaderboards={() => setShowLeaderboards(true)}
             />
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                <AdButton userId={userId} themeMode={themeMode} variant="button" />
+            </Box>
         </Box>
     );
     }
@@ -285,7 +308,7 @@ const handleHint = () => {
                 <GuessHistory guesses={guesses} themeMode={themeMode} />
                 
                 {/* Botões de ação */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4, mb: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4, mb: 2, flexWrap: 'wrap' }}>
                     <Button
                         variant="outlined"
                         color="success"
@@ -319,6 +342,7 @@ const handleHint = () => {
                     >
                         🏠 Menu Inicial
                     </Button>
+                    <AdButton userId={userId} themeMode={themeMode} variant="compact" />
                 </Box>
             </Container>
         );
@@ -343,15 +367,19 @@ const handleHint = () => {
                 </Box>
 
                 {/* Componente da carta com texto */}
-                {cardImageUrl && cardTextData && (
+                {cardTextData && (
                     <TextCard
-                        imageUrl={cardImageUrl}
                         cardText={cardTextData.text}
                         cardType={cardTextData.type}
                         manaCost={cardTextData.manaCost}
                         cardName={targetCard || undefined}
                         showCard={victory}
                         hasCensoredContent={cardTextData.hasCensoredContent}
+                        gameId={gameId || undefined}
+                        userId={userId}
+                        showManaCost={textManaCostShown}
+                        showCardType={textCardTypeShown}
+                        onHintPurchased={handleHintPurchased}
                     />
                 )}
 
@@ -469,13 +497,31 @@ const handleHint = () => {
 
         // Tela normal de jogo (não diário)
         return (
-            <Container maxWidth="md" sx={{ py: 8 }}>
+            <Container 
+                maxWidth="md" 
+                sx={{ 
+                    py: { xs: 4, sm: 8 },
+                    px: { xs: 2, sm: 3 }
+                }}
+            >
                 <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
-                    <Typography variant="h3" align="center" color="primary" gutterBottom>
+                    <Typography 
+                        variant="h3"
+                        align="center" 
+                        color="primary" 
+                        gutterBottom
+                        sx={{ fontSize: { xs: '1.8rem', sm: '2.125rem', md: '3rem' } }}
+                    >
                         Adivinhe a carta!
                     </Typography>
                 </Box>
-                <Box display="flex" gap={2} mb={2}>
+                <Box 
+                    display="flex" 
+                    gap={{ xs: 1, sm: 2 }} 
+                    mb={2}
+                    flexDirection={{ xs: 'column', sm: 'row' }}
+                    alignItems="center"
+                >
                     <Tooltip
                         title={wrongCount < 2 ? 'A dica de flavor ficará disponível após 2 erros' : ''}
                         disableHoverListener={wrongCount >= 2}

@@ -149,169 +149,286 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
     const { summary, transactionsByDate, earningsBreakdown, recentTransactions } = statement;
 
     return (
-        <Box sx={{ maxWidth: 800, mx: 'auto', p: 2 }}>
+        <Box sx={{ maxWidth: 900, mx: 'auto', p: { xs: 2, sm: 3 } }}>
             <Typography 
-                variant="h4" 
+                variant="h3" 
                 gutterBottom 
                 sx={{ 
                     color: '#ffd700', 
                     fontWeight: 'bold', 
                     textAlign: 'center',
-                    mb: 3
+                    mb: 4,
+                    fontSize: { xs: '2rem', sm: '3rem' }
                 }}
             >
                 💰 Extrato de Moedas
             </Typography>
 
-            {/* Resumo */}
-            <Stack 
-                direction={{ xs: 'column', sm: 'row' }} 
-                spacing={2} 
-                sx={{ mb: 3 }}
-                flexWrap="wrap"
-                justifyContent="space-between"
+            {/* Resumo - Layout em Grid Organizado */}
+            <Box 
+                sx={{ 
+                    display: 'grid',
+                    gridTemplateColumns: { 
+                        xs: '1fr',
+                        sm: '1fr 1fr',
+                        md: '1fr 1fr 1fr 1fr'
+                    },
+                    gap: 2,
+                    mb: 4
+                }}
             >
-                <Card sx={{ backgroundColor: themeMode === 'dark' ? '#2a2f42' : '#f5f5f5', flex: 1, minWidth: 200 }}>
-                    <CardContent sx={{ textAlign: 'center' }}>
-                        <Typography variant="h6" sx={{ color: '#ffd700', fontWeight: 'bold' }}>
+                <Card sx={{ 
+                    backgroundColor: themeMode === 'dark' ? '#2a2f42' : '#f8f9fa',
+                    borderRadius: 3,
+                    border: '2px solid #ffd700'
+                }}>
+                    <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                        <Typography variant="h4" sx={{ color: '#ffd700', fontWeight: 'bold', mb: 1 }}>
                             {summary.currentBalance.toLocaleString()}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                             Saldo Atual
                         </Typography>
                     </CardContent>
                 </Card>
-                <Card sx={{ backgroundColor: themeMode === 'dark' ? '#2a2f42' : '#f5f5f5', flex: 1, minWidth: 200 }}>
-                    <CardContent sx={{ textAlign: 'center' }}>
-                        <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 'bold' }}>
+                
+                <Card sx={{ 
+                    backgroundColor: themeMode === 'dark' ? '#1e3a1e' : '#f1f8e9',
+                    borderRadius: 3,
+                    border: '2px solid #4caf50'
+                }}>
+                    <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                        <Typography variant="h4" sx={{ color: '#4caf50', fontWeight: 'bold', mb: 1 }}>
                             +{summary.totalEarned.toLocaleString()}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                             Total Ganho
                         </Typography>
                     </CardContent>
                 </Card>
-                <Card sx={{ backgroundColor: themeMode === 'dark' ? '#2a2f42' : '#f5f5f5', flex: 1, minWidth: 200 }}>
-                    <CardContent sx={{ textAlign: 'center' }}>
-                        <Typography variant="h6" sx={{ color: '#f44336', fontWeight: 'bold' }}>
+                
+                <Card sx={{ 
+                    backgroundColor: themeMode === 'dark' ? '#3a1e1e' : '#ffebee',
+                    borderRadius: 3,
+                    border: '2px solid #f44336'
+                }}>
+                    <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                        <Typography variant="h4" sx={{ color: '#f44336', fontWeight: 'bold', mb: 1 }}>
                             -{summary.totalSpent.toLocaleString()}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                             Total Gasto
                         </Typography>
                     </CardContent>
                 </Card>
-                <Card sx={{ backgroundColor: themeMode === 'dark' ? '#2a2f42' : '#f5f5f5', flex: 1, minWidth: 200 }}>
-                    <CardContent sx={{ textAlign: 'center' }}>
-                        <Typography variant="h6" sx={{ color: '#2196f3', fontWeight: 'bold' }}>
+                
+                <Card sx={{ 
+                    backgroundColor: themeMode === 'dark' ? '#1e2a3a' : '#e3f2fd',
+                    borderRadius: 3,
+                    border: '2px solid #2196f3'
+                }}>
+                    <CardContent sx={{ textAlign: 'center', py: 3 }}>
+                        <Typography variant="h4" sx={{ color: '#2196f3', fontWeight: 'bold', mb: 1 }}>
                             +{summary.earnedToday.toLocaleString()}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                             Ganho Hoje
                         </Typography>
                     </CardContent>
                 </Card>
-            </Stack>
+            </Box>
 
-            {/* Ganhos por Categoria */}
-            <Paper sx={{ p: 2, mb: 3, backgroundColor: themeMode === 'dark' ? '#23283a' : '#fff' }}>
-                <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+            {/* Ganhos por Categoria - Layout Melhorado */}
+            <Paper sx={{ 
+                p: 3, 
+                mb: 4, 
+                backgroundColor: themeMode === 'dark' ? '#23283a' : '#fff',
+                borderRadius: 3,
+                border: `1px solid ${themeMode === 'dark' ? '#3a4354' : '#e0e0e0'}`
+            }}>
+                <Typography 
+                    variant="h5" 
+                    gutterBottom 
+                    sx={{ 
+                        color: 'primary.main', 
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        mb: 3
+                    }}
+                >
                     📊 Ganhos por Categoria
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                <Box 
+                    sx={{ 
+                        display: 'grid',
+                        gridTemplateColumns: { 
+                            xs: '1fr',
+                            sm: 'repeat(auto-fit, minmax(240px, 1fr))'
+                        },
+                        gap: 2
+                    }}
+                >
                     {Object.entries(earningsBreakdown).map(([reason, data]: [string, any]) => (
-                        <Chip
+                        <Card
                             key={reason}
-                            label={`${getReasonLabel(reason)}: +${data.total} (${data.count}x)`}
                             sx={{
                                 backgroundColor: getCategoryColor(reason),
                                 color: '#fff',
-                                fontWeight: 'bold',
-                                minWidth: 200
+                                borderRadius: 2,
+                                minHeight: 80
                             }}
-                        />
+                        >
+                            <CardContent sx={{ textAlign: 'center', py: 2 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                                    +{data.total}
+                                </Typography>
+                                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                                    {getReasonLabel(reason)}
+                                </Typography>
+                                <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                                    ({data.count}x)
+                                </Typography>
+                            </CardContent>
+                        </Card>
                     ))}
                 </Box>
             </Paper>
 
-            {/* Transações Recentes */}
-            <Paper sx={{ p: 2, mb: 3, backgroundColor: themeMode === 'dark' ? '#23283a' : '#fff' }}>
-                <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+            {/* Transações Recentes - Layout Limpo */}
+            <Paper sx={{ 
+                p: 3, 
+                mb: 4, 
+                backgroundColor: themeMode === 'dark' ? '#23283a' : '#fff',
+                borderRadius: 3,
+                border: `1px solid ${themeMode === 'dark' ? '#3a4354' : '#e0e0e0'}`
+            }}>
+                <Typography 
+                    variant="h5" 
+                    gutterBottom 
+                    sx={{ 
+                        color: 'primary.main', 
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        mb: 3
+                    }}
+                >
                     🕐 Transações Recentes
                 </Typography>
-                <List>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {recentTransactions.map((transaction: any, index: number) => (
-                        <React.Fragment key={transaction._id || index}>
-                            <ListItem>
-                                <ListItemIcon>
-                                    <Typography sx={{ fontSize: '1.5rem' }}>
-                                        {transaction.type === 'earn' ? '💰' : '💸'}
-                                    </Typography>
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={
-                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Card
+                            key={transaction._id || index}
+                            sx={{
+                                backgroundColor: themeMode === 'dark' ? '#2a2f42' : '#f8f9fa',
+                                borderRadius: 2,
+                                border: `1px solid ${themeMode === 'dark' ? '#3a4354' : '#dee2e6'}`
+                            }}
+                        >
+                            <CardContent sx={{ py: 2 }}>
+                                <Box 
+                                    sx={{ 
+                                        display: 'flex', 
+                                        justifyContent: 'space-between', 
+                                        alignItems: 'center',
+                                        mb: 1
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <Typography sx={{ fontSize: '1.5rem' }}>
+                                            {transaction.type === 'earn' ? '💰' : '💸'}
+                                        </Typography>
+                                        <Box>
                                             <Typography variant="body1" fontWeight="bold">
                                                 {getReasonLabel(transaction.reason)}
                                             </Typography>
-                                            <Chip
-                                                label={`${transaction.type === 'earn' ? '+' : '-'}${transaction.amount}`}
-                                                size="small"
-                                                sx={{
-                                                    backgroundColor: transaction.type === 'earn' ? '#4caf50' : '#f44336',
-                                                    color: '#fff',
-                                                    fontWeight: 'bold'
-                                                }}
-                                            />
-                                        </Box>
-                                    }
-                                    secondary={
-                                        <Box>
                                             <Typography variant="caption" color="text.secondary">
                                                 {formatDateTime(transaction.createdAt)}
                                             </Typography>
-                                            {transaction.description && (
-                                                <Typography variant="caption" display="block" color="text.secondary">
-                                                    {transaction.description}
-                                                </Typography>
-                                            )}
                                         </Box>
-                                    }
-                                />
-                            </ListItem>
-                            {index < recentTransactions.length - 1 && <Divider />}
-                        </React.Fragment>
+                                    </Box>
+                                    <Chip
+                                        label={`${transaction.type === 'earn' ? '+' : '-'}${transaction.amount}`}
+                                        sx={{
+                                            backgroundColor: transaction.type === 'earn' ? '#4caf50' : '#f44336',
+                                            color: '#fff',
+                                            fontWeight: 'bold',
+                                            fontSize: '0.9rem',
+                                            height: 32
+                                        }}
+                                    />
+                                </Box>
+                                {transaction.description && (
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                        {transaction.description}
+                                    </Typography>
+                                )}
+                            </CardContent>
+                        </Card>
                     ))}
-                </List>
+                </Box>
             </Paper>
 
-            {/* Histórico por Data */}
-            <Paper sx={{ backgroundColor: themeMode === 'dark' ? '#23283a' : '#fff' }}>
-                <Typography 
-                    variant="h6" 
-                    sx={{ 
-                        p: 2, 
-                        color: 'primary.main', 
-                        fontWeight: 'bold' 
-                    }}
-                >
-                    📅 Histórico Completo
-                </Typography>
+            {/* Histórico por Data - Design Melhorado */}
+            <Paper sx={{ 
+                backgroundColor: themeMode === 'dark' ? '#23283a' : '#fff',
+                borderRadius: 3,
+                border: `1px solid ${themeMode === 'dark' ? '#3a4354' : '#e0e0e0'}`
+            }}>
+                <Box sx={{ p: 3, borderBottom: `1px solid ${themeMode === 'dark' ? '#3a4354' : '#e0e0e0'}` }}>
+                    <Typography 
+                        variant="h5" 
+                        sx={{ 
+                            color: 'primary.main', 
+                            fontWeight: 'bold',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1
+                        }}
+                    >
+                        📅 Histórico Completo
+                    </Typography>
+                </Box>
                 {Object.entries(transactionsByDate)
                     .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
                     .map(([date, transactions]: [string, any]) => (
-                        <Accordion key={date}>
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Accordion 
+                            key={date}
+                            sx={{
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                boxShadow: 'none',
+                                '&:before': { display: 'none' },
+                                borderBottom: `1px solid ${themeMode === 'dark' ? '#3a4354' : '#e0e0e0'}`
+                            }}
+                        >
+                            <AccordionSummary 
+                                expandIcon={<ExpandMoreIcon />}
+                                sx={{
+                                    backgroundColor: 'transparent',
+                                    '&:hover': {
+                                        backgroundColor: themeMode === 'dark' ? '#2a2f42' : '#f8f9fa'
+                                    }
+                                }}
+                            >
                                 <Box display="flex" justifyContent="space-between" width="100%" mr={2}>
                                     <Typography variant="subtitle1" fontWeight="bold">
                                         {formatDate(date)}
                                     </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {transactions.length} transaç{transactions.length === 1 ? 'ão' : 'ões'}
-                                    </Typography>
+                                    <Chip
+                                        label={`${transactions.length} transaç${transactions.length === 1 ? 'ão' : 'ões'}`}
+                                        size="small"
+                                        sx={{
+                                            backgroundColor: themeMode === 'dark' ? '#3a4354' : '#e0e0e0',
+                                            color: 'text.primary'
+                                        }}
+                                    />
                                 </Box>
                             </AccordionSummary>
-                            <AccordionDetails>
+                            <AccordionDetails sx={{ backgroundColor: 'transparent', pt: 0 }}>
                                 <List>
                                     {transactions.map((transaction: any, index: number) => (
                                         <React.Fragment key={transaction._id || index}>

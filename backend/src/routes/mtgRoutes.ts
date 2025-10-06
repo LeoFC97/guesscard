@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { MtgController } from '../controllers/mtgController';
+import { validateHintRequest, validateHintRateLimit } from '../middleware/hintValidation';
 
 const router = Router();
 const controller = new MtgController();
@@ -15,6 +16,14 @@ router.get('/daily-played-dates/:userId', (req, res) => MtgController.getDailyPl
 router.get('/user-stats/:userId', (req, res) => MtgController.getUserStats(req, res));
 router.get('/user-blur-stats/:userId', (req, res) => MtgController.getUserBlurStats(req, res));
 router.get('/user-text-stats/:userId', (req, res) => MtgController.getUserTextStats(req, res));
+
+// Hint routes
+router.get('/available-hints', (req, res) => MtgController.getAvailableHints(req, res));
+router.post('/request-hint', 
+    validateHintRateLimit, 
+    validateHintRequest, 
+    (req, res) => controller.requestHint(req, res)
+);
 
 // Leaderboard routes
 router.get('/leaderboards/normal', (req, res) => MtgController.getNormalLeaderboard(req, res));

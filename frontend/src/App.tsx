@@ -15,6 +15,15 @@ import { fetchUserProfile } from './services/mtgApi';
 import { CoinsProvider } from './contexts/CoinsContext';
 
 const getTheme = (mode: 'light' | 'dark') => createTheme({
+    breakpoints: {
+        values: {
+            xs: 0,
+            sm: 600,
+            md: 900,
+            lg: 1200,
+            xl: 1536,
+        },
+    },
     palette: {
         mode,
         background: {
@@ -56,6 +65,19 @@ const getTheme = (mode: 'light' | 'dark') => createTheme({
         h6: { fontWeight: 600, color: mode === 'dark' ? '#fff' : '#23283a' },
         subtitle1: { color: mode === 'dark' ? '#fff' : '#23283a' },
         subtitle2: { color: mode === 'dark' ? '#bdbdbd' : '#555' },
+        // Melhor tipografia para mobile
+        body1: {
+            fontSize: '1rem',
+            '@media (max-width:600px)': {
+                fontSize: '0.875rem',
+            },
+        },
+        body2: {
+            fontSize: '0.875rem',
+            '@media (max-width:600px)': {
+                fontSize: '0.75rem',
+            },
+        },
     },
     components: {
         MuiChip: {
@@ -231,7 +253,14 @@ const App: React.FC = () => {
             }}>
                 <Tooltip title={themeMode === 'dark' ? 'Modo claro' : 'Modo escuro'}>
                     <IconButton
-                        sx={{ position: 'fixed', top: 16, left: 24, zIndex: 2100 }}
+                        sx={{ 
+                            position: 'fixed', 
+                            top: { xs: 8, sm: 16 }, 
+                            left: { xs: 8, sm: 24 }, 
+                            zIndex: 2100,
+                            width: { xs: 40, sm: 48 },
+                            height: { xs: 40, sm: 48 }
+                        }}
                         color="secondary"
                         onClick={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')}
                     >
@@ -246,12 +275,21 @@ const App: React.FC = () => {
                 />
                 
                 {!isGuest && (
-                    <Box position="fixed" top={16} right={24} zIndex={2000}>
+                    <Box 
+                        position="fixed" 
+                        top={{ xs: 8, sm: 16 }} 
+                        right={{ xs: 8, sm: 24 }} // Posicionamento mais à direita para evitar conflito
+                        zIndex={2000}
+                    >
                         <IconButton
                             color="primary"
                             onClick={() => setPerfilOpen(true)}
-                            size="large"
+                            size="medium"
                             disabled={!userId}
+                            sx={{
+                                width: { xs: 40, sm: 48 },
+                                height: { xs: 40, sm: 48 }
+                            }}
                         >
                             <AccountCircleIcon fontSize="inherit" />
                         </IconButton>

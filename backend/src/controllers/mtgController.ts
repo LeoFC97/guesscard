@@ -7,6 +7,8 @@ import dailyCardRepo from '../repositories/dailyCardRepository';
 import { getUserStatsService } from '../services/userStatsService';
 import leaderboardService from '../services/leaderboardService';
 import { maskCardNameInText } from '../utils/textUtils';
+import hintService from '../services/hintService';
+import coinsRepository from '../repositories/coinsRepository';
 
 // Mapeamento em memória para partidas: { [gameId]: targetCard }
 const games: Record<string, any> = {};
@@ -44,6 +46,21 @@ export interface CardInfo {
     rarity: string;
     artist: string;
     legalities?: Record<string, string>;
+}
+
+export interface HintRequest {
+    gameId: string;
+    hintType: 'mana_cost' | 'card_type';
+    userId: string;
+}
+
+export interface HintResponse {
+    success: boolean;
+    hintType: string;
+    hintValue: any;
+    costPaid: number;
+    newBalance: number;
+    message: string;
 }
 
 export class MtgController {
@@ -492,6 +509,104 @@ export class MtgController {
             res.status(200).json(leaderboard);
         } catch (error) {
             res.status(500).json({ message: 'Error fetching perfect leaderboard', error });
+        }
+    }
+
+    public async requestHint(req: Request, res: Response): Promise<void> {
+        const startTime = Date.now();
+        console.log(`🔍 Hint request started - User: ${req.body.userId}, Type: ${req.body.hintType}, Game: ${req.body.gameId}`);
+        
+        try {
+            const { gameId, hintType, userId }: HintRequest = req.body;
+
+            if (!gameId || !hintType || !userId) {
+                res.status(400).json({ message: 'GameId, hintType and userId are required' });
+                return;
+            }
+
+            // Validar tipo de dica usando o serviço
+            if (!hintService.isValidHintType(hintType)) {
+                res.status(400).json({ message: 'Invalid hint type. Must be mana_cost or card_type' });
+                return;
+            }
+
+            // Verificar se o jogo existe
+            const targetCard = games[gameId];
+            if (!targetCard) {
+                res.status(404).json({ message: 'Game not found. Please start a new game.' });
+                return;
+            }
+
+            // Obter informações da dica
+            const hintInfo = await hintService.getHintInfo(targetCard.name, hintType);
+
+            // Verificar saldo do usuário
+            const userCoins = await coinsRepository.getUserCoins(userId);
+            if (!userCoins || userCoins.balance < hintInfo.cost) {
+                res.status(400).json({ 
+                    message: 'Insufficient coins for hint',
+                    required: hintInfo.cost,
+                    current: userCoins?.balance || 0
+                });
+                return;
+            }
+
+            // Processar pagamento da dica
+            await coinsRepository.spendCoins(
+                userId,
+                hintInfo.cost,
+                `hint_${hintType}`,
+                hintInfo.description,
+                {
+                    gameId,
+                    cardName: targetCard.name,
+                    hintType
+                }
+            );
+
+            // Buscar novo saldo
+            const updatedUserCoins = await coinsRepository.getUserCoins(userId);
+
+            const response: HintResponse = {
+                success: true,
+                hintType,
+                hintValue: hintInfo.value,
+                costPaid: hintInfo.cost,
+                newBalance: updatedUserCoins?.balance || 0,
+                message: `Hint revealed for ${hintInfo.cost} coin(s)`
+            };
+
+            const duration = Date.now() - startTime;
+            console.log(`✅ Hint request completed successfully in ${duration}ms - User: ${userId}, Type: ${hintType}, Value: ${hintInfo.value}, New Balance: ${response.newBalance}`);
+
+            res.status(200).json(response);
+
+        } catch (error) {
+            const duration = Date.now() - startTime;
+            console.error(`❌ Hint request failed after ${duration}ms:`, error);
+            console.error(`Failed request details - User: ${req.body.userId}, Type: ${req.body.hintType}, Game: ${req.body.gameId}`);
+            
+            res.status(500).json({ 
+                message: 'Error processing hint request', 
+                error: process.env.NODE_ENV === 'development' ? error : 'Internal server error'
+            });
+        }
+    }
+
+    // Endpoint: GET /api/available-hints
+    public static async getAvailableHints(req: Request, res: Response): Promise<void> {
+        try {
+            const availableHints = hintService.getAvailableHints();
+            res.status(200).json({
+                success: true,
+                hints: availableHints
+            });
+        } catch (error) {
+            console.error('❌ Error getting available hints:', error);
+            res.status(500).json({ 
+                message: 'Error fetching available hints', 
+                error: process.env.NODE_ENV === 'development' ? error : 'Internal server error'
+            });
         }
     }
 }

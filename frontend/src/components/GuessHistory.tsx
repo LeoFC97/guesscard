@@ -93,21 +93,24 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                     <Typography variant="h6" sx={{ mb: 1, color: 'text.secondary', fontWeight: 600 }}>
                         Palpites
                     </Typography>
-                            {/* Cabeçalho das colunas agora dentro de cada palpite */}
+                            
+                            {/* Layout responsivo - tabela em desktop, cards em mobile */}
                             <Box sx={{ width: '100%', maxWidth: 900, mt: 1 }}>
-                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                    <thead>
-                                        <tr>
-                                            <th style={{ textAlign: 'left', padding: 6, fontWeight: 700, color: isDark ? '#222' : '#fff', fontSize: '1rem' }}>Carta</th>
-                                            <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Cor</span></th>
-                                            <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Tipo</span></th>
-                                            <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>CMC</span></th>
-                                            <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Edição</span></th>
-                                            <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Raridade</span></th>
-                                            <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Artista</span></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                                {/* Desktop Table */}
+                                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                        <thead>
+                                            <tr>
+                                                <th style={{ textAlign: 'left', padding: 6, fontWeight: 700, color: isDark ? '#222' : '#fff', fontSize: '1rem' }}>Carta</th>
+                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Cor</span></th>
+                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Tipo</span></th>
+                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>CMC</span></th>
+                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Edição</span></th>
+                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Raridade</span></th>
+                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Artista</span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                         {shownGuesses.length > 0 ? shownGuesses.map((g, idx) => (
                                                                                             <>
                                                                                                 <tr key={idx}>
@@ -182,6 +185,48 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                         )}
                                     </tbody>
                                 </table>
+                                </Box>
+                                
+                                {/* Mobile Cards */}
+                                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+                                    <Stack spacing={2}>
+                                        {shownGuesses.length > 0 ? shownGuesses.map((g, idx) => (
+                                            <Paper 
+                                                key={idx} 
+                                                sx={{ 
+                                                    p: 2, 
+                                                    backgroundColor: isDark ? '#2a2f42' : '#f5f5f5',
+                                                    border: `1px solid ${isDark ? '#444' : '#ddd'}`
+                                                }}
+                                            >
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+                                                    {g.guessedCard?.name}
+                                                </Typography>
+                                                <Stack direction="row" spacing={1} flexWrap="wrap">
+                                                    <Chip 
+                                                        label={getColorInitials(g.guessedCard?.colors)} 
+                                                        color={getColor(g.feedback.colors)} 
+                                                        size="small" 
+                                                    />
+                                                    <Chip 
+                                                        label={g.guessedCard?.types?.[0] || '-'} 
+                                                        color={getColor(g.feedback.type)} 
+                                                        size="small" 
+                                                    />
+                                                    <Chip 
+                                                        label={g.guessedCard?.convertedManaCost || '-'} 
+                                                        color={getColor(g.feedback.convertedManaCost)} 
+                                                        size="small" 
+                                                    />
+                                                </Stack>
+                                            </Paper>
+                                        )) : (
+                                            <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary' }}>
+                                                Nenhum palpite ainda.
+                                            </Typography>
+                                        )}
+                                    </Stack>
+                                </Box>
                             </Box>
                     {/* Legenda visual dos ícones */}
                     <Stack direction="row" spacing={1} sx={{ mt: 2, mb: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>

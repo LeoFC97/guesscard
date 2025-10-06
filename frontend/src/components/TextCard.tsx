@@ -1,25 +1,39 @@
-import React from 'react';
-import { Box, Typography, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Paper, Button, CircularProgress } from '@mui/material';
+import { requestHint } from '../services/mtgApi';
+import { useCoins } from '../contexts/CoinsContext';
 
 interface TextCardProps {
-    imageUrl: string;
     cardText: string;
     cardType: string;
     manaCost: number;
     cardName?: string; // Para debug ou quando acertar
     showCard?: boolean; // Se deve mostrar a carta sem censura (quando acerta)
     hasCensoredContent?: boolean; // Se o texto contém conteúdo censurado
+    gameId?: string; // ID do jogo para solicitar dicas
+    userId?: string; // ID do usuário para cobrar moedas
+    showManaCost?: boolean; // Se deve mostrar o custo de mana
+    showCardType?: boolean; // Se deve mostrar o tipo da carta
+    onHintPurchased?: () => void; // Callback quando uma dica é comprada
 }
 
 const TextCard: React.FC<TextCardProps> = ({ 
-    imageUrl, 
     cardText,
     cardType,
     manaCost,
     cardName, 
     showCard = false,
-    hasCensoredContent = false
+    hasCensoredContent = false,
+    gameId,
+    userId,
+    showManaCost = false,
+    showCardType = false,
+    onHintPurchased
 }) => {
+    const [loadingManaCost, setLoadingManaCost] = useState(false);
+    const [loadingCardType, setLoadingCardType] = useState(false);
+    const { refreshBalance, balance } = useCoins();
+
     // Função para censurar o nome da carta no texto
     const censorCardName = (text: string, name: string): string => {
         if (!name || !text) return text;
@@ -27,6 +41,40 @@ const TextCard: React.FC<TextCardProps> = ({
         // Substituir o nome exato da carta por <card_name>
         const regex = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
         return text.replace(regex, '<card_name>');
+    };
+
+    // Função para solicitar dica do custo de mana
+    const handleManaCostHint = async () => {
+        if (!gameId || !userId || showManaCost) return;
+
+        setLoadingManaCost(true);
+        try {
+            await requestHint(gameId, 'mana_cost', userId);
+            await refreshBalance(); // Atualizar saldo de moedas
+            onHintPurchased?.(); // Callback para atualizar o estado do jogo
+        } catch (error) {
+            console.error('Erro ao solicitar dica de custo de mana:', error);
+            alert(error instanceof Error ? error.message : 'Erro ao solicitar dica');
+        } finally {
+            setLoadingManaCost(false);
+        }
+    };
+
+    // Função para solicitar dica do tipo da carta
+    const handleCardTypeHint = async () => {
+        if (!gameId || !userId || showCardType) return;
+
+        setLoadingCardType(true);
+        try {
+            await requestHint(gameId, 'card_type', userId);
+            await refreshBalance(); // Atualizar saldo de moedas
+            onHintPurchased?.(); // Callback para atualizar o estado do jogo
+        } catch (error) {
+            console.error('Erro ao solicitar dica de tipo:', error);
+            alert(error instanceof Error ? error.message : 'Erro ao solicitar dica');
+        } finally {
+            setLoadingCardType(false);
+        }
     };
 
     // O texto já vem censurado do backend quando não showCard
@@ -48,144 +96,210 @@ const TextCard: React.FC<TextCardProps> = ({
                 {showCard ? '🎉 Carta Revelada!' : '📜 Adivinhe pela Descrição'}
             </Typography>
             
-            <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start', width: '100%' }}>
-                {/* Imagem da carta com nome censurado */}
-                <Box
-                    sx={{
-                        position: 'relative',
-                        borderRadius: 3,
-                        overflow: 'hidden',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                        flexShrink: 0,
-                        width: '250px'
+            {/* Layout centralizado apenas com informações de texto */}
+            <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>
+                {/* Grid responsivo para as informações */}
+                <Box 
+                    sx={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                        gap: 2,
+                        mb: 3
                     }}
                 >
-                    <img
-                        src={imageUrl}
-                        alt={showCard ? cardName : "Carta misteriosa"}
-                        style={{
-                            width: '100%',
-                            height: 'auto',
-                            display: 'block',
-                        }}
-                    />
-                    
-                    {/* Overlays para censurar informações na imagem */}
-                    {!showCard && (
-                        <>
-                            {/* Overlay no nome da carta (topo) */}
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    top: 12,
-                                    left: 12,
-                                    right: 12,
-                                    height: 24,
-                                    background: 'linear-gradient(45deg, #333 25%, #555 25%, #555 50%, #333 50%, #333 75%, #555 75%)',
-                                    backgroundSize: '8px 8px',
-                                    border: '2px solid #000',
-                                    borderRadius: 1,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
-                            >
-                                <Typography variant="caption" sx={{ color: '#fff', fontWeight: 'bold' }}>
-                                    NOME CENSURADO
-                                </Typography>
-                            </Box>
-
-                            {/* Blur overlay sobre toda a área de texto da carta */}
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    bottom: 40, // Posição aproximada onde fica o texto de habilidades
-                                    left: 12,
-                                    right: 12,
-                                    height: 100,
-                                    backdropFilter: 'blur(8px)',
-                                    borderRadius: 1
-                                }}
-                            />
-                        </>
-                    )}
-                </Box>
-
-                {/* Informações da carta */}
-                <Box sx={{ flex: 1, minWidth: 0 }}>
                     {/* Custo de Mana */}
-                    <Paper sx={{ p: 2, mb: 2, backgroundColor: '#f5f5f5' }}>
-                        <Typography variant="subtitle2" color="primary" gutterBottom>
+                    <Paper sx={{ p: { xs: 2, sm: 3 }, backgroundColor: '#f8f9fa', textAlign: 'center', borderRadius: 2, boxShadow: 2 }}>
+                        <Typography variant="subtitle1" color="primary" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
                             💎 Custo de Mana
                         </Typography>
-                        <Typography variant="h6" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
-                            {manaCost}
-                        </Typography>
-                    </Paper>
-
-                    {/* Tipo da Carta */}
-                    <Paper sx={{ p: 2, mb: 2, backgroundColor: '#f5f5f5' }}>
-                        <Typography variant="subtitle2" color="primary" gutterBottom>
-                            🏷️ Tipo
-                        </Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                            {cardType}
-                        </Typography>
-                    </Paper>
-
-                    {/* Texto da Carta */}
-                    <Paper sx={{ p: 2, backgroundColor: '#f9f9f9' }}>
-                        <Typography variant="subtitle2" color="primary" gutterBottom>
-                            📖 Texto da Carta {!showCard && '(Censurado)'}
-                        </Typography>
                         
-                        {!showCard && hasCensoredContent && (
-                            <Box sx={{ mb: 1, p: 1, backgroundColor: '#ffecb3', borderRadius: 1, border: '1px solid #ffc107' }}>
-                                <Typography variant="caption" sx={{ color: '#e65100', fontWeight: 'bold' }}>
-                                    ⚠️ Referências ao nome da carta foram censuradas com █
+                        {showCard || showManaCost ? (
+                            <Typography variant="h4" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                                {manaCost}
+                            </Typography>
+                        ) : (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleManaCostHint}
+                                    disabled={loadingManaCost || balance < 10}
+                                    sx={{ 
+                                        minWidth: 180,
+                                        height: 56,
+                                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                                        fontWeight: 'bold',
+                                        textTransform: 'none',
+                                        borderRadius: 2,
+                                        boxShadow: 3,
+                                        '&:hover': {
+                                            boxShadow: 6,
+                                            transform: 'translateY(-1px)'
+                                        },
+                                        '&.Mui-disabled': {
+                                            backgroundColor: '#e0e0e0',
+                                            color: '#9e9e9e'
+                                        }
+                                    }}
+                                >
+                                    {loadingManaCost ? (
+                                        <CircularProgress size={24} color="inherit" />
+                                    ) : (
+                                        'Revelar custo de mana'
+                                    )}
+                                </Button>
+                                <Typography 
+                                    variant="body2" 
+                                    sx={{ 
+                                        color: balance < 10 ? '#d32f2f' : '#666666',
+                                        fontWeight: balance < 10 ? 'bold' : '500',
+                                        fontSize: '0.875rem',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    (Custa 10 moedas)
                                 </Typography>
                             </Box>
                         )}
+                    </Paper>
+
+                    {/* Tipo da Carta */}
+                    <Paper sx={{ p: { xs: 2, sm: 3 }, backgroundColor: '#f8f9fa', textAlign: 'center', borderRadius: 2, boxShadow: 2 }}>
+                        <Typography variant="subtitle1" color="primary" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
+                            🏷️ Tipo da Carta
+                        </Typography>
                         
+                        {showCard || showCardType ? (
+                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
+                                {cardType}
+                            </Typography>
+                        ) : (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={handleCardTypeHint}
+                                    disabled={loadingCardType || balance < 10}
+                                    sx={{ 
+                                        minWidth: 180,
+                                        height: 56,
+                                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                                        fontWeight: 'bold',
+                                        textTransform: 'none',
+                                        borderRadius: 2,
+                                        boxShadow: 3,
+                                        '&:hover': {
+                                            boxShadow: 6,
+                                            transform: 'translateY(-1px)'
+                                        },
+                                        '&.Mui-disabled': {
+                                            backgroundColor: '#e0e0e0',
+                                            color: '#9e9e9e'
+                                        }
+                                    }}
+                                >
+                                    {loadingCardType ? (
+                                        <CircularProgress size={24} color="inherit" />
+                                    ) : (
+                                        'Revelar tipo da carta'
+                                    )}
+                                </Button>
+                                <Typography 
+                                    variant="body2" 
+                                    sx={{ 
+                                        color: balance < 10 ? '#d32f2f' : '#666666',
+                                        fontWeight: balance < 10 ? 'bold' : '500',
+                                        fontSize: '0.875rem',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    (Custa 10 moedas)
+                                </Typography>
+                            </Box>
+                        )}
+                    </Paper>
+                </Box>
+
+                {/* Texto da Carta - Destaque principal */}
+                <Paper 
+                    sx={{ 
+                        p: 4, 
+                        backgroundColor: '#f9f9f9',
+                        border: '3px solid #2196f3',
+                        borderRadius: 2
+                    }}
+                >
+                    <Typography variant="h6" color="primary" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
+                        📖 Texto da Carta {!showCard && '(Censurado)'}
+                    </Typography>
+                    
+                    {!showCard && hasCensoredContent && (
+                        <Box sx={{ mb: 2, p: 2, backgroundColor: '#ffecb3', borderRadius: 1, border: '1px solid #ffc107' }}>
+                            <Typography variant="body2" sx={{ color: '#e65100', fontWeight: 'bold', textAlign: 'center' }}>
+                                ⚠️ Referências ao nome da carta foram censuradas com █
+                            </Typography>
+                        </Box>
+                    )}
+                    
+                    <Paper 
+                        elevation={2}
+                        sx={{ 
+                            p: 3,
+                            backgroundColor: showCard ? 'transparent' : '#ffffff',
+                            border: '1px solid #ddd'
+                        }}
+                    >
                         <Typography 
-                            variant="body2" 
+                            variant="body1" 
                             sx={{ 
-                                lineHeight: 1.6,
-                                fontFamily: 'monospace',
-                                backgroundColor: showCard ? 'transparent' : '#ffffff',
+                                lineHeight: 1.8,
+                                fontFamily: 'Georgia, serif',
                                 color: showCard ? 'inherit' : '#1a1a1a',
                                 fontWeight: showCard ? 'normal' : 'bold',
-                                padding: 1.5,
-                                borderRadius: 1,
-                                border: showCard ? 'none' : '2px solid #2196f3',
-                                fontSize: '0.9rem',
-                                whiteSpace: 'pre-wrap', // Preserva quebras de linha
-                                textShadow: showCard ? 'none' : '0 0 1px rgba(0,0,0,0.1)'
+                                fontSize: { xs: '1rem', sm: '1.1rem' },
+                                whiteSpace: 'pre-wrap',
+                                textAlign: 'justify',
+                                minHeight: '120px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
                             }}
                         >
                             {displayText || 'Esta carta não possui texto de habilidade.'}
                         </Typography>
-                        
-                        {!showCard && (
-                            <Box sx={{ mt: 1, p: 1, backgroundColor: '#e3f2fd', borderRadius: 1 }}>
-                                <Typography variant="caption" sx={{ color: '#1565c0', fontStyle: 'italic' }}>
-                                    💡 Dica: Use as informações de tipo, custo de mana e habilidades para adivinhar a carta!
-                                </Typography>
-                            </Box>
-                        )}
                     </Paper>
-                </Box>
+                    
+                    {!showCard && (
+                        <Box sx={{ mt: 3, p: 2, backgroundColor: '#e3f2fd', borderRadius: 1 }}>
+                            <Typography variant="body2" sx={{ color: '#1565c0', fontStyle: 'italic', textAlign: 'center' }}>
+                                💡 Dica: Use as informações de tipo, custo de mana e habilidades para adivinhar a carta!
+                            </Typography>
+                        </Box>
+                    )}
+                </Paper>
             </Box>
 
             {showCard && cardName && (
-                <Box sx={{ mt: 3, textAlign: 'center' }}>
-                    <Typography variant="h4" sx={{ color: 'success.main', fontWeight: 'bold', mb: 1 }}>
-                        {cardName}
+                <Paper 
+                    sx={{ 
+                        mt: 4, 
+                        p: 4, 
+                        textAlign: 'center',
+                        backgroundColor: '#e8f5e8',
+                        border: '3px solid #4caf50',
+                        borderRadius: 2
+                    }}
+                >
+                    <Typography variant="h3" sx={{ color: 'success.main', fontWeight: 'bold', mb: 2 }}>
+                        🎉 {cardName} 🎉
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Parabéns! Você adivinhou baseado no texto da carta! 🎉
+                    <Typography variant="h6" sx={{ color: '#2e7d32', mb: 1 }}>
+                        Parabéns! Você adivinhou baseado no texto da carta!
                     </Typography>
-                </Box>
+                    <Typography variant="body1" color="text.secondary">
+                        Modo Texto concluído com sucesso! ✨
+                    </Typography>
+                </Paper>
             )}
         </Box>
     );

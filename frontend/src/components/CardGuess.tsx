@@ -51,7 +51,11 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
 
     return (
         <Box component="form" onSubmit={handleSubmit} mb={6}>
-            <Stack direction="row" spacing={2}>
+            <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={2}
+                alignItems="center"
+            >
                 <Autocomplete
                     freeSolo
                     options={options}
@@ -66,6 +70,11 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
                             disabled={loading}
                             size="medium"
                             variant="outlined"
+                            sx={{ 
+                                '& .MuiInputBase-root': { 
+                                    fontSize: { xs: '0.875rem', sm: '1rem' } 
+                                } 
+                            }}
                         />
                     )}
                 />
@@ -75,6 +84,11 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
                     color="primary"
                     disabled={loading}
                     size="large"
+                    sx={{ 
+                        minWidth: { xs: '100%', sm: 120 },
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        padding: { xs: '12px 24px', sm: '10px 22px' }
+                    }}
                 >
                     {loading ? 'Enviando...' : 'Enviar'}
                 </Button>

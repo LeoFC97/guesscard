@@ -65,8 +65,8 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', o
                 alignItems: 'center',
                 gap: 1,
                 position: 'fixed',
-                top: 16,
-                right: 80, // Posicionar à esquerda do botão de perfil
+                top: { xs: 8, sm: 16 },
+                right: { xs: 56, sm: 80 }, // Espaçamento calculado: 8px (margem) + 40px (botão) + 8px (gap) = 56px
                 zIndex: 2000
             }}
         >
@@ -84,25 +84,44 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', o
                     onClick={onClick}
                     clickable={!loading}
                     sx={{
-                        backgroundColor: themeMode === 'dark' ? '#2a2f42' : '#fff3cd',
+                        background: themeMode === 'dark' 
+                            ? 'linear-gradient(135deg, #2a2f42 0%, #353b52 50%, #2a2f42 100%)'
+                            : 'linear-gradient(135deg, #fff3cd 0%, #ffebcd 50%, #fff3cd 100%)',
                         color: '#ffd700',
                         fontWeight: 'bold',
-                        fontSize: '0.9rem',
+                        fontSize: { xs: '0.75rem', sm: '0.9rem' },
                         border: `2px solid ${themeMode === 'dark' ? '#ffd700' : '#ff9800'}`,
                         cursor: loading ? 'default' : 'pointer',
+                        height: { xs: 32, sm: 40 },
+                        borderRadius: '20px', // Formato mais orgânico, menos circular
+                        minWidth: { xs: 64, sm: 84 }, // Proporção mais natural
+                        width: 'auto',
+                        paddingX: { xs: 1.5, sm: 2 },
                         '& .MuiChip-label': {
                             color: '#ffd700',
-                            fontWeight: 'bold'
+                            fontWeight: 'bold',
+                            paddingLeft: '4px',
+                            paddingRight: '8px',
+                            letterSpacing: '0.5px'
                         },
                         '& .MuiChip-icon': {
-                            color: '#ffd700'
+                            color: '#ffd700',
+                            marginLeft: '4px',
+                            marginRight: '6px',
+                            fontSize: { xs: '1rem', sm: '1.1rem' }
                         },
-                        boxShadow: '0 2px 8px rgba(255, 215, 0, 0.2)',
-                        transition: 'all 0.3s ease',
+                        boxShadow: '0 3px 12px rgba(255, 215, 0, 0.25), 0 1px 4px rgba(0, 0, 0, 0.1)',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transform: 'translateZ(0)', // Otimização para hardware acceleration
                         '&:hover': {
-                            transform: loading ? 'none' : 'scale(1.05)',
-                            boxShadow: loading ? '0 2px 8px rgba(255, 215, 0, 0.2)' : '0 4px 16px rgba(255, 215, 0, 0.4)',
-                            backgroundColor: loading ? (themeMode === 'dark' ? '#2a2f42' : '#fff3cd') : (themeMode === 'dark' ? '#3a3f52' : '#fff8dc')
+                            transform: loading ? 'translateZ(0)' : 'translateY(-1px) scale(1.02)',
+                            boxShadow: loading ? '0 3px 12px rgba(255, 215, 0, 0.25), 0 1px 4px rgba(0, 0, 0, 0.1)' : '0 6px 20px rgba(255, 215, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.15)',
+                            background: loading ? (themeMode === 'dark' 
+                                ? 'linear-gradient(135deg, #2a2f42 0%, #353b52 50%, #2a2f42 100%)'
+                                : 'linear-gradient(135deg, #fff3cd 0%, #ffebcd 50%, #fff3cd 100%)')
+                                : (themeMode === 'dark' 
+                                ? 'linear-gradient(135deg, #323856 0%, #3d4562 50%, #323856 100%)'
+                                : 'linear-gradient(135deg, #fffadc 0%, #fff0cd 50%, #fffadc 100%)')
                         }
                     }}
                 />
