@@ -13,6 +13,9 @@ import { useCoins } from '../contexts/CoinsContext';
 import BlurredCard from '../components/BlurredCard';
 import TextCard from '../components/TextCard';
 import AdButton from '../components/AdButton';
+import AdBanner from '../components/AdBanner';
+import InterstitialAd from '../components/InterstitialAd';
+import { getAdUnitId } from '../config/adConfig';
 import { Container, Typography, Box } from '@mui/material';
 // Removido useUserInfo, centralizado no contexto Auth0
 
@@ -56,6 +59,7 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     const [victory, setVictory] = useState(false);
     const [startTime, setStartTime] = useState<number | null>(null);
     const [endTime, setEndTime] = useState<number | null>(null);
+    const [showInterstitialAd, setShowInterstitialAd] = useState(false);
     const [showLeaderboards, setShowLeaderboards] = useState(false);
     const [isBlurMode, setIsBlurMode] = useState(false);
     const [isTextMode, setIsTextMode] = useState(false);
@@ -94,6 +98,13 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
             if (result.coinReward && userId && userId !== 'guest') {
                 console.log('🪙 Moedas ganhas:', result.coinReward);
                 animateCoinsGain(result.coinReward);
+            }
+
+            // Mostrar anúncio intersticial ocasionalmente (30% de chance)
+            if (Math.random() < 0.3 && userId && userId !== 'guest') {
+                setTimeout(() => {
+                    setShowInterstitialAd(true);
+                }, 2000); // Aguardar 2 segundos após a vitória
             }
         }
         setTextReady(null);
@@ -203,6 +214,15 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
             }}
         >
             <ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} />
+            
+            {/* Banner de Anúncio Superior */}
+            <AdBanner 
+                adSlot={getAdUnitId('BANNER_TOP')}
+                adFormat="horizontal"
+                adSize="728x90"
+                style={{ marginBottom: 16 }}
+            />
+            
             <StartGame 
                 onGameStarted={handleGameStarted} 
                 userId={userId} 
@@ -352,6 +372,14 @@ const handleHint = () => {
     if (isTextMode) {
         return (
             <Container maxWidth="lg" sx={{ py: 8 }}>
+                {/* Banner de Anúncio Superior - Modo Texto */}
+                <AdBanner 
+                    adSlot={getAdUnitId('BANNER_TEXT_MODE')}
+                    adFormat="rectangle"
+                    adSize="300x250"
+                    style={{ marginBottom: 24 }}
+                />
+                
                 <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
                     <Typography variant="h3" align="center" sx={{ 
                         background: 'linear-gradient(45deg, #ed6c02 30%, #ff9800 90%)',
@@ -498,12 +526,29 @@ const handleHint = () => {
         // Tela normal de jogo (não diário)
         return (
             <Container 
-                maxWidth="md" 
+                maxWidth="lg" 
                 sx={{ 
                     py: { xs: 4, sm: 8 },
                     px: { xs: 2, sm: 3 }
                 }}
             >
+                {/* Layout com Sidebar para Anúncios */}
+                <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+                    
+                    {/* Sidebar Esquerda - Anúncios */}
+                    <Box sx={{ 
+                        width: { xs: '100%', md: '200px' },
+                        display: { xs: 'none', md: 'block' }
+                    }}>
+                        <AdBanner 
+                            adSlot={getAdUnitId('SIDEBAR_LEFT')}
+                            adFormat="vertical"
+                            adSize="160x600"
+                        />
+                    </Box>
+                    
+                    {/* Conteúdo Principal */}
+                    <Box sx={{ flex: 1, maxWidth: { xs: '100%', md: 'calc(100% - 416px)' } }}>
                 <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
                     <Typography 
                         variant="h3"
@@ -606,6 +651,43 @@ const handleHint = () => {
                         🏠 Menu Inicial
                     </Button>
                 </Box>
+                    
+                    </Box> {/* Fim do Conteúdo Principal */}
+                    
+                    {/* Sidebar Direita - Anúncios */}
+                    <Box sx={{ 
+                        width: { xs: '100%', md: '200px' },
+                        display: { xs: 'none', md: 'block' }
+                    }}>
+                        <AdBanner 
+                            adSlot={getAdUnitId('SIDEBAR_RIGHT')}
+                            adFormat="vertical"
+                            adSize="160x600"
+                        />
+                    </Box>
+                    
+                </Box> {/* Fim do Layout com Sidebar */}
+                
+                {/* Anúncio Intersticial */}
+                <InterstitialAd
+                    isOpen={showInterstitialAd}
+                    onClose={() => setShowInterstitialAd(false)}
+                    onAdCompleted={() => {
+                        // Dar uma pequena recompensa por assistir o anúncio intersticial
+                        if (userId && userId !== 'guest') {
+                            console.log('🎯 Anúncio intersticial completado!');
+                            animateCoinsGain({
+                                coinsEarned: 2,
+                                rewardType: 'interstitial_ad',
+                                newBalance: 0, // Será atualizado pelo refreshBalance
+                                rewardDescription: 'Anúncio assistido!'
+                            });
+                            refreshBalance(); // Atualizar saldo real
+                        }
+                    }}
+                    adSlot={getAdUnitId('INTERSTITIAL')}
+                    closeDelay={5}
+                />
             </Container>
         );
 }
