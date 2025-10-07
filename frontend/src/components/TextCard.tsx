@@ -230,7 +230,7 @@ const TextCard: React.FC<TextCardProps> = ({
                     }}
                 >
                     <Typography variant="h6" color="primary" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
-                        📖 Texto da Carta {!showCard && '(Censurado)'}
+                        📖 Texto da Carta {!showCard}
                     </Typography>
                     
                     {!showCard && hasCensoredContent && (
