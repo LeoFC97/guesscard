@@ -6,7 +6,7 @@ export const AD_CONFIG = {
   // Ad Unit IDs - SUBSTITUA pelos IDs reais do painel AdSense
   AD_UNITS: {
     // Banner horizontal no topo da página inicial
-    BANNER_TOP: '1234567890', // ⚠️ SUBSTITUA pelo ID real
+    BANNER_TOP: '9071929096', // ✅ ID real do AdSense
     
     // Banner retângulo no modo texto  
     BANNER_TEXT_MODE: '2345678901', // ⚠️ SUBSTITUA pelo ID real
@@ -22,7 +22,7 @@ export const AD_CONFIG = {
   },
   
   // Configurações para teste (use durante desenvolvimento)
-  TEST_MODE: false, // Mude para true para usar anúncios de teste
+  TEST_MODE: true, // false = anúncios reais, true = anúncios de teste
   
   // IDs de teste do Google (use apenas durante desenvolvimento)
   TEST_AD_UNITS: {
