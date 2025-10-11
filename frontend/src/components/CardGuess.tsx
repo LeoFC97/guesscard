@@ -50,11 +50,16 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} mb={6}>
+        <Box 
+            component="form" 
+            onSubmit={handleSubmit} 
+            mb={{ xs: 3, sm: 4, md: 6 }}
+            px={{ xs: 1, sm: 0 }}
+        >
             <Stack 
                 direction={{ xs: 'column', sm: 'row' }} 
-                spacing={2}
-                alignItems="center"
+                spacing={{ xs: 1.5, sm: 2 }}
+                alignItems={{ xs: 'stretch', sm: 'center' }}
             >
                 <Autocomplete
                     freeSolo
@@ -68,12 +73,16 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
                             {...params}
                             placeholder="Nome da carta"
                             disabled={loading}
-                            size="medium"
+                            size={window.innerWidth < 600 ? "small" : "medium"}
                             variant="outlined"
                             sx={{ 
                                 '& .MuiInputBase-root': { 
-                                    fontSize: { xs: '0.875rem', sm: '1rem' } 
-                                } 
+                                    fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' },
+                                    padding: { xs: '8px 12px', sm: '14px' }
+                                },
+                                '& .MuiInputLabel-root': {
+                                    fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' }
+                                }
                             }}
                         />
                     )}
@@ -83,11 +92,13 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
                     variant="contained"
                     color="primary"
                     disabled={loading}
-                    size="large"
+                    size={window.innerWidth < 600 ? "medium" : "large"}
                     sx={{ 
-                        minWidth: { xs: '100%', sm: 120 },
-                        fontSize: { xs: '0.875rem', sm: '1rem' },
-                        padding: { xs: '12px 24px', sm: '10px 22px' }
+                        minWidth: { xs: '100%', sm: 120, md: 140 },
+                        fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' },
+                        padding: { xs: '10px 20px', sm: '12px 24px', md: '10px 22px' },
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap'
                     }}
                 >
                     {loading ? 'Enviando...' : 'Enviar'}

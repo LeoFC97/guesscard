@@ -1,0 +1,115 @@
+/* Reset básico para evitar overflow horizontal */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+#root {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Garante que containers não ultrapassem a tela */
+.MuiContainer-root {
+  max-width: 100vw !important;
+  overflow-x: hidden;
+}
+
+/* Corrige problemas com anúncios em mobile */
+.ad-container {
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.adsbygoogle {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Melhora a responsividade dos botões em mobile */
+@media (max-width: 600px) {
+  .MuiButton-root {
+    font-size: 0.8rem !important;
+    padding: 8px 16px !important;
+  }
+  
+  .MuiToggleButton-root {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+  }
+  
+  /* Ajusta títulos para mobile */
+  .MuiTypography-h4 {
+    font-size: 1.5rem !important;
+  }
+  
+  .MuiTypography-h6 {
+    font-size: 1rem !important;
+  }
+  
+  /* Corrige problema de altura mínima */
+  .MuiContainer-root {
+    min-height: auto !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+  
+  /* Espaçamento dos chips */
+  .MuiChip-root {
+    margin: 2px !important;
+    font-size: 0.7rem !important;
+  }
+}
+
+/* Evita que elementos flutuem fora da tela */
+.MuiBox-root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Corrige problemas com DatePicker em mobile */
+.MuiTextField-root {
+  max-width: 100% !important;
+}
+
+@media (max-width: 400px) {
+  .MuiTextField-root {
+    width: 100% !important;
+  }
+  
+  /* Reduz ainda mais o padding em telas muito pequenas */
+  body {
+    padding: 0 4px !important;
+  }
+  
+  .MuiContainer-root {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+}
+
+/* Corrige sobreposição de elementos */
+.MuiBox-root {
+  z-index: 1;
+}
+
+.MuiTooltip-popper {
+  z-index: 9999 !important;
+}
+
+/* Melhora o espaçamento vertical em mobile */
+@media (max-width: 768px) {
+  .MuiStack-root {
+    gap: 8px !important;
+  }
+  
+  .MuiBox-root[component="form"] {
+    margin-bottom: 16px !important;
+  }
+}

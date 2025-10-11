@@ -210,18 +210,22 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
             position="relative" 
             sx={{ 
                 padding: { xs: 1, sm: 2 },
-                minHeight: '100vh' 
+                minHeight: '100vh',
+                maxWidth: '100vw',
+                overflow: 'hidden'
             }}
         >
             <ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} />
             
-            {/* Banner de Anúncio Superior */}
-            <AdBanner 
-                adSlot={getAdUnitId('BANNER_TOP')}
-                adFormat="horizontal"
-                adSize="728x90"
-                style={{ marginBottom: 16 }}
-            />
+            {/* Banner de Anúncio Superior - Só mostrar em telas médias e grandes */}
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                <AdBanner 
+                    adSlot={getAdUnitId('BANNER_TOP')}
+                    adFormat="horizontal"
+                    adSize="728x90"
+                    style={{ marginBottom: 16 }}
+                />
+            </Box>
             
             <StartGame 
                 onGameStarted={handleGameStarted} 
@@ -230,7 +234,12 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
                 email={email}
                 onShowLeaderboards={() => setShowLeaderboards(true)}
             />
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                mt: { xs: 2, sm: 3 },
+                px: { xs: 1, sm: 0 }
+            }}>
                 <AdButton userId={userId} themeMode={themeMode} variant="button" />
             </Box>
         </Box>
@@ -278,17 +287,32 @@ const handleHint = () => {
                     </Typography>
 
                 </Box>
-                <Box display="flex" gap={2} mb={2}>
+                <Box 
+                    display="flex" 
+                    gap={{ xs: 1, sm: 2 }} 
+                    mb={{ xs: 2, sm: 3 }}
+                    flexDirection={{ xs: 'column', sm: 'row' }}
+                    alignItems="stretch"
+                    justifyContent="center"
+                    px={{ xs: 1, sm: 0 }}
+                >
                     <Tooltip
                         title={wrongCount < 2 ? 'A dica de flavor ficará disponível após 2 erros' : ''}
                         disableHoverListener={wrongCount >= 2}
                     >
-                        <span>
+                        <span style={{ width: '100%' }}>
                             <Button
                                 variant="outlined"
                                 color="secondary"
                                 onClick={handleFlavorHint}
                                 disabled={flavorShown || wrongCount < 2}
+                                sx={{
+                                    width: { xs: '100%', sm: 'auto' },
+                                    minWidth: { xs: 'auto', sm: 160 },
+                                    py: { xs: 1.2, sm: 1 },
+                                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                                    fontWeight: 600
+                                }}
                             >
                                 Mostrar Dica (Flavor)
                             </Button>
@@ -298,12 +322,19 @@ const handleHint = () => {
                         title={wrongCount < 5 ? 'A dica do efeito ficará disponível após 5 erros' : ''}
                         disableHoverListener={wrongCount >= 5}
                     >
-                        <span>
+                        <span style={{ width: '100%' }}>
                             <Button
                                 variant="outlined"
                                 color="secondary"
                                 onClick={handleHint}
                                 disabled={textShown || wrongCount < 5}
+                                sx={{
+                                    width: { xs: '100%', sm: 'auto' },
+                                    minWidth: { xs: 'auto', sm: 160 },
+                                    py: { xs: 1.2, sm: 1 },
+                                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                                    fontWeight: 600
+                                }}
                             >
                                 Mostrar Dica (Efeito)
                             </Button>
@@ -328,18 +359,27 @@ const handleHint = () => {
                 <GuessHistory guesses={guesses} themeMode={themeMode} />
                 
                 {/* Botões de ação */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4, mb: 2, flexWrap: 'wrap' }}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    gap: { xs: 1, sm: 2 }, 
+                    mt: { xs: 3, sm: 4 }, 
+                    mb: 2, 
+                    flexWrap: 'wrap',
+                    px: { xs: 1, sm: 0 }
+                }}>
                     <Button
                         variant="outlined"
                         color="success"
                         onClick={() => setShowLeaderboards(true)}
                         size="medium"
                         sx={{ 
-                            px: 3,
-                            py: 1,
-                            fontSize: '0.9rem',
+                            px: { xs: 2, sm: 3 },
+                            py: { xs: 0.8, sm: 1 },
+                            fontSize: { xs: '0.8rem', sm: '0.9rem' },
                             fontWeight: 600,
-                            borderRadius: 2
+                            borderRadius: 2,
+                            minWidth: { xs: 'auto', sm: 140 }
                         }}
                     >
                         🏆 Ver Rankings
@@ -353,11 +393,12 @@ const handleHint = () => {
                         }}
                         size="medium"
                         sx={{ 
-                            px: 3,
-                            py: 1,
-                            fontSize: '0.9rem',
+                            px: { xs: 2, sm: 3 },
+                            py: { xs: 0.8, sm: 1 },
+                            fontSize: { xs: '0.8rem', sm: '0.9rem' },
                             fontWeight: 600,
-                            borderRadius: 2
+                            borderRadius: 2,
+                            minWidth: { xs: 'auto', sm: 140 }
                         }}
                     >
                         🏠 Menu Inicial
@@ -528,17 +569,23 @@ const handleHint = () => {
             <Container 
                 maxWidth="lg" 
                 sx={{ 
-                    py: { xs: 4, sm: 8 },
-                    px: { xs: 2, sm: 3 }
+                    py: { xs: 2, sm: 4, md: 8 },
+                    px: { xs: 1, sm: 2, md: 3 },
+                    minHeight: '100vh'
                 }}
             >
                 {/* Layout com Sidebar para Anúncios */}
-                <Box sx={{ display: 'flex', gap: 3, flexDirection: { xs: 'column', md: 'row' } }}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    gap: { xs: 1, sm: 2, md: 3 }, 
+                    flexDirection: { xs: 'column', lg: 'row' } 
+                }}>
                     
-                    {/* Sidebar Esquerda - Anúncios */}
+                    {/* Sidebar Esquerda - Anúncios - Só mostrar em telas grandes */}
                     <Box sx={{ 
-                        width: { xs: '100%', md: '200px' },
-                        display: { xs: 'none', md: 'block' }
+                        width: { lg: '200px' },
+                        display: { xs: 'none', lg: 'block' },
+                        flexShrink: 0
                     }}>
                         <AdBanner 
                             adSlot={getAdUnitId('SIDEBAR_LEFT')}
@@ -548,14 +595,21 @@ const handleHint = () => {
                     </Box>
                     
                     {/* Conteúdo Principal */}
-                    <Box sx={{ flex: 1, maxWidth: { xs: '100%', md: 'calc(100% - 416px)' } }}>
-                <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
+                    <Box sx={{ 
+                        flex: 1, 
+                        maxWidth: { xs: '100%', lg: 'calc(100% - 416px)' },
+                        overflow: 'hidden'
+                    }}>
+                <Box display="flex" flexDirection="column" alignItems="center" mb={{ xs: 2, sm: 3, md: 4 }}>
                     <Typography 
                         variant="h3"
                         align="center" 
                         color="primary" 
                         gutterBottom
-                        sx={{ fontSize: { xs: '1.8rem', sm: '2.125rem', md: '3rem' } }}
+                        sx={{ 
+                            fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2.125rem', lg: '3rem' },
+                            px: { xs: 1, sm: 0 }
+                        }}
                     >
                         Adivinhe a carta!
                     </Typography>
@@ -563,20 +617,29 @@ const handleHint = () => {
                 <Box 
                     display="flex" 
                     gap={{ xs: 1, sm: 2 }} 
-                    mb={2}
+                    mb={{ xs: 2, sm: 3 }}
                     flexDirection={{ xs: 'column', sm: 'row' }}
-                    alignItems="center"
+                    alignItems="stretch"
+                    justifyContent="center"
+                    px={{ xs: 1, sm: 0 }}
                 >
                     <Tooltip
                         title={wrongCount < 2 ? 'A dica de flavor ficará disponível após 2 erros' : ''}
                         disableHoverListener={wrongCount >= 2}
                     >
-                        <span>
+                        <span style={{ width: '100%' }}>
                             <Button
                                 variant="outlined"
                                 color="secondary"
                                 onClick={handleFlavorHint}
                                 disabled={flavorShown || wrongCount < 2}
+                                sx={{
+                                    width: { xs: '100%', sm: 'auto' },
+                                    minWidth: { xs: 'auto', sm: 160 },
+                                    py: { xs: 1.2, sm: 1 },
+                                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                                    fontWeight: 600
+                                }}
                             >
                                 Mostrar Dica (Flavor)
                             </Button>
@@ -586,12 +649,19 @@ const handleHint = () => {
                         title={wrongCount < 5 ? 'A dica do efeito ficará disponível após 5 erros' : ''}
                         disableHoverListener={wrongCount >= 5}
                     >
-                        <span>
+                        <span style={{ width: '100%' }}>
                             <Button
                                 variant="outlined"
                                 color="secondary"
                                 onClick={handleHint}
                                 disabled={textShown || wrongCount < 5}
+                                sx={{
+                                    width: { xs: '100%', sm: 'auto' },
+                                    minWidth: { xs: 'auto', sm: 160 },
+                                    py: { xs: 1.2, sm: 1 },
+                                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                                    fontWeight: 600
+                                }}
                             >
                                 Mostrar Dica (Efeito)
                             </Button>
@@ -654,10 +724,11 @@ const handleHint = () => {
                     
                     </Box> {/* Fim do Conteúdo Principal */}
                     
-                    {/* Sidebar Direita - Anúncios */}
+                    {/* Sidebar Direita - Anúncios - Só mostrar em telas grandes */}
                     <Box sx={{ 
-                        width: { xs: '100%', md: '200px' },
-                        display: { xs: 'none', md: 'block' }
+                        width: { lg: '200px' },
+                        display: { xs: 'none', lg: 'block' },
+                        flexShrink: 0
                     }}>
                         <AdBanner 
                             adSlot={getAdUnitId('SIDEBAR_RIGHT')}

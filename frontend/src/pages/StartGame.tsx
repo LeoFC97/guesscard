@@ -171,35 +171,103 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
     };
 
     return (
-        <Box display="flex" flexDirection="column" alignItems="center" gap={2} mt={8}>
-            <Typography variant="h4" gutterBottom>
+        <Box 
+            display="flex" 
+            flexDirection="column" 
+            alignItems="center" 
+            gap={{ xs: 1.5, sm: 2 }} 
+            mt={{ xs: 4, sm: 6, md: 8 }}
+            px={{ xs: 2, sm: 3 }}
+            maxWidth="100%"
+        >
+            <Typography 
+                variant="h4" 
+                gutterBottom
+                sx={{
+                    fontSize: { xs: '1.75rem', sm: '2rem', md: '2.125rem' },
+                    textAlign: 'center'
+                }}
+            >
                 Guess the card
             </Typography>
             <ToggleButtonGroup
                 value={difficulty}
                 exclusive
                 onChange={(_, value) => value && setDifficulty(value)}
-                sx={{ mb: 2 }}
+                sx={{ 
+                    mb: 2,
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    width: { xs: '100%', sm: 'auto' },
+                    '& .MuiToggleButton-root': {
+                        fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                        px: { xs: 2, sm: 3 },
+                        py: { xs: 1, sm: 1.5 }
+                    }
+                }}
             >
                 <ToggleButton value="easy">Fácil</ToggleButton>
                 <ToggleButton value="medium">Intermediário</ToggleButton>
                 <ToggleButton value="hard">Difícil</ToggleButton>
             </ToggleButtonGroup>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+            <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                sx={{ 
+                    mb: 1, 
+                    fontWeight: 500,
+                    textAlign: 'center',
+                    px: { xs: 1, sm: 0 },
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                }}
+            >
                 <span style={{ color: '#9c27b0', fontWeight: 700 }}>
                     A dificuldade escolhida vale para todos os modos, inclusive o modo Blur!
                 </span>
             </Typography>
-            <Button variant="contained" color="primary" size="large" onClick={handleStart} disabled={loading}>
+            <Button 
+                variant="contained" 
+                color="primary" 
+                size="large" 
+                onClick={handleStart} 
+                disabled={loading}
+                sx={{
+                    width: { xs: '100%', sm: 'auto' },
+                    minWidth: { xs: 'auto', sm: 200 },
+                    py: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '0.9rem', sm: '1rem' }
+                }}
+            >
                 {loading ? <CircularProgress size={24} /> : 'Iniciar Novo Jogo'}
             </Button>
 
             {/* Modo Texto */}
-            <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
-                <Typography variant="h6" gutterBottom sx={{ color: 'warning.main' }}>
+            <Box sx={{ 
+                mt: { xs: 3, sm: 2 }, 
+                mb: 2, 
+                textAlign: 'center',
+                px: { xs: 1, sm: 0 },
+                maxWidth: { xs: '100%', sm: 500 }
+            }}>
+                <Typography 
+                    variant="h6" 
+                    gutterBottom 
+                    sx={{ 
+                        color: 'warning.main',
+                        fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                    }}
+                >
                     📜 Modo Texto
                 </Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
+                <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    gutterBottom 
+                    sx={{ 
+                        mb: 2,
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                        lineHeight: 1.4
+                    }}
+                >
                     Adivinhe a carta pelo seu texto e habilidades! O nome fica censurado.
                     <br />
                     <span style={{ color: '#ed6c02', fontWeight: 700 }}>
@@ -215,6 +283,10 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     sx={{
                         background: 'linear-gradient(45deg, #ed6c02 30%, #ff9800 90%)',
                         boxShadow: '0 3px 5px 2px rgba(237, 108, 2, .3)',
+                        width: { xs: '100%', sm: 'auto' },
+                        minWidth: { xs: 'auto', sm: 200 },
+                        py: { xs: 1.5, sm: 2 },
+                        fontSize: { xs: '0.9rem', sm: '1rem' }
                     }}
                 >
                     {loadingText ? <CircularProgress size={24} /> : '📖 Jogar Modo Texto'}
@@ -222,11 +294,33 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
             </Box>
 
             {/* Modo Blur */}
-            <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
-                <Typography variant="h6" gutterBottom sx={{ color: 'secondary.main' }}>
+            <Box sx={{ 
+                mt: 2, 
+                mb: 2, 
+                textAlign: 'center',
+                px: { xs: 1, sm: 0 },
+                maxWidth: { xs: '100%', sm: 500 }
+            }}>
+                <Typography 
+                    variant="h6" 
+                    gutterBottom 
+                    sx={{ 
+                        color: 'secondary.main',
+                        fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                    }}
+                >
                     🔍 Modo Blur
                 </Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
+                <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    gutterBottom 
+                    sx={{ 
+                        mb: 2,
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                        lineHeight: 1.4
+                    }}
+                >
                     A carta começa levemente borrada e vai ficando mais nítida a cada palpite!
                     <br />
                     <span style={{ color: '#9c27b0', fontWeight: 700 }}>
@@ -242,17 +336,41 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     sx={{
                         background: 'linear-gradient(45deg, #9c27b0 30%, #673ab7 90%)',
                         boxShadow: '0 3px 5px 2px rgba(156, 39, 176, .3)',
+                        width: { xs: '100%', sm: 'auto' },
+                        minWidth: { xs: 'auto', sm: 200 },
+                        py: { xs: 1.5, sm: 2 },
+                        fontSize: { xs: '0.9rem', sm: '1rem' }
                     }}
                 >
                     {loadingBlur ? <CircularProgress size={24} /> : '🎯 Jogar Modo Blur'}
                 </Button>
             </Box>
             
-            <Box sx={{ mt: 3, mb: 2, textAlign: 'center' }}>
-                <Typography variant="h6" gutterBottom sx={{ color: 'text.primary' }}>
+            <Box sx={{ 
+                mt: { xs: 3, sm: 3 }, 
+                mb: 2, 
+                textAlign: 'center',
+                px: { xs: 1, sm: 0 },
+                maxWidth: { xs: '100%', sm: 400 }
+            }}>
+                <Typography 
+                    variant="h6" 
+                    gutterBottom 
+                    sx={{ 
+                        color: 'text.primary',
+                        fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                    }}
+                >
                     Modo Carta do Dia
                 </Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
+                <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    gutterBottom
+                    sx={{
+                        fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                    }}
+                >
                     Escolha uma data para jogar:
                 </Typography>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -275,7 +393,11 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         slotProps={{ 
                             textField: { 
                                 fullWidth: false,
-                                sx: { maxWidth: 250, mb: 2 },
+                                sx: { 
+                                    maxWidth: { xs: '100%', sm: 250 }, 
+                                    width: { xs: '100%', sm: 'auto' },
+                                    mb: 2 
+                                },
                                 error: isDateInFuture(selectedDate),
                                 helperText: isDateInFuture(selectedDate) ? 'Não é possível selecionar datas futuras' : ''
                             }
@@ -292,27 +414,38 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                 disabled={loadingDaily || isDateInFuture(selectedDate)}
                 sx={{ 
                     opacity: isDateInFuture(selectedDate) ? 0.5 : 1,
-                    cursor: isDateInFuture(selectedDate) ? 'not-allowed' : 'pointer'
+                    cursor: isDateInFuture(selectedDate) ? 'not-allowed' : 'pointer',
+                    width: { xs: '100%', sm: 'auto' },
+                    minWidth: { xs: 'auto', sm: 300 },
+                    py: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '0.85rem', sm: '1rem' },
+                    px: { xs: 2, sm: 3 }
                 }}
             >
-                {loadingDaily ? <CircularProgress size={24} /> : `Jogar carta do dia (${getLocalDateStr(selectedDate)})`}
+                {loadingDaily ? <CircularProgress size={24} /> : 
+                 `Jogar carta do dia (${getLocalDateStr(selectedDate)})`}
             </Button>
 
             {/* Botão de Leaderboards */}
             {onShowLeaderboards && (
-                <Box sx={{ mt: 4 }}>
+                <Box sx={{ 
+                    mt: { xs: 3, sm: 4 },
+                    px: { xs: 1, sm: 0 }
+                }}>
                     <Button
                         variant="contained"
                         color="success"
                         size="large"
                         onClick={onShowLeaderboards}
                         sx={{ 
-                            px: 4,
-                            py: 1.5,
-                            fontSize: '1.1rem',
+                            px: { xs: 3, sm: 4 },
+                            py: { xs: 1.2, sm: 1.5 },
+                            fontSize: { xs: '0.95rem', sm: '1.1rem' },
                             fontWeight: 600,
                             borderRadius: 3,
-                            boxShadow: 3
+                            boxShadow: 3,
+                            width: { xs: '100%', sm: 'auto' },
+                            minWidth: { xs: 'auto', sm: 180 }
                         }}
                     >
                         🏆 Ver Rankings
@@ -325,19 +458,20 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     sx={{
                         mt: 2,
                         mb: 1,
-                        px: 3,
-                        py: 2,
+                        px: { xs: 2, sm: 3 },
+                        py: { xs: 1.5, sm: 2 },
                         borderRadius: 2,
                         background: 'linear-gradient(90deg, #ff5252 0%, #ffb300 100%)',
                         color: '#fff',
                         fontWeight: 600,
-                        fontSize: '1.1rem',
+                        fontSize: { xs: '0.9rem', sm: '1.1rem' },
                         boxShadow: '0 2px 12px rgba(0,0,0,0.10)',
                         textAlign: 'center',
-                        maxWidth: 420,
+                        maxWidth: { xs: '100%', sm: 420 },
                         letterSpacing: 0.2,
                         border: '2px solid #fff3e0',
                         animation: 'shake 0.4s',
+                        mx: { xs: 1, sm: 0 }
                     }}
                 >
                     <span style={{ fontSize: 22, marginRight: 8 }}>⚠️</span>

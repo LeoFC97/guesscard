@@ -3,26 +3,26 @@ export const AD_CONFIG = {
   // ID do Publisher (seu código principal do AdSense)
   PUBLISHER_ID: 'ca-pub-3322168839772907',
   
-  // Ad Unit IDs - SUBSTITUA pelos IDs reais do painel AdSense
+  // Ad Unit IDs - Use o mesmo ID válido para todos até ter IDs específicos
   AD_UNITS: {
     // Banner horizontal no topo da página inicial
     BANNER_TOP: '9071929096', // ✅ ID real do AdSense
     
-    // Banner retângulo no modo texto  
-    BANNER_TEXT_MODE: '2345678901', // ⚠️ SUBSTITUA pelo ID real
+    // Banner retângulo no modo texto - usando mesmo ID válido temporariamente
+    BANNER_TEXT_MODE: '9071929096', // ✅ Usando ID válido
     
-    // Sidebar esquerda durante o jogo
-    SIDEBAR_LEFT: '3456789012', // ⚠️ SUBSTITUA pelo ID real
+    // Sidebar esquerda durante o jogo - usando mesmo ID válido temporariamente
+    SIDEBAR_LEFT: '9071929096', // ✅ Usando ID válido
     
-    // Sidebar direita durante o jogo
-    SIDEBAR_RIGHT: '4567890123', // ⚠️ SUBSTITUA pelo ID real
+    // Sidebar direita durante o jogo - usando mesmo ID válido temporariamente
+    SIDEBAR_RIGHT: '9071929096', // ✅ Usando ID válido
     
-    // Anúncio intersticial após vitórias
-    INTERSTITIAL: '5678901234', // ⚠️ SUBSTITUA pelo ID real
+    // Anúncio intersticial após vitórias - usando mesmo ID válido temporariamente
+    INTERSTITIAL: '9071929096', // ✅ Usando ID válido
   },
   
   // Configurações para teste (use durante desenvolvimento)
-  TEST_MODE: true, // false = anúncios reais, true = anúncios de teste
+  TEST_MODE: false, // false = anúncios reais, true = anúncios de teste
   
   // IDs de teste do Google (use apenas durante desenvolvimento)
   TEST_AD_UNITS: {

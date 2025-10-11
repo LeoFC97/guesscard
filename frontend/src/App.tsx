@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Home from './pages/Home';
 import LeaderboardsPage from './pages/LeaderboardsPage';
 import { Dialog, Box } from '@mui/material';
+import './styles/mobile.css';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MeuPerfil from './components/MeuPerfil';
 import CoinDisplay from './components/CoinDisplay';

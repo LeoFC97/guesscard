@@ -89,13 +89,35 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
         );
     };
             return (
-                <Box mt={4} sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <Typography variant="h6" sx={{ mb: 1, color: 'text.secondary', fontWeight: 600 }}>
+                <Box 
+                    mt={{ xs: 2, sm: 3, md: 4 }} 
+                    sx={{ 
+                        width: '100%', 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center',
+                        px: { xs: 1, sm: 0 }
+                    }}
+                >
+                    <Typography 
+                        variant="h6" 
+                        sx={{ 
+                            mb: { xs: 1, sm: 2 }, 
+                            color: 'text.secondary', 
+                            fontWeight: 600,
+                            fontSize: { xs: '1rem', sm: '1.25rem' },
+                            textAlign: 'center'
+                        }}
+                    >
                         Palpites
                     </Typography>
                             
                             {/* Layout responsivo - tabela em desktop, cards em mobile */}
-                            <Box sx={{ width: '100%', maxWidth: 900, mt: 1 }}>
+                            <Box sx={{ 
+                                width: '100%', 
+                                maxWidth: { xs: '100%', sm: 900 }, 
+                                mt: { xs: 1, sm: 2 }
+                            }}>
                                 {/* Desktop Table */}
                                 <Box sx={{ display: { xs: 'none', md: 'block' } }}>
                                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -188,40 +210,75 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                 </Box>
                                 
                                 {/* Mobile Cards */}
-                                <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-                                    <Stack spacing={2}>
+                                <Box sx={{ display: { xs: 'block', md: 'none' }, px: { xs: 1, sm: 0 } }}>
+                                    <Stack spacing={{ xs: 1.5, sm: 2 }}>
                                         {shownGuesses.length > 0 ? shownGuesses.map((g, idx) => (
                                             <Paper 
                                                 key={idx} 
                                                 sx={{ 
-                                                    p: 2, 
+                                                    p: { xs: 1.5, sm: 2 }, 
                                                     backgroundColor: isDark ? '#2a2f42' : '#f5f5f5',
-                                                    border: `1px solid ${isDark ? '#444' : '#ddd'}`
+                                                    border: `1px solid ${isDark ? '#444' : '#ddd'}`,
+                                                    borderRadius: 2
                                                 }}
                                             >
-                                                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+                                                <Typography 
+                                                    variant="subtitle2" 
+                                                    sx={{ 
+                                                        fontWeight: 700, 
+                                                        mb: 1,
+                                                        fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                                                        lineHeight: 1.2,
+                                                        wordBreak: 'break-word'
+                                                    }}
+                                                >
                                                     {g.guessedCard?.name}
                                                 </Typography>
-                                                <Stack direction="row" spacing={1} flexWrap="wrap">
+                                                <Stack 
+                                                    direction="row" 
+                                                    spacing={{ xs: 0.5, sm: 1 }} 
+                                                    flexWrap="wrap" 
+                                                    sx={{ gap: { xs: 0.5, sm: 1 } }}
+                                                >
                                                     <Chip 
                                                         label={getColorInitials(g.guessedCard?.colors)} 
                                                         color={getColor(g.feedback.colors)} 
                                                         size="small" 
+                                                        sx={{ 
+                                                            fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                                                            height: { xs: 24, sm: 28 }
+                                                        }}
                                                     />
                                                     <Chip 
                                                         label={g.guessedCard?.types?.[0] || '-'} 
                                                         color={getColor(g.feedback.type)} 
                                                         size="small" 
+                                                        sx={{ 
+                                                            fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                                                            height: { xs: 24, sm: 28 }
+                                                        }}
                                                     />
                                                     <Chip 
                                                         label={g.guessedCard?.convertedManaCost || '-'} 
                                                         color={getColor(g.feedback.convertedManaCost)} 
                                                         size="small" 
+                                                        sx={{ 
+                                                            fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                                                            height: { xs: 24, sm: 28 }
+                                                        }}
                                                     />
                                                 </Stack>
                                             </Paper>
                                         )) : (
-                                            <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary' }}>
+                                            <Typography 
+                                                variant="body2" 
+                                                sx={{ 
+                                                    textAlign: 'center', 
+                                                    color: 'text.secondary',
+                                                    py: 3,
+                                                    fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                                                }}
+                                            >
                                                 Nenhum palpite ainda.
                                             </Typography>
                                         )}
