@@ -3,7 +3,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { setRoutes } from './routes/mtgRoutes';
 import coinsRoutes from './routes/coinsRoutes';
-import adRoutes from './routes/adRoutes';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -34,7 +33,6 @@ app.use(cors());
 // Routes
 setRoutes(app);
 app.use('/api/coins', coinsRoutes);
-app.use('/api/ads', adRoutes);
 
 app.use(cors({
   origin: 'https://guesscard.vercel.app/' // ou a URL do seu frontend no Render/Vercel/Netlify
