@@ -17,11 +17,40 @@ const getLabel = (status: string) => {
     return '❌';
 };
 
+const formatValue = (value: any) => {
+    if (value === 0) return '0';
+    if (value === undefined || value === null || value === '') return '-';
+    return String(value);
+};
+
+const StatusChip = ({ status, sx }: { status: string; sx?: any }) => (
+    <Chip
+        label={getLabel(status)}
+        color={getColor(status)}
+        size="small"
+        sx={{
+            bgcolor: getColor(status) === 'success' ? '#388e3c' : getColor(status) === 'warning' ? '#fbc02d' : '#c62828',
+            color: '#fff',
+            fontWeight: 800,
+            fontSize: '0.75rem',
+            minWidth: 32,
+            height: 24,
+            '& .MuiChip-label': { px: 0.6 },
+            ...sx
+        }}
+    />
+);
+
 export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode?: 'light' | 'dark' }) {
     // Mostra até 10 palpites (mais compacto)
     const shownGuesses = guesses.slice(0, 10);
     // Usa themeMode para cor da fonte
     const isDark = themeMode === 'dark';
+    const gridColumns = 'minmax(220px, 1.6fr) repeat(6, minmax(120px, 1fr))';
+    const headerTextColor = isDark ? '#e5e7eb' : '#1f2937';
+    const valueTextColor = isDark ? '#f8fafc' : '#111827';
+    const mutedTextColor = isDark ? '#cbd5f5' : '#6b7280';
+    const rowBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
     // Função para converter array de cores em iniciais
     const getColorInitials = (colors: string[] | undefined) => {
         if (!Array.isArray(colors) || colors.length === 0) return '-';
@@ -115,98 +144,189 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                             {/* Layout responsivo - tabela em desktop, cards em mobile */}
                             <Box sx={{ 
                                 width: '100%', 
-                                maxWidth: { xs: '100%', sm: 900 }, 
+                                maxWidth: { xs: '100%', lg: 1100 }, 
                                 mt: { xs: 1, sm: 2 }
                             }}>
-                                {/* Desktop Table */}
-                                <Box sx={{ display: { xs: 'none', md: 'flex' }, overflowX: 'auto', justifyContent: 'center' }}>
-                                    <table style={{ width: 'min(100%,900px)', margin: '0 auto', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
-                                        <thead>
-                                            <tr>
-                                                <th style={{ textAlign: 'left', padding: 8, fontWeight: 800, color: isDark ? '#e6e6e6' : '#1f2937', fontSize: '1rem' }}>Carta</th>
-                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Cor</span></th>
-                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Tipo</span></th>
-                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>CMC</span></th>
-                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Edição</span></th>
-                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Raridade</span></th>
-                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Artista</span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                        {shownGuesses.length > 0 ? shownGuesses.map((g, idx) => (
-                                                                                            <>
-                                                                                                <tr key={idx}>
-                                                                                                    <td style={{ fontWeight: 700, color: isDark ? '#fff' : '#111', fontSize: '0.95rem', maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textShadow: isDark ? '0 2px 12px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial', lineHeight: '1.2', verticalAlign: 'middle' }}>{g.guessedCard?.name}</td>
-                                                                                                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
-                                                                                                        <span>
-                                                                                                            {g.feedback.colors === 'correct' || g.feedback.colors === 'partial' ? (
-                                                                                                                <>
-                                                                                                                    <Chip label={getLabel(g.feedback.colors)} color={getColor(g.feedback.colors)} size="small" sx={{ bgcolor: getColor(g.feedback.colors) === 'success' ? '#388e3c' : getColor(g.feedback.colors) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, mr: 1, maxWidth: 44 }} />
-                                                                                                                    <span style={{ fontWeight: 800, color: isDark ? '#fff' : '#111', fontSize: '0.95rem', textShadow: isDark ? '0 1px 6px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial' }}>{getColorInitials(g.guessedCard?.colors)}</span>
-                                                                                                                </>
-                                                                                                            ) : (
-                                                                                                                <Chip 
-                                                                                                                    label={`${getColorInitials(g.guessedCard?.colors)} ❌`} 
-                                                                                                                    color="error" 
-                                                                                                                    size="small" 
-                                                                                                                    sx={{ bgcolor: '#c62828', color: '#fff', fontWeight: 700, maxWidth: 120, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} 
-                                                                                                                />
-                                                                                                            )}
-                                                                                                        </span>
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <span>
-                                                                                                            <Chip 
-                                                                                                                label={`${g.guessedCard?.type || '-'} ${getLabel(g.feedback.type)}`} 
-                                                                                                                color={getColor(g.feedback.type)} 
-                                                                                                                size="small" 
-                                                                                                                sx={{ bgcolor: getColor(g.feedback.type) === 'success' ? '#388e3c' : getColor(g.feedback.type) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 160, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} 
-                                                                                                            />
-                                                                                                        </span>
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        <span>
-                                                                                                            <Chip 
-                                                                                                                label={`${g.guessedCard?.cmc || 0} ${getLabel(g.feedback.cmc)}`} 
-                                                                                                                color={getColor(g.feedback.cmc)} 
-                                                                                                                size="small" 
-                                                                                                                sx={{ bgcolor: getColor(g.feedback.cmc) === 'success' ? '#388e3c' : getColor(g.feedback.cmc) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 100, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} 
-                                                                                                            />
-                                                                                                        </span>
-                                                                                                    </td>
-                                                                                                    <td><span><Chip label={`${g.guessedCard?.setName || '-'} ${getLabel(g.feedback.edition)}`} color={getColor(g.feedback.edition)} size="small" sx={{ bgcolor: getColor(g.feedback.edition) === 'success' ? '#388e3c' : getColor(g.feedback.edition) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 140, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} /></span></td>
-                                                                                                      <td>
-                                                                                                            <span>
-                                                                                                                <Chip 
-                                                                                                                    label={`${g.guessedCard?.rarity || '-'} ${getLabel(g.feedback.rarity)}`} 
-                                                                                                                    color={getColor(g.feedback.rarity)} 
-                                                                                                                    size="small" 
-                                                                                                                    sx={{ bgcolor: getColor(g.feedback.rarity) === 'success' ? '#388e3c' : getColor(g.feedback.rarity) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 120, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} 
-                                                                                                                />
-                                                                                                            </span>
-                                                                                                        </td>
-                                                                                                    <td><span><Chip label={`${g.guessedCard?.artist || '-'} ${getLabel(g.feedback.artist)}`} color={getColor(g.feedback.artist)} size="small" sx={{ bgcolor: getColor(g.feedback.artist) === 'success' ? '#388e3c' : getColor(g.feedback.artist) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 160, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} /></span></td>
-                                                                                                </tr>
-                                                                                                {idx < shownGuesses.length - 1 && (
-                                                                                                    <tr aria-hidden="true" style={{ height: 8 }}>
-                                                                                                        <td colSpan={7} style={{ 
-                                                                                                            background: 'linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 100%)', 
-                                                                                                            height: 8, 
-                                                                                                            padding: 0, 
-                                                                                                            border: 'none',
-                                                                                                            borderTop: '1px solid rgba(255,255,255,0.2)',
-                                                                                                            borderBottom: '1px solid rgba(255,255,255,0.1)'
-                                                                                                        }} />
-                                                                                                    </tr>
-                                                                                                )}
-                                                                                            </>
-                                        )) : (
-                                            <tr>
-                                                <td colSpan={7} style={{ textAlign: 'center', color: '#888', padding: 12 }}>Nenhum palpite ainda. Faça seu primeiro palpite!</td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                                {/* Desktop Grid Table */}
+                                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                                    <Paper
+                                        variant="outlined"
+                                        sx={{
+                                            backgroundColor: isDark ? '#1f2435' : '#fff',
+                                            borderColor: rowBorder,
+                                            overflow: 'hidden'
+                                        }}
+                                    >
+                                        <Box sx={{ overflowX: 'auto' }}>
+                                            <Box sx={{ minWidth: 980 }}>
+                                                <Box
+                                                    sx={{
+                                                        display: 'grid',
+                                                        gridTemplateColumns: gridColumns,
+                                                        alignItems: 'center',
+                                                        columnGap: 1.5,
+                                                        px: 2,
+                                                        py: 1.2,
+                                                        backgroundColor: isDark ? '#151a28' : '#f3f4f6',
+                                                        borderBottom: `1px solid ${rowBorder}`
+                                                    }}
+                                                >
+                                                    {['Carta', 'Cor', 'Tipo', 'CMC', 'Edição', 'Raridade', 'Artista'].map((label, index) => (
+                                                        <Typography
+                                                            key={label}
+                                                            variant="caption"
+                                                            sx={{
+                                                                fontWeight: 800,
+                                                                fontSize: '0.8rem',
+                                                                textTransform: 'uppercase',
+                                                                letterSpacing: '0.04em',
+                                                                color: headerTextColor,
+                                                                textAlign: index === 0 ? 'left' : 'center'
+                                                            }}
+                                                        >
+                                                            {label}
+                                                        </Typography>
+                                                    ))}
+                                                </Box>
+                                                {shownGuesses.length > 0 ? shownGuesses.map((g, idx) => {
+                                                    const cardName = formatValue(g.guessedCard?.name);
+                                                    const colorValue = getColorInitials(g.guessedCard?.colors);
+                                                    const typeValue = formatValue(g.guessedCard?.type || g.guessedCard?.types?.[0]);
+                                                    const cmcValue = formatValue(g.guessedCard?.cmc ?? g.guessedCard?.convertedManaCost);
+                                                    const setNameValue = formatValue(g.guessedCard?.setName);
+                                                    const rarityValue = formatValue(g.guessedCard?.rarity);
+                                                    const artistValue = formatValue(g.guessedCard?.artist);
+                                                    return (
+                                                        <Box
+                                                            key={`${cardName}-${idx}`}
+                                                            sx={{
+                                                                display: 'grid',
+                                                                gridTemplateColumns: gridColumns,
+                                                                alignItems: 'center',
+                                                                columnGap: 1.5,
+                                                                px: 2,
+                                                                py: 1.2,
+                                                                borderBottom: idx === shownGuesses.length - 1 ? 'none' : `1px solid ${rowBorder}`,
+                                                                backgroundColor: idx % 2 === 0 ? (isDark ? '#1d2233' : '#fafafa') : (isDark ? '#20263a' : '#fff')
+                                                            }}
+                                                        >
+                                                            <Box sx={{ pr: 2 }}>
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontWeight: 700,
+                                                                        color: valueTextColor,
+                                                                        fontSize: '0.95rem',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap'
+                                                                    }}
+                                                                    title={cardName}
+                                                                >
+                                                                    {cardName}
+                                                                </Typography>
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{ color: mutedTextColor }}
+                                                                >
+                                                                    {`#${shownGuesses.length - idx}`}
+                                                                </Typography>
+                                                            </Box>
+                                                            <Stack direction="row" spacing={0.75} alignItems="center" justifyContent="center">
+                                                                <StatusChip status={g.feedback.colors} />
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontWeight: 700,
+                                                                        fontSize: '0.9rem',
+                                                                        color: valueTextColor
+                                                                    }}
+                                                                >
+                                                                    {colorValue}
+                                                                </Typography>
+                                                            </Stack>
+                                                            <Stack direction="row" spacing={0.75} alignItems="center" justifyContent="center">
+                                                                <StatusChip status={g.feedback.type} />
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontWeight: 600,
+                                                                        fontSize: '0.85rem',
+                                                                        color: valueTextColor,
+                                                                        maxWidth: 140,
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap'
+                                                                    }}
+                                                                    title={typeValue}
+                                                                >
+                                                                    {typeValue}
+                                                                </Typography>
+                                                            </Stack>
+                                                            <Stack direction="row" spacing={0.75} alignItems="center" justifyContent="center">
+                                                                <StatusChip status={g.feedback.cmc} />
+                                                                <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: valueTextColor }}>
+                                                                    {cmcValue}
+                                                                </Typography>
+                                                            </Stack>
+                                                            <Stack direction="row" spacing={0.75} alignItems="center" justifyContent="center">
+                                                                <StatusChip status={g.feedback.edition} />
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontWeight: 600,
+                                                                        fontSize: '0.85rem',
+                                                                        color: valueTextColor,
+                                                                        maxWidth: 140,
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap'
+                                                                    }}
+                                                                    title={setNameValue}
+                                                                >
+                                                                    {setNameValue}
+                                                                </Typography>
+                                                            </Stack>
+                                                            <Stack direction="row" spacing={0.75} alignItems="center" justifyContent="center">
+                                                                <StatusChip status={g.feedback.rarity} />
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontWeight: 600,
+                                                                        fontSize: '0.85rem',
+                                                                        color: valueTextColor,
+                                                                        maxWidth: 140,
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap'
+                                                                    }}
+                                                                    title={rarityValue}
+                                                                >
+                                                                    {rarityValue}
+                                                                </Typography>
+                                                            </Stack>
+                                                            <Stack direction="row" spacing={0.75} alignItems="center" justifyContent="center">
+                                                                <StatusChip status={g.feedback.artist} />
+                                                                <Typography
+                                                                    sx={{
+                                                                        fontWeight: 600,
+                                                                        fontSize: '0.85rem',
+                                                                        color: valueTextColor,
+                                                                        maxWidth: 160,
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap'
+                                                                    }}
+                                                                    title={artistValue}
+                                                                >
+                                                                    {artistValue}
+                                                                </Typography>
+                                                            </Stack>
+                                                        </Box>
+                                                    );
+                                                }) : (
+                                                    <Box sx={{ px: 2, py: 2, textAlign: 'center', color: mutedTextColor }}>
+                                                        Nenhum palpite ainda. Faça seu primeiro palpite!
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    </Paper>
                                 </Box>
                                 
                                 {/* Mobile Cards */}
@@ -234,39 +354,85 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                 >
                                                     {g.guessedCard?.name}
                                                 </Typography>
-                                                <Stack 
-                                                    direction="row" 
-                                                    spacing={{ xs: 0.5, sm: 1 }} 
-                                                    flexWrap="wrap" 
-                                                    sx={{ gap: { xs: 0.5, sm: 1 } }}
-                                                >
-                                                    <Chip 
-                                                        label={getColorInitials(g.guessedCard?.colors)} 
-                                                        color={getColor(g.feedback.colors)} 
-                                                        size="small" 
-                                                        sx={{ 
-                                                            fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                                                            height: { xs: 24, sm: 28 }
-                                                        }}
-                                                    />
-                                                    <Chip 
-                                                        label={g.guessedCard?.types?.[0] || '-'} 
-                                                        color={getColor(g.feedback.type)} 
-                                                        size="small" 
-                                                        sx={{ 
-                                                            fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                                                            height: { xs: 24, sm: 28 }
-                                                        }}
-                                                    />
-                                                    <Chip 
-                                                        label={g.guessedCard?.convertedManaCost || '-'} 
-                                                        color={getColor(g.feedback.convertedManaCost)} 
-                                                        size="small" 
-                                                        sx={{ 
-                                                            fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                                                            height: { xs: 24, sm: 28 }
-                                                        }}
-                                                    />
+                                                <Stack spacing={0.8}>
+                                                    <Stack direction="row" spacing={1} alignItems="center">
+                                                        <StatusChip status={g.feedback.colors} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>Cor</Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{ fontWeight: 600, color: valueTextColor }}
+                                                        >
+                                                            {getColorInitials(g.guessedCard?.colors)}
+                                                        </Typography>
+                                                    </Stack>
+                                                    <Stack direction="row" spacing={1} alignItems="center">
+                                                        <StatusChip status={g.feedback.type} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>Tipo</Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{ fontWeight: 600, color: valueTextColor }}
+                                                        >
+                                                            {formatValue(g.guessedCard?.type || g.guessedCard?.types?.[0])}
+                                                        </Typography>
+                                                    </Stack>
+                                                    <Stack direction="row" spacing={1} alignItems="center">
+                                                        <StatusChip status={g.feedback.cmc} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>CMC</Typography>
+                                                        <Typography variant="body2" sx={{ fontWeight: 600, color: valueTextColor }}>
+                                                            {formatValue(g.guessedCard?.cmc ?? g.guessedCard?.convertedManaCost)}
+                                                        </Typography>
+                                                    </Stack>
+                                                    <Stack direction="row" spacing={1} alignItems="center">
+                                                        <StatusChip status={g.feedback.edition} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>Edição</Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                color: valueTextColor,
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                whiteSpace: 'nowrap'
+                                                            }}
+                                                            title={formatValue(g.guessedCard?.setName)}
+                                                        >
+                                                            {formatValue(g.guessedCard?.setName)}
+                                                        </Typography>
+                                                    </Stack>
+                                                    <Stack direction="row" spacing={1} alignItems="center">
+                                                        <StatusChip status={g.feedback.rarity} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>Raridade</Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                color: valueTextColor,
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                whiteSpace: 'nowrap'
+                                                            }}
+                                                            title={formatValue(g.guessedCard?.rarity)}
+                                                        >
+                                                            {formatValue(g.guessedCard?.rarity)}
+                                                        </Typography>
+                                                    </Stack>
+                                                    <Stack direction="row" spacing={1} alignItems="center">
+                                                        <StatusChip status={g.feedback.artist} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>Artista</Typography>
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                color: valueTextColor,
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                whiteSpace: 'nowrap'
+                                                            }}
+                                                            title={formatValue(g.guessedCard?.artist)}
+                                                        >
+                                                            {formatValue(g.guessedCard?.artist)}
+                                                        </Typography>
+                                                    </Stack>
                                                 </Stack>
                                             </Paper>
                                         )) : (
