@@ -105,6 +105,14 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
                 console.log('🪙 Moedas ganhas:', result.coinReward);
                 animateCoinsGain(result.coinReward);
             }
+
+        }
+        setTextReady(null);
+        setTextShown(false);
+        // Só reseta o tempo se não foi vitória
+        if (!result.isCorrect) {
+            setStartTime(Date.now());
+            setEndTime(null);
         }
         // Não resetar textReady e flavorReady aqui - eles devem persistir para mostrar hints
         // Eles só são resetados quando um novo jogo é iniciado
