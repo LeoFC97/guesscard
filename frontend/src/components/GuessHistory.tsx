@@ -119,37 +119,37 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                 mt: { xs: 1, sm: 2 }
                             }}>
                                 {/* Desktop Table */}
-                                <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <Box sx={{ display: { xs: 'none', md: 'flex' }, overflowX: 'auto', justifyContent: 'center' }}>
+                                    <table style={{ width: 'min(100%,900px)', margin: '0 auto', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                                         <thead>
                                             <tr>
-                                                <th style={{ textAlign: 'left', padding: 6, fontWeight: 700, color: isDark ? '#222' : '#fff', fontSize: '1rem' }}>Carta</th>
-                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Cor</span></th>
-                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Tipo</span></th>
-                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>CMC</span></th>
-                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Edição</span></th>
-                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Raridade</span></th>
-                                                <th><span style={{ background: '#222', color: '#fff', borderRadius: 8, padding: '2px 10px', fontWeight: 700 }}>Artista</span></th>
+                                                <th style={{ textAlign: 'left', padding: 8, fontWeight: 800, color: isDark ? '#e6e6e6' : '#1f2937', fontSize: '1rem' }}>Carta</th>
+                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Cor</span></th>
+                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Tipo</span></th>
+                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>CMC</span></th>
+                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Edição</span></th>
+                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Raridade</span></th>
+                                                <th style={{ textAlign: 'center', padding: 8 }}><span style={{ background: isDark ? '#111' : '#f0f0f0', color: isDark ? '#fff' : '#111', borderRadius: 8, padding: '4px 10px', fontWeight: 700 }}>Artista</span></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                         {shownGuesses.length > 0 ? shownGuesses.map((g, idx) => (
                                                                                             <>
                                                                                                 <tr key={idx}>
-                                                                                                    <td style={{ fontWeight: 700, color: isDark ? '#fff' : '#fff', fontSize: '0.9rem', maxWidth: 180, whiteSpace: 'normal', wordBreak: 'break-word', textShadow: isDark ? '0 2px 12px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial', lineHeight: '1.2' }}>{g.guessedCard?.name}</td>
-                                                                                                    <td>
+                                                                                                    <td style={{ fontWeight: 700, color: isDark ? '#fff' : '#111', fontSize: '0.95rem', maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textShadow: isDark ? '0 2px 12px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial', lineHeight: '1.2', verticalAlign: 'middle' }}>{g.guessedCard?.name}</td>
+                                                                                                    <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
                                                                                                         <span>
                                                                                                             {g.feedback.colors === 'correct' || g.feedback.colors === 'partial' ? (
                                                                                                                 <>
-                                                                                                                    <Chip label={getLabel(g.feedback.colors)} color={getColor(g.feedback.colors)} size="small" sx={{ bgcolor: getColor(g.feedback.colors) === 'success' ? '#388e3c' : getColor(g.feedback.colors) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, mr: 1 }} />
-                                                                                                                    <span style={{ fontWeight: 800, color: isDark ? '#fff' : '#fff', fontSize: '0.95rem', textShadow: isDark ? '0 1px 6px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial' }}>{getColorInitials(g.guessedCard?.colors)}</span>
+                                                                                                                    <Chip label={getLabel(g.feedback.colors)} color={getColor(g.feedback.colors)} size="small" sx={{ bgcolor: getColor(g.feedback.colors) === 'success' ? '#388e3c' : getColor(g.feedback.colors) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, mr: 1, maxWidth: 44 }} />
+                                                                                                                    <span style={{ fontWeight: 800, color: isDark ? '#fff' : '#111', fontSize: '0.95rem', textShadow: isDark ? '0 1px 6px #23283a' : 'none', fontFamily: 'Montserrat, Roboto, Arial' }}>{getColorInitials(g.guessedCard?.colors)}</span>
                                                                                                                 </>
                                                                                                             ) : (
                                                                                                                 <Chip 
                                                                                                                     label={`${getColorInitials(g.guessedCard?.colors)} ❌`} 
                                                                                                                     color="error" 
                                                                                                                     size="small" 
-                                                                                                                    sx={{ bgcolor: '#c62828', color: '#fff', fontWeight: 700 }} 
+                                                                                                                    sx={{ bgcolor: '#c62828', color: '#fff', fontWeight: 700, maxWidth: 120, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} 
                                                                                                                 />
                                                                                                             )}
                                                                                                         </span>
@@ -160,7 +160,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                                                                                 label={`${g.guessedCard?.type || '-'} ${getLabel(g.feedback.type)}`} 
                                                                                                                 color={getColor(g.feedback.type)} 
                                                                                                                 size="small" 
-                                                                                                                sx={{ bgcolor: getColor(g.feedback.type) === 'success' ? '#388e3c' : getColor(g.feedback.type) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} 
+                                                                                                                sx={{ bgcolor: getColor(g.feedback.type) === 'success' ? '#388e3c' : getColor(g.feedback.type) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 160, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} 
                                                                                                             />
                                                                                                         </span>
                                                                                                     </td>
@@ -170,22 +170,22 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                                                                                 label={`${g.guessedCard?.cmc || 0} ${getLabel(g.feedback.cmc)}`} 
                                                                                                                 color={getColor(g.feedback.cmc)} 
                                                                                                                 size="small" 
-                                                                                                                sx={{ bgcolor: getColor(g.feedback.cmc) === 'success' ? '#388e3c' : getColor(g.feedback.cmc) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} 
+                                                                                                                sx={{ bgcolor: getColor(g.feedback.cmc) === 'success' ? '#388e3c' : getColor(g.feedback.cmc) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 100, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} 
                                                                                                             />
                                                                                                         </span>
                                                                                                     </td>
-                                                                                                      <td><span><Chip label={`${g.guessedCard?.setName || '-'} ${getLabel(g.feedback.edition)}`} color={getColor(g.feedback.edition)} size="small" sx={{ bgcolor: getColor(g.feedback.edition) === 'success' ? '#388e3c' : getColor(g.feedback.edition) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
+                                                                                                    <td><span><Chip label={`${g.guessedCard?.setName || '-'} ${getLabel(g.feedback.edition)}`} color={getColor(g.feedback.edition)} size="small" sx={{ bgcolor: getColor(g.feedback.edition) === 'success' ? '#388e3c' : getColor(g.feedback.edition) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 140, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} /></span></td>
                                                                                                       <td>
                                                                                                             <span>
                                                                                                                 <Chip 
                                                                                                                     label={`${g.guessedCard?.rarity || '-'} ${getLabel(g.feedback.rarity)}`} 
                                                                                                                     color={getColor(g.feedback.rarity)} 
                                                                                                                     size="small" 
-                                                                                                                    sx={{ bgcolor: getColor(g.feedback.rarity) === 'success' ? '#388e3c' : getColor(g.feedback.rarity) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} 
+                                                                                                                    sx={{ bgcolor: getColor(g.feedback.rarity) === 'success' ? '#388e3c' : getColor(g.feedback.rarity) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 120, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} 
                                                                                                                 />
                                                                                                             </span>
                                                                                                         </td>
-                                                                                                      <td><span><Chip label={`${g.guessedCard?.artist || '-'} ${getLabel(g.feedback.artist)}`} color={getColor(g.feedback.artist)} size="small" sx={{ bgcolor: getColor(g.feedback.artist) === 'success' ? '#388e3c' : getColor(g.feedback.artist) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700 }} /></span></td>
+                                                                                                    <td><span><Chip label={`${g.guessedCard?.artist || '-'} ${getLabel(g.feedback.artist)}`} color={getColor(g.feedback.artist)} size="small" sx={{ bgcolor: getColor(g.feedback.artist) === 'success' ? '#388e3c' : getColor(g.feedback.artist) === 'warning' ? '#fbc02d' : '#c62828', color: '#fff', fontWeight: 700, maxWidth: 160, '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }} /></span></td>
                                                                                                 </tr>
                                                                                                 {idx < shownGuesses.length - 1 && (
                                                                                                     <tr aria-hidden="true" style={{ height: 8 }}>

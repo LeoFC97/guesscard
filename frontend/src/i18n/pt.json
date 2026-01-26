@@ -1,0 +1,104 @@
+{
+  "home": {
+    "loadingUser": "Carregando usuário...",
+    "leaderboards": "🏆 Leaderboards",
+    "backToGame": "Voltar ao Jogo",
+    "title": "Adivinhe a carta!",
+    "viewRankings": "🏆 Ver Rankings",
+    "menu": "🏠 Menu Inicial",
+    "dailyCard": "Carta do Dia",
+    "youArePlaying": "Você está jogando o modo especial: Carta do Dia",
+    "showFlavorHint": "Mostrar Dica (Flavor)",
+    "showEffectHint": "Mostrar Dica (Efeito)",
+    "flavorHintTooltip": "A dica de flavor ficará disponível após {{count}} erros",
+    "effectHintTooltip": "A dica do efeito ficará disponível após {{count}} erros",
+    "backToMenu": "Voltar ao Menu",
+    "viewLeaderboards": "Ver Rankings"
+  },
+  "global": {
+    "switchToEnglish": "Switch to English",
+    "switchToPortuguese": "Mudar para Português"
+  },
+  "start": {
+    "title": "Guess the card",
+    "difficulty": { "easy": "Fácil", "medium": "Intermediário", "hard": "Difícil" },
+    "difficultyNote": "A dificuldade escolhida vale para todos os modos, inclusive o modo Blur!",
+    "startNewGame": "Iniciar Novo Jogo",
+    "textMode": { "title": "📜 Modo Texto", "description": "Adivinhe a carta pelo seu texto e habilidades! O nome fica censurado.", "play": "📖 Jogar Modo Texto" },
+    "blurMode": { "title": "🔍 Modo Blur", "description": "A carta começa levemente borrada e vai ficando mais nítida a cada palpite!", "play": "🎯 Jogar Modo Blur" },
+    "dailyMode": { "title": "Modo Carta do Dia", "chooseDate": "Escolha uma data para jogar:", "dateLabel": "Data do desafio", "playWithDate": "Jogar carta do dia ({{date}})", "futureDateHelper": "Não é possível selecionar datas futuras" }
+  },
+  "errors": {
+    "newGame": "Erro ao iniciar novo jogo",
+    "newBlurGame": "Erro ao iniciar novo jogo blur",
+    "newTextGame": "Erro ao iniciar novo jogo texto",
+    "dailyAlreadyPlayed": "Você já jogou a carta do dia {{date}}. Escolha uma data diferente.",
+    "dailyNotDefined": "Nenhuma carta foi definida para o dia {{date}}.",
+    "dailyStartError": "Erro ao iniciar modo diário",
+    "futureDate": "Não é possível jogar cartas do futuro. Escolha uma data de hoje ou anterior.",
+    "connectionError": "Erro de conexão. Verifique sua internet e tente novamente."
+  },
+  "textcard": {
+    "revealedTitle": "🎉 Carta Revelada!",
+    "guessTitle": "📜 Adivinhe pela Descrição",
+    "manaTitle": "💎 Custo de Mana",
+    "manaReveal": "Revelar custo de mana",
+    "manaCostNote": "(Custa 10 moedas)",
+    "cardTypeTitle": "🏷️ Tipo da Carta",
+    "cardTypeReveal": "Revelar tipo da carta",
+    "textTitle": "📖 Texto da Carta",
+    "textEmpty": "Esta carta não possui texto de habilidade.",
+    "hintTip": "💡 Dica: Use as informações de tipo, custo de mana e habilidades para adivinhar a carta!",
+    "congrats": "Parabéns! Você adivinhou baseado no texto da carta!",
+    "completed": "Modo Texto concluído com sucesso! ✨"
+  },
+  "blurred": {
+    "revealedTitle": "🎉 Carta Revelada!",
+    "guessTitle": "🔍 Adivinhe a Carta",
+    "mysteryAlt": "Carta misteriosa"
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Senha",
+    "submit": "Entrar",
+    "social": "Entrar com rede social",
+    "guest": "Jogar como visitante",
+    "unknownError": "Erro desconhecido"
+  },
+  "profile": {
+    "title": "Meu Perfil",
+    "coins": "Moedas",
+    "name": "Nome:",
+    "daysWon": "Dias que acertou a carta do dia:",
+    "noDays": "Nenhum dia ainda",
+    "personalRecord": "Recorde pessoal",
+    "bestAttempts": "Menor número de tentativas:",
+    "bestTime": "Menor tempo:",
+    "statistics": "Estatísticas",
+    "lastCard": "Última carta jogada",
+    "streak": "Sequencia de acertos da carta diária:",
+    "coinStatsTitle": "Estatísticas de Moedas",
+    "balance": "Saldo atual:",
+    "totalEarned": "Total ganho:",
+    "totalSpent": "Total gasto:",
+    "earnedToday": "Ganho hoje:",
+    "spentToday": "Gasto hoje:"
+  },
+  "coin": {
+    "loading": "Carregando moedas...",
+    "clickToView": "Clique para ver extrato - Saldo: {{balance}} moedas"
+  },
+  "victory": {
+    "congrats": "Parabéns!",
+    "youGuessed": "Você acertou a carta!",
+    "attempts": "Tentativas:",
+    "time": "Tempo:",
+    "playAgain": "Jogar Novamente"
+  },
+  "guess": {
+    "placeholder": "Nome da carta",
+    "submit": "Enviar",
+    "sending": "Enviando..."
+  }
+}

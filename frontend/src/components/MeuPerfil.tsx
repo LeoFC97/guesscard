@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Divider, Chip, List, ListItem, ListItemText, Stack } from '@mui/material';
 import coinsApi, { CoinStats } from '../services/coinsApi';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 interface PerfilProps {
   userId: string;
@@ -73,6 +75,8 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, the
     streak: stats?.streak ?? 0,
     cardsGuessed: stats?.cardsGuessed ?? [],
   };
+  const { locale } = useLocale();
+
   return (
     <Box 
       minWidth={320} 
@@ -86,7 +90,7 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, the
       }}
     >
       {/* DEBUG INFO */}
-      <Typography variant="h5" fontWeight={700} mb={1} sx={{ color: themeMode === 'dark' ? '#a78bfa' : '#1976d2' }}>Meu Perfil</Typography>
+      <Typography variant="h5" fontWeight={700} mb={1} sx={{ color: themeMode === 'dark' ? '#a78bfa' : '#1976d2' }}>{t('profile.title', locale)}</Typography>
       <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
       
       {/* Seção de Moedas */}
@@ -105,7 +109,7 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, the
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="h6" sx={{ fontSize: '1.5rem', color: '#ffd700' }}>🪙</Typography>
           <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>
-            Moedas
+            {t('profile.coins', locale)}
           </Typography>
         </Box>
         <Typography 
@@ -120,37 +124,37 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, the
         </Typography>
       </Box>
 
-      <Typography variant="subtitle1" sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}><b>Nome:</b> {name || '-'}</Typography>
+        <Typography variant="subtitle1" sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}><b>{t('profile.name', locale)}</b> {name || '-'}</Typography>
       <Typography variant="subtitle2" sx={{ color: themeMode === 'dark' ? '#bdbdbd' : '#555' }} mb={2}>{email || '-'}</Typography>
       <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
-      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Dias que acertou a carta do dia:</Typography>
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{t('profile.daysWon', locale)}</Typography>
       <Stack direction="row" flexWrap="wrap" gap={1} mb={2}>
-        {dailyDates && dailyDates.length === 0 ? <Chip label="Nenhum dia ainda" color="default" /> : (dailyDates || []).map(date => (
+        {dailyDates && dailyDates.length === 0 ? <Chip label={t('profile.noDays', locale)} color="default" /> : (dailyDates || []).map(date => (
           <Chip key={date} label={date} color="success" size="small" />
         ))}
       </Stack>
       <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
-      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Recorde pessoal</Typography>
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{t('profile.personalRecord', locale)}</Typography>
       <List dense>
         <ListItem>
           <ListItemText 
-            primary={`Menor número de tentativas: ${safeStats.bestTries}`}
+            primary={`${t('profile.bestAttempts', locale)} ${safeStats.bestTries}`}
             sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
           />
         </ListItem>
         <ListItem>
           <ListItemText 
-            primary={`Menor tempo: ${safeStats.bestTime !== '-' ? `${safeStats.bestTime}s` : '-'}`}
+            primary={`${t('profile.bestTime', locale)} ${safeStats.bestTime !== '-' ? `${safeStats.bestTime}s` : '-'}`}
             sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
           />
         </ListItem>
       </List>
       <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
-      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Estatísticas</Typography>
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{t('profile.statistics', locale)}</Typography>
       <List dense>
         <ListItem>
           <ListItemText 
-            primary={`Partidas normais: ${safeStats.totalNormal}`}
+            primary={`${t('profile.statistics', locale)}: ${safeStats.totalNormal}`}
             sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
           />
         </ListItem>
@@ -186,45 +190,45 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, the
         </ListItem>
       </List>
       <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
-      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Última carta jogada</Typography>
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{t('profile.lastCard', locale)}</Typography>
       <Typography variant="body2" mb={2} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{safeStats.lastCard !== '-' ? `${safeStats.lastCard} (${safeStats.lastDate ? new Date(safeStats.lastDate).toLocaleDateString() : ''})` : '-'}</Typography>
       <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
-      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Sequencia de acertos da carta diária:</Typography>
+      <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{t('profile.streak', locale)}</Typography>
       <Typography variant="body2" mb={2} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{safeStats.streak}</Typography>
       
       {/* Estatísticas detalhadas das moedas */}
       {coinStats && (
         <>
           <Divider sx={{ mb: 2, borderColor: themeMode === 'dark' ? '#444' : '#e0e0e0' }} />
-          <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>Estatísticas de Moedas</Typography>
+          <Typography variant="subtitle1" fontWeight={600} sx={{ color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' }}>{t('profile.coinStatsTitle', locale)}</Typography>
           <List dense>
             <ListItem>
               <ListItemText 
-                primary={`💰 Saldo atual: ${coinStats.balance.toLocaleString()} moedas`}
+                primary={`💰 ${t('profile.balance', locale)} ${coinStats.balance.toLocaleString()} moedas`}
                 sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#ffd700' : '#ff9800', fontWeight: 600 } }}
               />
             </ListItem>
             <ListItem>
               <ListItemText 
-                primary={`📈 Total ganho: ${coinStats.totalEarned.toLocaleString()}`}
+                primary={`📈 ${t('profile.totalEarned', locale)} ${coinStats.totalEarned.toLocaleString()}`}
                 sx={{ '& .MuiListItemText-primary': { color: '#4caf50' } }}
               />
             </ListItem>
             <ListItem>
               <ListItemText 
-                primary={`📉 Total gasto: ${coinStats.totalSpent.toLocaleString()}`}
+                primary={`📉 ${t('profile.totalSpent', locale)} ${coinStats.totalSpent.toLocaleString()}`}
                 sx={{ '& .MuiListItemText-primary': { color: '#f44336' } }}
               />
             </ListItem>
             <ListItem>
               <ListItemText 
-                primary={`🌟 Ganho hoje: ${coinStats.earnedToday.toLocaleString()}`}
+                primary={`🌟 ${t('profile.earnedToday', locale)} ${coinStats.earnedToday.toLocaleString()}`}
                 sx={{ '& .MuiListItemText-primary': { color: '#2196f3' } }}
               />
             </ListItem>
             <ListItem>
               <ListItemText 
-                primary={`💸 Gasto hoje: ${coinStats.spentToday.toLocaleString()}`}
+                primary={`💸 ${t('profile.spentToday', locale)} ${coinStats.spentToday.toLocaleString()}`}
                 sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
               />
             </ListItem>

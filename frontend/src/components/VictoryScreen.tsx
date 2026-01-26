@@ -1,5 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 interface VictoryScreenProps {
   onRestart: () => void;
@@ -10,6 +12,7 @@ interface VictoryScreenProps {
 }
 
 const VictoryScreen: React.FC<VictoryScreenProps> = ({ onRestart, attempts, timeSpent, cardName, cardImage }) => {
+  const { locale } = useLocale();
   return (
     <Box
       sx={{
@@ -23,17 +26,17 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({ onRestart, attempts, time
       }}
     >
       <Typography variant="h2" color="white" gutterBottom sx={{ animation: 'pop 0.7s' }}>
-        Parabéns!
+        {t('victory.congrats', locale)}
       </Typography>
       <Typography variant="h5" color="white" gutterBottom>
-        Você acertou a carta!
+        {t('victory.youGuessed', locale)}
       </Typography>
       <Box sx={{ mt: 3, mb: 2, p: 2, bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2 }}>
         <Typography variant="body1" color="white">
-          <strong>Tentativas:</strong> {attempts}
+          <strong>{t('victory.attempts', locale)}</strong> {attempts}
         </Typography>
         <Typography variant="body1" color="white">
-          <strong>Tempo:</strong> {timeSpent} segundos
+          <strong>{t('victory.time', locale)}</strong> {timeSpent} segundos
         </Typography>
       </Box>
       <Box sx={{ mt: 2, mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -41,7 +44,7 @@ const VictoryScreen: React.FC<VictoryScreenProps> = ({ onRestart, attempts, time
         <Typography variant="h6" color="white" sx={{ mt: 1 }}>{cardName}</Typography>
       </Box>
       <Button variant="contained" color="primary" onClick={onRestart} sx={{ mt: 4 }}>
-        Jogar Novamente
+        {t('victory.playAgain', locale)}
       </Button>
       <style>
         {`

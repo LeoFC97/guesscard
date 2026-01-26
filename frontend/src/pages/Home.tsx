@@ -7,12 +7,15 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import VictoryScreen from '../components/VictoryScreen';
 import { CardGuess } from '../components/CardGuess';
 import GuessHistory from '../components/GuessHistory';
+import PlayActionBar from '../components/PlayActionBar';
 import StartGame from './StartGame';
 import Leaderboards from '../components/Leaderboards';
 import { useCoins } from '../contexts/CoinsContext';
 import BlurredCard from '../components/BlurredCard';
 import TextCard from '../components/TextCard';
 import { Container, Typography, Box } from '@mui/material';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 // Removido useUserInfo, centralizado no contexto Auth0
 
 import { useAuth0 } from '@auth0/auth0-react';
@@ -38,6 +41,7 @@ const ThemeToggle: React.FC<{ themeMode: 'light' | 'dark'; setThemeMode: React.D
 );
 const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMode }) => {
     const { animateCoinsGain } = useCoins();
+    const { locale } = useLocale();
 
     React.useEffect(() => {
         console.log('API_URL:', process.env.REACT_APP_API_URL);
@@ -92,6 +96,16 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
             // Processar recompensa de moedas se houver
             if (result.coinReward && userId && userId !== 'guest') {
                 console.log('🪙 Moedas ganhas:', result.coinReward);
+                <PlayActionBar
+                    onHint={handleHint}
+                    onFlavorHint={handleFlavorHint}
+                    hintDisabled={textShown || wrongCount < 5}
+                    flavorDisabled={flavorShown || wrongCount < 2}
+                    onShowLeaderboards={() => setShowLeaderboards(true)}
+                    onExit={() => { setGameStarted(false); setVictory(false); }}
+                    attempts={guesses.length}
+                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
+                />
                 animateCoinsGain(result.coinReward);
             }
 
@@ -101,6 +115,16 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         // Só reseta o tempo se não foi vitória
         if (!result.isCorrect) {
             setStartTime(Date.now());
+                <PlayActionBar
+                    onHint={handleHint}
+                    onFlavorHint={handleFlavorHint}
+                    hintDisabled={textShown || wrongCount < 5}
+                    flavorDisabled={flavorShown || wrongCount < 2}
+                    onShowLeaderboards={() => setShowLeaderboards(true)}
+                    onExit={() => { setGameStarted(false); setVictory(false); }}
+                    attempts={guesses.length}
+                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
+                />
             setEndTime(null);
         }
     };
@@ -110,6 +134,16 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         setTargetCard(cardName);
         setGameId(gameId);
         setGuesses([]);
+                <PlayActionBar
+                    onHint={handleHint}
+                    onFlavorHint={handleFlavorHint}
+                    hintDisabled={textShown || wrongCount < 5}
+                    flavorDisabled={flavorShown || wrongCount < 2}
+                    onShowLeaderboards={() => setShowLeaderboards(true)}
+                    onExit={() => { setGameStarted(false); setVictory(false); }}
+                    attempts={guesses.length}
+                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
+                />
         setTextReady(null);
         setTextShown(false);
         setFlavorReady(null);
@@ -181,7 +215,7 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
                             onClick={() => setShowLeaderboards(false)}
                             sx={{ ml: 2 }}
                         >
-                            Voltar ao Jogo
+                            {t('home.backToGame', locale)}
                         </Button>
                     </Box>
                     <Leaderboards />
@@ -192,7 +226,7 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
 
     if (!gameStarted) {
         if (!userId) {
-            return <Box display="flex" alignItems="center" justifyContent="center" minHeight={300}><ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} /><span>Carregando usuário...</span></Box>;
+            return <Box display="flex" alignItems="center" justifyContent="center" minHeight={300}><ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} /><span>{t('home.loadingUser', locale)}</span></Box>;
         }
     return (
         <Box 
@@ -251,12 +285,11 @@ const handleHint = () => {
             <Container maxWidth="md" sx={{ py: 8 }}>
                 <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
                     <Typography variant="h3" align="center" color="secondary" gutterBottom>
-                        Carta do Dia
+                        {t('start.dailyMode.title', locale)}
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                        Você está jogando o modo especial: Carta do Dia
+                        {t('home.youArePlaying', locale)}
                     </Typography>
-
                 </Box>
                 <Box 
                     display="flex" 
@@ -268,7 +301,7 @@ const handleHint = () => {
                     px={{ xs: 1, sm: 0 }}
                 >
                     <Tooltip
-                        title={wrongCount < 2 ? 'A dica de flavor ficará disponível após 2 erros' : ''}
+                        title={wrongCount < 2 ? t('home.flavorHintTooltip', locale).replace('{{count}}', '2') : ''}
                         disableHoverListener={wrongCount >= 2}
                     >
                         <span style={{ width: '100%' }}>
@@ -285,12 +318,12 @@ const handleHint = () => {
                                     fontWeight: 600
                                 }}
                             >
-                                Mostrar Dica (Flavor)
+                                {t('home.showFlavorHint', locale)}
                             </Button>
                         </span>
                     </Tooltip>
                     <Tooltip
-                        title={wrongCount < 5 ? 'A dica do efeito ficará disponível após 5 erros' : ''}
+                        title={wrongCount < 5 ? t('home.effectHintTooltip', locale).replace('{{count}}', '5') : ''}
                         disableHoverListener={wrongCount >= 5}
                     >
                         <span style={{ width: '100%' }}>
@@ -307,7 +340,7 @@ const handleHint = () => {
                                     fontWeight: 600
                                 }}
                             >
-                                Mostrar Dica (Efeito)
+                                {t('home.showEffectHint', locale)}
                             </Button>
                         </span>
                     </Tooltip>
@@ -326,6 +359,17 @@ const handleHint = () => {
                     email={email}
                     attempts={guesses.length + 1}
                     timeSpent={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
+                />
+                {/* Sticky play action bar for improved mobile reachability */}
+                <PlayActionBar
+                    onHint={handleHint}
+                    onFlavorHint={handleFlavorHint}
+                    hintDisabled={textShown || wrongCount < 5}
+                    flavorDisabled={flavorShown || wrongCount < 2}
+                    onShowLeaderboards={() => setShowLeaderboards(true)}
+                    onExit={() => { setGameStarted(false); setVictory(false); }}
+                    attempts={guesses.length}
+                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
                 />
                 <GuessHistory guesses={guesses} themeMode={themeMode} />
                 
@@ -353,7 +397,7 @@ const handleHint = () => {
                             minWidth: { xs: 'auto', sm: 140 }
                         }}
                     >
-                        🏆 Ver Rankings
+                        {t('home.viewRankings', locale)}
                     </Button>
                     <Button
                         variant="outlined"
@@ -372,7 +416,7 @@ const handleHint = () => {
                             minWidth: { xs: 'auto', sm: 140 }
                         }}
                     >
-                        🏠 Menu Inicial
+                        {t('home.menu', locale)}
                     </Button>
                 </Box>
             </Container>
@@ -391,10 +435,10 @@ const handleHint = () => {
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text'
                     }} gutterBottom>
-                        📜 Modo Texto
+                        {t('start.textMode.title', locale)}
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                        Adivinhe a carta pelo texto e habilidades! Nome censurado.
+                        {t('start.textMode.description', locale)}
                     </Typography>
                 </Box>
 
@@ -439,7 +483,7 @@ const handleHint = () => {
                         onClick={() => setGameStarted(false)}
                         sx={{ mr: 2 }}
                     >
-                        Voltar ao Menu
+                        {t('home.backToMenu', locale)}
                     </Button>
                 </Box>
             </Container>
@@ -451,16 +495,16 @@ const handleHint = () => {
         return (
             <Container maxWidth="md" sx={{ py: 8 }}>
                 <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
-                    <Typography variant="h3" align="center" sx={{ 
+                    <Typography variant="h6" align="center" sx={{ 
                         background: 'linear-gradient(45deg, #9c27b0 30%, #673ab7 90%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text'
                     }} gutterBottom>
-                        🔍 Modo Blur
+                        {t('start.blurMode.title', locale)}
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                        A carta vai ficando mais nítida a cada palpite! (Reduz 10% do blur por erro)
+                        {t('start.blurMode.description', locale)}
                     </Typography>
                 </Box>
 
@@ -502,7 +546,7 @@ const handleHint = () => {
                             borderRadius: 2
                         }}
                     >
-                        🏆 Ver Rankings
+                        {t('home.viewRankings', locale)}
                     </Button>
                     <Button
                         variant="outlined"
@@ -520,7 +564,7 @@ const handleHint = () => {
                             borderRadius: 2
                         }}
                     >
-                        🏠 Menu Inicial
+                        {t('home.menu', locale)}
                     </Button>
                 </Box>
             </Container>
@@ -561,7 +605,7 @@ const handleHint = () => {
                             px: { xs: 1, sm: 0 }
                         }}
                     >
-                        Adivinhe a carta!
+                        {t('home.title', locale)}
                     </Typography>
                 </Box>
                 <Box 
@@ -591,12 +635,12 @@ const handleHint = () => {
                                     fontWeight: 600
                                 }}
                             >
-                                Mostrar Dica (Flavor)
+                                {t('home.showFlavorHint', locale)}
                             </Button>
                         </span>
                     </Tooltip>
                     <Tooltip
-                        title={wrongCount < 5 ? 'A dica do efeito ficará disponível após 5 erros' : ''}
+                        title={wrongCount < 5 ? t('home.effectHintTooltip', locale).replace('{{count}}', '5') : ''}
                         disableHoverListener={wrongCount >= 5}
                     >
                         <span style={{ width: '100%' }}>
@@ -613,7 +657,7 @@ const handleHint = () => {
                                     fontWeight: 600
                                 }}
                             >
-                                Mostrar Dica (Efeito)
+                                {t('home.showEffectHint', locale)}
                             </Button>
                         </span>
                     </Tooltip>
@@ -650,7 +694,7 @@ const handleHint = () => {
                             borderRadius: 2
                         }}
                     >
-                        🏆 Ver Rankings
+                        {t('home.viewRankings', locale)}
                     </Button>
                     <Button
                         variant="outlined"
@@ -668,7 +712,7 @@ const handleHint = () => {
                             borderRadius: 2
                         }}
                     >
-                        🏠 Menu Inicial
+                        {t('home.menu', locale)}
                     </Button>
                 </Box>
                     

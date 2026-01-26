@@ -9,6 +9,7 @@ import { inject } from '@vercel/analytics';
 
 
 import App from './App';
+import { LocaleProvider } from './contexts/LocaleContext';
 // Log do valor da variável de ambiente API_URL
 console.log('API_URL:', process.env.REACT_APP_API_URL);
 
@@ -23,9 +24,11 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <App />
-    </ThemeProvider>
+    <LocaleProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>
+    </LocaleProvider>
   </React.StrictMode>
 );

@@ -11,6 +11,7 @@ import { ThemeProvider, createTheme, CssBaseline, IconButton, Tooltip } from '@m
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Login from './components/Login';
+import LanguageToggle from './components/LanguageToggle';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { fetchUserProfile } from './services/mtgApi';
 import { CoinsProvider } from './contexts/CoinsContext';
@@ -234,6 +235,7 @@ const App: React.FC = () => {
                             {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                         </IconButton>
                     </Tooltip>
+                    <LanguageToggle />
                     <Login onLoginSuccess={handleLoginSuccess} />
                 </Box>
             </ThemeProvider>
@@ -268,6 +270,7 @@ const App: React.FC = () => {
                         {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>
                 </Tooltip>
+                <LanguageToggle />
                 {/* Exibir moedas para usuários logados */}
                 <CoinDisplay 
                     userId={userId} 

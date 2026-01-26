@@ -1,0 +1,110 @@
+{
+  "home": {
+    "loadingUser": "Loading user...",
+    "leaderboards": "🏆 Leaderboards",
+    "backToGame": "Back to Game",
+    "viewRankings": "🏆 View Rankings",
+    "title": "Guess the card!",
+    "menu": "🏠 Main Menu",
+    "dailyCard": "Daily Card",
+    "youArePlaying": "You're playing the special mode: Daily Card",
+    "showFlavorHint": "Show Hint (Flavor)",
+    "showEffectHint": "Show Hint (Effect)",
+    "flavorHintTooltip": "Flavor hint will be available after {{count}} mistakes",
+    "effectHintTooltip": "Effect hint will be available after {{count}} mistakes",
+    "backToMenu": "Back to Menu"
+  },
+  "global": {
+    "switchToEnglish": "Switch to English",
+    "switchToPortuguese": "Switch to Portuguese"
+  },
+  "start": {
+    "title": "Guess the card",
+    "difficulty": { "easy": "Easy", "medium": "Medium", "hard": "Hard" },
+    "difficultyNote": "The chosen difficulty applies to all modes, including Blur!",
+    "startNewGame": "Start New Game",
+    "textMode": { "title": "📜 Text Mode", "description": "Guess the card by its text and abilities! Name is censored.", "play": "📖 Play Text Mode" },
+    "blurMode": { "title": "🔍 Blur Mode", "description": "The card starts slightly blurred and becomes clearer with each guess!", "play": "🎯 Play Blur Mode" },
+    "dailyMode": { "title": "Daily Card", "chooseDate": "Choose a date to play:", "dateLabel": "Challenge date", "playWithDate": "Play daily card ({{date}})", "futureDateHelper": "You cannot select future dates" }
+  },
+  "errors": {
+    "newGame": "Error starting a new game",
+    "newBlurGame": "Error starting a new blur game",
+    "newTextGame": "Error starting a new text game",
+    "dailyAlreadyPlayed": "You already played the daily card for {{date}}. Choose another date.",
+    "dailyNotDefined": "No card was defined for {{date}}.",
+    "dailyStartError": "Error starting daily mode",
+    "futureDate": "You cannot play cards from the future. Choose today or a past date.",
+    "connectionError": "Connection error. Check your internet and try again."
+  },
+  "textcard": {
+    "revealedTitle": "🎉 Card Revealed!",
+    "guessTitle": "📜 Guess by Description",
+    "manaTitle": "💎 Mana Cost",
+    "manaReveal": "Reveal mana cost",
+    "manaCostNote": "(Costs 10 coins)",
+    "cardTypeTitle": "🏷️ Card Type",
+    "cardTypeReveal": "Reveal card type",
+    "textTitle": "📖 Card Text",
+    "textEmpty": "This card has no ability text.",
+    "hintTip": "💡 Tip: Use type, mana cost and abilities to guess the card!",
+    "congrats": "Congratulations! You guessed based on the card text!",
+    "completed": "Text Mode completed successfully! ✨"
+  },
+  "blurred": {
+    "revealedTitle": "🎉 Card Revealed!",
+    "guessTitle": "🔍 Guess the Card",
+    "mysteryAlt": "Mysterious card"
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign In",
+    "social": "Sign in with social",
+    "guest": "Play as guest",
+    "unknownError": "Unknown error"
+  },
+  "profile": {
+    "title": "My Profile",
+    "coins": "Coins",
+    "name": "Name:",
+    "daysWon": "Days you won the daily card:",
+    "noDays": "No days yet",
+    "personalRecord": "Personal best",
+    "bestAttempts": "Lowest number of attempts:",
+    "bestTime": "Fastest time:",
+    "statistics": "Statistics",
+    "lastCard": "Last card played",
+    "streak": "Daily card win streak:",
+    "coinStatsTitle": "Coin Statistics",
+    "balance": "Current balance:",
+    "totalEarned": "Total earned:",
+    "totalSpent": "Total spent:",
+    "earnedToday": "Earned today:",
+    "spentToday": "Spent today:"
+  },
+  "coin": {
+    "loading": "Loading coins...",
+    "clickToView": "Click to see statement - Balance: {{balance}} coins"
+  },
+  "victory": {
+    "congrats": "Congratulations!",
+    "youGuessed": "You guessed the card!",
+    "attempts": "Attempts:",
+    "time": "Time:",
+    "playAgain": "Play Again"
+  },
+  "app": {
+    "guestPlaying": "You are playing as a guest. No profile data will be saved."
+  },
+  "guess": {
+    "placeholder": "Card name",
+    "submit": "Submit",
+    "sending": "Sending..."
+  },
+  "home_extra": {
+    "noTextAvailable": "No text available for this card.",
+    "noFlavorAvailable": "No flavor available for this card."
+  }
+}
