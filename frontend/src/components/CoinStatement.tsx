@@ -122,7 +122,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
     if (!userId || userId === 'guest') {
         return (
             <Box p={3} textAlign="center">
-                <Typography variant="h6" color="text.secondary">
+                <Typography variant="h6" sx={{ color: themeMode === 'dark' ? 'text.secondary' : '#333333' }}>
                     {t('coinStatement.guestPrompt', locale)}
                 </Typography>
             </Box>
@@ -133,7 +133,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
         return (
             <Box p={4} display="flex" justifyContent="center" alignItems="center" minHeight="300px">
                 <CircularProgress sx={{ color: '#ffd700' }} />
-                <Typography variant="body1" sx={{ ml: 2, color: 'text.secondary' }}>
+                <Typography variant="body1" sx={{ ml: 2, color: themeMode === 'dark' ? 'text.secondary' : '#333333' }}>
                     {t('coinStatement.loading', locale)}
                 </Typography>
             </Box>
@@ -151,7 +151,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
     if (!statement) {
         return (
             <Box p={3} textAlign="center">
-                <Typography variant="h6" color="text.secondary">
+                <Typography variant="h6" sx={{ color: themeMode === 'dark' ? 'text.secondary' : '#333333' }}>
                     {t('coinStatement.empty', locale)}
                 </Typography>
             </Box>
@@ -198,7 +198,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                         <Typography variant="h4" sx={{ color: '#ffd700', fontWeight: 'bold', mb: 1 }}>
                             {summary.currentBalance.toLocaleString()}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 500, color: themeMode === 'dark' ? 'text.secondary' : '#333333' }}>
                             {t('coinStatement.summary.currentBalance', locale)}
                         </Typography>
                     </CardContent>
@@ -213,7 +213,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                         <Typography variant="h4" sx={{ color: '#4caf50', fontWeight: 'bold', mb: 1 }}>
                             +{summary.totalEarned.toLocaleString()}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 500, color: themeMode === 'dark' ? 'text.secondary' : '#333333' }}>
                             {t('coinStatement.summary.totalEarned', locale)}
                         </Typography>
                     </CardContent>
@@ -228,7 +228,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                         <Typography variant="h4" sx={{ color: '#f44336', fontWeight: 'bold', mb: 1 }}>
                             -{summary.totalSpent.toLocaleString()}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 500, color: themeMode === 'dark' ? 'text.secondary' : '#333333' }}>
                             {t('coinStatement.summary.totalSpent', locale)}
                         </Typography>
                     </CardContent>
@@ -243,7 +243,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                         <Typography variant="h4" sx={{ color: '#2196f3', fontWeight: 'bold', mb: 1 }}>
                             +{summary.earnedToday.toLocaleString()}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 500, color: themeMode === 'dark' ? 'text.secondary' : '#333333' }}>
                             {t('coinStatement.summary.earnedToday', locale)}
                         </Typography>
                     </CardContent>
@@ -354,10 +354,10 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                                             {transaction.type === 'earn' ? '💰' : '💸'}
                                         </Typography>
                                         <Box>
-                                            <Typography variant="body1" fontWeight="bold">
+                                            <Typography variant="body1" fontWeight="bold" sx={{ color: themeMode === 'dark' ? '#ffffff' : '#000000' }}>
                                                 {getReasonLabel(transaction.reason)}
                                             </Typography>
-                                            <Typography variant="caption" color="text.secondary">
+                                            <Typography variant="caption" sx={{ color: themeMode === 'dark' ? 'text.secondary' : '#666666' }}>
                                                 {formatDateTime(transaction.createdAt)}
                                             </Typography>
                                         </Box>
@@ -374,7 +374,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                                     />
                                 </Box>
                                 {transaction.description && (
-                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                    <Typography variant="body2" sx={{ mt: 1, color: themeMode === 'dark' ? 'text.secondary' : '#666666' }}>
                                         {transaction.description}
                                     </Typography>
                                 )}

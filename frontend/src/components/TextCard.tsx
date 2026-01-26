@@ -112,7 +112,7 @@ const TextCard: React.FC<TextCardProps> = ({
                 >
                     {/* Custo de Mana */}
                     <Paper sx={{ p: { xs: 2, sm: 3 }, backgroundColor: '#f8f9fa', textAlign: 'center', borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" color="primary" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
+                        <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', mb: 2, color: '#1976d2' }}>
                             {t('textcard.manaTitle', locale)}
                         </Typography>
                         
@@ -154,7 +154,7 @@ const TextCard: React.FC<TextCardProps> = ({
                                 <Typography 
                                     variant="body2" 
                                     sx={{ 
-                                        color: balance < 10 ? '#d32f2f' : '#666666',
+                                        color: balance < 10 ? '#d32f2f' : '#333333',
                                         fontWeight: balance < 10 ? 'bold' : '500',
                                         fontSize: '0.875rem',
                                         textAlign: 'center'
@@ -168,7 +168,7 @@ const TextCard: React.FC<TextCardProps> = ({
 
                     {/* Tipo da Carta */}
                     <Paper sx={{ p: { xs: 2, sm: 3 }, backgroundColor: '#f8f9fa', textAlign: 'center', borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" color="primary" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
+                        <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', mb: 2, color: '#1976d2' }}>
                             {t('textcard.cardTypeTitle', locale)}
                         </Typography>
                         
@@ -210,7 +210,7 @@ const TextCard: React.FC<TextCardProps> = ({
                                 <Typography 
                                     variant="body2" 
                                     sx={{ 
-                                        color: balance < 10 ? '#d32f2f' : '#666666',
+                                        color: balance < 10 ? '#d32f2f' : '#333333',
                                         fontWeight: balance < 10 ? 'bold' : '500',
                                         fontSize: '0.875rem',
                                         textAlign: 'center'
@@ -232,7 +232,7 @@ const TextCard: React.FC<TextCardProps> = ({
                         borderRadius: 2
                     }}
                 >
-                    <Typography variant="h6" color="primary" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 3, color: '#1976d2' }}>
                         {t('textcard.textTitle', locale)} {!showCard}
                     </Typography>
                     

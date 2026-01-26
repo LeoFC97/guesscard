@@ -50,10 +50,10 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
     // Usa themeMode para cor da fonte
     const isDark = themeMode === 'dark';
     const gridColumns = 'minmax(220px, 1.6fr) repeat(6, minmax(120px, 1fr))';
-    const headerTextColor = isDark ? '#e5e7eb' : '#1f2937';
-    const valueTextColor = isDark ? '#f8fafc' : '#111827';
-    const mutedTextColor = isDark ? '#cbd5f5' : '#6b7280';
-    const rowBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+    const headerTextColor = isDark ? '#ffffff' : '#1f2937';
+    const valueTextColor = isDark ? '#ffffff' : '#111827';
+    const mutedTextColor = isDark ? '#e0e0e0' : '#6b7280';
+    const rowBorder = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
     // Função para converter array de cores em iniciais
     const getColorInitials = (colors: string[] | undefined) => {
         if (!Array.isArray(colors) || colors.length === 0) return '-';
@@ -135,7 +135,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                         variant="h6" 
                         sx={{ 
                             mb: { xs: 1, sm: 2 }, 
-                            color: 'text.secondary', 
+                            color: isDark ? '#e0e0e0' : '#6b7280', 
                             fontWeight: 600,
                             fontSize: { xs: '1rem', sm: '1.25rem' },
                             textAlign: 'center'
@@ -360,7 +360,8 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                         mb: 1,
                                                         fontSize: { xs: '0.8rem', sm: '0.9rem' },
                                                         lineHeight: 1.2,
-                                                        wordBreak: 'break-word'
+                                                        wordBreak: 'break-word',
+                                                        color: isDark ? '#ffffff' : '#111827'
                                                     }}
                                                 >
                                                     {g.guessedCard?.name}
@@ -368,7 +369,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                 <Stack spacing={0.8}>
                                                     <Stack direction="row" spacing={1} alignItems="center">
                                                         <StatusChip status={g.feedback.colors} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
-                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#e0e0e0' : '#6b7280', minWidth: 64 }}>
                                                             {t('history.labels.color', locale)}
                                                         </Typography>
                                                         <Typography
@@ -380,7 +381,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                     </Stack>
                                                     <Stack direction="row" spacing={1} alignItems="center">
                                                         <StatusChip status={g.feedback.type} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
-                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#e0e0e0' : '#6b7280', minWidth: 64 }}>
                                                             {t('history.labels.type', locale)}
                                                         </Typography>
                                                         <Typography
@@ -392,7 +393,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                     </Stack>
                                                     <Stack direction="row" spacing={1} alignItems="center">
                                                         <StatusChip status={g.feedback.cmc} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
-                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#e0e0e0' : '#6b7280', minWidth: 64 }}>
                                                             {t('history.labels.cmc', locale)}
                                                         </Typography>
                                                         <Typography variant="body2" sx={{ fontWeight: 600, color: valueTextColor }}>
@@ -401,7 +402,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                     </Stack>
                                                     <Stack direction="row" spacing={1} alignItems="center">
                                                         <StatusChip status={g.feedback.edition} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
-                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#e0e0e0' : '#6b7280', minWidth: 64 }}>
                                                             {t('history.labels.edition', locale)}
                                                         </Typography>
                                                         <Typography
@@ -420,7 +421,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                     </Stack>
                                                     <Stack direction="row" spacing={1} alignItems="center">
                                                         <StatusChip status={g.feedback.rarity} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
-                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#e0e0e0' : '#6b7280', minWidth: 64 }}>
                                                             {t('history.labels.rarity', locale)}
                                                         </Typography>
                                                         <Typography
@@ -439,7 +440,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                     </Stack>
                                                     <Stack direction="row" spacing={1} alignItems="center">
                                                         <StatusChip status={g.feedback.artist} sx={{ minWidth: 28, height: 22, fontSize: '0.7rem' }} />
-                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', minWidth: 64 }}>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: isDark ? '#e0e0e0' : '#6b7280', minWidth: 64 }}>
                                                             {t('history.labels.artist', locale)}
                                                         </Typography>
                                                         <Typography
@@ -463,7 +464,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                                                 variant="body2" 
                                                 sx={{ 
                                                     textAlign: 'center', 
-                                                    color: 'text.secondary',
+                                                    color: isDark ? '#e0e0e0' : '#6b7280',
                                                     py: 3,
                                                     fontSize: { xs: '0.8rem', sm: '0.875rem' }
                                                 }}
@@ -476,7 +477,7 @@ export function GuessHistory({ guesses, themeMode }: { guesses: any[], themeMode
                             </Box>
                     {/* Legenda visual dos ícones */}
                     <Stack direction="row" spacing={1} sx={{ mt: 2, mb: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                        <Typography variant="caption" sx={{ color: isDark ? '#e0e0e0' : '#6b7280', fontWeight: 600 }}>
                             {t('history.legend.title', locale)}
                         </Typography>
                         <Chip label={t('history.legend.correct', locale)} size="small" sx={{ bgcolor: '#388e3c', color: '#fff', fontWeight: 700 }} />

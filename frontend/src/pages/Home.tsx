@@ -91,6 +91,9 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         // Conta erro se o palpite não for correto
         if (!result.isCorrect) {
             setWrongCount(prev => prev + 1);
+            // Só reseta o tempo se não foi vitória
+            setStartTime(Date.now());
+            setEndTime(null);
         } else {
             // Se acertou, mostra tela de vitória
             setVictory(true);
@@ -100,37 +103,11 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
             // Processar recompensa de moedas se houver
             if (result.coinReward && userId && userId !== 'guest') {
                 console.log('🪙 Moedas ganhas:', result.coinReward);
-                <PlayActionBar
-                    onHint={handleHint}
-                    onFlavorHint={handleFlavorHint}
-                    hintDisabled={textShown || wrongCount < 5}
-                    flavorDisabled={flavorShown || wrongCount < 2}
-                    onShowLeaderboards={() => setShowLeaderboards(true)}
-                    onExit={() => { setGameStarted(false); setVictory(false); }}
-                    attempts={guesses.length}
-                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
-                />
                 animateCoinsGain(result.coinReward);
             }
-
         }
-        setTextReady(null);
-        setTextShown(false);
-        // Só reseta o tempo se não foi vitória
-        if (!result.isCorrect) {
-            setStartTime(Date.now());
-                <PlayActionBar
-                    onHint={handleHint}
-                    onFlavorHint={handleFlavorHint}
-                    hintDisabled={textShown || wrongCount < 5}
-                    flavorDisabled={flavorShown || wrongCount < 2}
-                    onShowLeaderboards={() => setShowLeaderboards(true)}
-                    onExit={() => { setGameStarted(false); setVictory(false); }}
-                    attempts={guesses.length}
-                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
-                />
-            setEndTime(null);
-        }
+        // Não resetar textReady e flavorReady aqui - eles devem persistir para mostrar hints
+        // Eles só são resetados quando um novo jogo é iniciado
     };
 
     const handleGameStarted = (cardName: string, gameId: string, gameData?: any) => {
@@ -138,21 +115,12 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         setTargetCard(cardName);
         setGameId(gameId);
         setGuesses([]);
-                <PlayActionBar
-                    onHint={handleHint}
-                    onFlavorHint={handleFlavorHint}
-                    hintDisabled={textShown || wrongCount < 5}
-                    flavorDisabled={flavorShown || wrongCount < 2}
-                    onShowLeaderboards={() => setShowLeaderboards(true)}
-                    onExit={() => { setGameStarted(false); setVictory(false); }}
-                    attempts={guesses.length}
-                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
-                />
         setTextReady(null);
         setTextShown(false);
         setFlavorReady(null);
         setFlavorShown(false);
         setWrongCount(0);
+        setVictory(false);
         setStartTime(Date.now());
         setEndTime(null);
         // Resetar estados das dicas do modo texto
@@ -257,10 +225,10 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     if (victory) {
         const attempts = guesses.length;
         const timeSpent = startTime && endTime ? Math.round((endTime - startTime) / 1000) : 0;
-        // Pega a carta alvo do último palpite correto
+        // Pega a carta alvo do último palpite correto ou usa a carta alvo
         const lastGuess = guesses.find(g => g.isCorrect) || guesses[0];
-        const cardName = lastGuess?.guessedCard?.name || '-';
-        const cardImage = lastGuess?.guessedCard?.imageUrl || '';
+        const cardName = lastGuess?.guessedCard?.name || targetCard || '-';
+        const cardImage = lastGuess?.guessedCard?.imageUrl || cardImageUrl || '';
         return <Box position="relative"><ThemeToggle themeMode={themeMode} setThemeMode={setThemeMode} /><VictoryScreen 
                 onRestart={() => {
                     setVictory(false);
@@ -274,13 +242,15 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
     }
 
 const handleHint = () => {
-    setTextShown(true);
-    if (!textReady) setTextReady(t('home_extra.noTextAvailable', locale));
+    if (textReady) {
+        setTextShown(true);
+    }
 };
 
     const handleFlavorHint = () => {
-        setFlavorShown(true);
-        if (!flavorReady) setFlavorReady(t('home_extra.noFlavorAvailable', locale));
+        if (flavorReady) {
+            setFlavorShown(true);
+        }
     };
 
     // Tela especial para modo Carta do Dia
@@ -319,7 +289,17 @@ const handleHint = () => {
                                     minWidth: { xs: 'auto', sm: 160 },
                                     py: { xs: 1.2, sm: 1 },
                                     fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                    fontWeight: 600
+                                    fontWeight: 600,
+                                    color: themeMode === 'dark' ? '#ffffff' : undefined,
+                                    borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : undefined,
+                                    '&:hover': {
+                                        borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : undefined,
+                                        backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : undefined
+                                    },
+                                    '&.Mui-disabled': {
+                                        color: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : undefined,
+                                        borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : undefined
+                                    }
                                 }}
                             >
                                 {t('home.showFlavorHint', locale)}
@@ -341,7 +321,17 @@ const handleHint = () => {
                                     minWidth: { xs: 'auto', sm: 160 },
                                     py: { xs: 1.2, sm: 1 },
                                     fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                    fontWeight: 600
+                                    fontWeight: 600,
+                                    color: themeMode === 'dark' ? '#ffffff' : undefined,
+                                    borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : undefined,
+                                    '&:hover': {
+                                        borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : undefined,
+                                        backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : undefined
+                                    },
+                                    '&.Mui-disabled': {
+                                        color: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : undefined,
+                                        borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : undefined
+                                    }
                                 }}
                             >
                                 {t('home.showEffectHint', locale)}
@@ -368,8 +358,8 @@ const handleHint = () => {
                 <PlayActionBar
                     onHint={handleHint}
                     onFlavorHint={handleFlavorHint}
-                    hintDisabled={textShown || wrongCount < 5}
-                    flavorDisabled={flavorShown || wrongCount < 2}
+                    hintDisabled={textShown || wrongCount < 5 || !textReady}
+                    flavorDisabled={flavorShown || wrongCount < 2 || !flavorReady}
                     onShowLeaderboards={() => setShowLeaderboards(true)}
                     onExit={() => { setGameStarted(false); setVictory(false); }}
                     attempts={guesses.length}
@@ -577,38 +567,9 @@ const handleHint = () => {
 
         // Tela normal de jogo (não diário)
         return (
-            <Container 
-                maxWidth="lg" 
-                sx={{ 
-                    py: { xs: 2, sm: 4, md: 8 },
-                    px: { xs: 1, sm: 2, md: 3 },
-                    minHeight: '100vh'
-                }}
-            >
-                {/* Layout com Sidebar para Anúncios */}
-                <Box sx={{ 
-                    display: 'flex', 
-                    gap: { xs: 1, sm: 2, md: 3 }, 
-                    flexDirection: { xs: 'column', lg: 'row' } 
-                }}>
-                    
-                    {/* Conteúdo Principal */}
-                    <Box sx={{ 
-                        flex: 1, 
-                        maxWidth: { xs: '100%', lg: 'calc(100% - 416px)' },
-                        overflow: 'hidden'
-                    }}>
-                <Box display="flex" flexDirection="column" alignItems="center" mb={{ xs: 2, sm: 3, md: 4 }}>
-                    <Typography 
-                        variant="h3"
-                        align="center" 
-                        color="primary" 
-                        gutterBottom
-                        sx={{ 
-                            fontSize: { xs: '1.5rem', sm: '1.8rem', md: '2.125rem', lg: '3rem' },
-                            px: { xs: 1, sm: 0 }
-                        }}
-                    >
+            <Container maxWidth="md" sx={{ py: 8 }}>
+                <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
+                    <Typography variant="h3" align="center" color="secondary" gutterBottom>
                         {t('home.title', locale)}
                     </Typography>
                 </Box>
@@ -636,7 +597,17 @@ const handleHint = () => {
                                     minWidth: { xs: 'auto', sm: 160 },
                                     py: { xs: 1.2, sm: 1 },
                                     fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                    fontWeight: 600
+                                    fontWeight: 600,
+                                    color: themeMode === 'dark' ? '#ffffff' : undefined,
+                                    borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : undefined,
+                                    '&:hover': {
+                                        borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : undefined,
+                                        backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : undefined
+                                    },
+                                    '&.Mui-disabled': {
+                                        color: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : undefined,
+                                        borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : undefined
+                                    }
                                 }}
                             >
                                 {t('home.showFlavorHint', locale)}
@@ -658,7 +629,17 @@ const handleHint = () => {
                                     minWidth: { xs: 'auto', sm: 160 },
                                     py: { xs: 1.2, sm: 1 },
                                     fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                    fontWeight: 600
+                                    fontWeight: 600,
+                                    color: themeMode === 'dark' ? '#ffffff' : undefined,
+                                    borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : undefined,
+                                    '&:hover': {
+                                        borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.8)' : undefined,
+                                        backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : undefined
+                                    },
+                                    '&.Mui-disabled': {
+                                        color: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : undefined,
+                                        borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : undefined
+                                    }
                                 }}
                             >
                                 {t('home.showEffectHint', locale)}
@@ -667,10 +648,10 @@ const handleHint = () => {
                     </Tooltip>
                 </Box>
                 {flavorShown && flavorReady && (
-                    <Alert severity="info" sx={{ mb: 2 }}>{flavorReady}</Alert>
+                    <Alert severity="info" sx={{ mb: 2, color: '#fff', background: themeMode === 'dark' ? '#23283a' : undefined }}>{flavorReady}</Alert>
                 )}
                 {textShown && textReady && (
-                    <Alert severity="info" sx={{ mb: 2 }}>{textReady}</Alert>
+                    <Alert severity="info" sx={{ mb: 2, color: '#fff', background: themeMode === 'dark' ? '#23283a' : undefined }}>{textReady}</Alert>
                 )}
                 <CardGuess
                     onGuess={handleGuess}
@@ -681,21 +662,41 @@ const handleHint = () => {
                     attempts={guesses.length + 1}
                     timeSpent={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
                 />
-                <GuessHistory guesses={guesses} />
+                {/* Sticky play action bar for improved mobile reachability */}
+                <PlayActionBar
+                    onHint={handleHint}
+                    onFlavorHint={handleFlavorHint}
+                    hintDisabled={textShown || wrongCount < 5 || !textReady}
+                    flavorDisabled={flavorShown || wrongCount < 2 || !flavorReady}
+                    onShowLeaderboards={() => setShowLeaderboards(true)}
+                    onExit={() => { setGameStarted(false); setVictory(false); }}
+                    attempts={guesses.length}
+                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
+                />
+                <GuessHistory guesses={guesses} themeMode={themeMode} />
                 
                 {/* Botões de ação */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4, mb: 2 }}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    gap: { xs: 1, sm: 2 }, 
+                    mt: { xs: 3, sm: 4 }, 
+                    mb: 2, 
+                    flexWrap: 'wrap',
+                    px: { xs: 1, sm: 0 }
+                }}>
                     <Button
                         variant="outlined"
                         color="success"
                         onClick={() => setShowLeaderboards(true)}
                         size="medium"
                         sx={{ 
-                            px: 3,
-                            py: 1,
-                            fontSize: '0.9rem',
+                            px: { xs: 2, sm: 3 },
+                            py: { xs: 0.8, sm: 1 },
+                            fontSize: { xs: '0.8rem', sm: '0.9rem' },
                             fontWeight: 600,
-                            borderRadius: 2
+                            borderRadius: 2,
+                            minWidth: { xs: 'auto', sm: 140 }
                         }}
                     >
                         {t('home.viewRankings', locale)}
@@ -709,19 +710,17 @@ const handleHint = () => {
                         }}
                         size="medium"
                         sx={{ 
-                            px: 3,
-                            py: 1,
-                            fontSize: '0.9rem',
+                            px: { xs: 2, sm: 3 },
+                            py: { xs: 0.8, sm: 1 },
+                            fontSize: { xs: '0.8rem', sm: '0.9rem' },
                             fontWeight: 600,
-                            borderRadius: 2
+                            borderRadius: 2,
+                            minWidth: { xs: 'auto', sm: 140 }
                         }}
                     >
                         {t('home.menu', locale)}
                     </Button>
                 </Box>
-                    
-                    </Box> {/* Fim do Conteúdo Principal */}
-                </Box> {/* Fim do Layout com Sidebar */}
             </Container>
         );
 }

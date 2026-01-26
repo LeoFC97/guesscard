@@ -4,7 +4,6 @@ import Tooltip from '@mui/material/Tooltip';
 import InfoIcon from '@mui/icons-material/Info';
 import { useLocale } from '../contexts/LocaleContext';
 import { t } from '../utils/translate';
-import { useCoins } from '../contexts/CoinsContext';
 
 interface PlayActionBarProps {
   onHint: () => void;
@@ -28,7 +27,6 @@ const PlayActionBar: React.FC<PlayActionBarProps> = ({
   timeSec = 0
 }) => {
   const { locale } = useLocale();
-  const { balance } = useCoins();
 
   return (
     <Box
@@ -58,32 +56,85 @@ const PlayActionBar: React.FC<PlayActionBarProps> = ({
     >
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography sx={{ fontWeight: 700, fontSize: '0.95rem' }}>{t('home.title', locale)}</Typography>
-          <Typography sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>{`${t('victory.attempts', locale)} ${attempts} • ${t('victory.time', locale)} ${timeSec}s`}</Typography>
+          <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#000000' }}>{t('home.title', locale)}</Typography>
+          <Typography sx={{ fontSize: '0.85rem', color: '#333333' }}>{`${t('victory.attempts', locale)} ${attempts} • ${t('victory.time', locale)} ${timeSec}s`}</Typography>
         </Box>
       </Box>
 
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-        <Typography sx={{ fontWeight: 700, mr: 1 }}>{balance}</Typography>
         <Tooltip title={t('textcard.manaCostNote', locale)}>
-          <IconButton aria-label={t('textcard.manaReveal', locale)}>
+          <IconButton 
+            aria-label={t('textcard.manaReveal', locale)}
+            sx={{ color: '#000000' }}
+          >
             <InfoIcon />
           </IconButton>
         </Tooltip>
-        <Button variant="outlined" color="secondary" onClick={onFlavorHint} disabled={flavorDisabled} aria-disabled={flavorDisabled}>
+        <Button 
+          variant="outlined" 
+          color="secondary" 
+          onClick={onFlavorHint} 
+          disabled={flavorDisabled} 
+          aria-disabled={flavorDisabled}
+          sx={{ 
+            color: '#000000',
+            borderColor: 'rgba(0, 0, 0, 0.5)',
+            '&:hover': {
+              borderColor: 'rgba(0, 0, 0, 0.8)',
+              backgroundColor: 'rgba(0, 0, 0, 0.05)'
+            },
+            '&.Mui-disabled': {
+              color: 'rgba(0, 0, 0, 0.3)',
+              borderColor: 'rgba(0, 0, 0, 0.2)'
+            }
+          }}
+        >
           {t('home.showFlavorHint', locale)}
         </Button>
-        <Button variant="contained" color="primary" onClick={onHint} disabled={hintDisabled} aria-disabled={hintDisabled}>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={onHint} 
+          disabled={hintDisabled} 
+          aria-disabled={hintDisabled}
+          sx={{
+            color: '#ffffff',
+            '&.Mui-disabled': {
+              color: 'rgba(0, 0, 0, 0.3)',
+              backgroundColor: 'rgba(0, 0, 0, 0.1)'
+            }
+          }}
+        >
           {t('home.showEffectHint', locale)}
         </Button>
       </Box>
 
       <Box sx={{ display: { xs: 'none', sm: 'flex' }, gap: 1 }}>
         {onShowLeaderboards && (
-          <Button variant="text" onClick={onShowLeaderboards}>{t('home.viewRankings', locale)}</Button>
+          <Button 
+            variant="text" 
+            onClick={onShowLeaderboards}
+            sx={{ color: '#000000' }}
+          >
+            {t('home.viewRankings', locale)}
+          </Button>
         )}
         {onExit && (
-          <Button variant="outlined" color="secondary" onClick={onExit}>{t('home.menu', locale)}</Button>
+          <Button 
+            variant="outlined" 
+            color="secondary" 
+            onClick={onExit}
+            sx={{ 
+              color: '#000000',
+              borderColor: 'rgba(0, 0, 0, 0.5)',
+              '&:hover': {
+                borderColor: 'rgba(0, 0, 0, 0.8)',
+                backgroundColor: 'rgba(0, 0, 0, 0.05)'
+              }
+            }}
+          >
+            {t('home.menu', locale)}
+          </Button>
         )}
       </Box>
     </Box>
