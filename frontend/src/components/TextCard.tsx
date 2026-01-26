@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Box, Typography, Paper, Button, CircularProgress } from '@mui/material';
 import { requestHint } from '../services/mtgApi';
 import { useCoins } from '../contexts/CoinsContext';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 interface TextCardProps {
     cardText: string;
@@ -81,6 +83,8 @@ const TextCard: React.FC<TextCardProps> = ({
     // Aplica censura local para substituir por <card_name> se necessário
     const displayText = showCard ? cardText : censorCardName(cardText, cardName || '');
 
+    const { locale } = useLocale();
+
     return (
         <Box 
             sx={{ 
@@ -93,7 +97,7 @@ const TextCard: React.FC<TextCardProps> = ({
             }}
         >
             <Typography variant="h6" gutterBottom color="secondary" sx={{ fontWeight: 'bold' }}>
-                {showCard ? '🎉 Carta Revelada!' : '📜 Adivinhe pela Descrição'}
+                {showCard ? t('textcard.revealedTitle', locale) : t('textcard.guessTitle', locale)}
             </Typography>
             
             {/* Layout centralizado apenas com informações de texto */}
@@ -110,7 +114,7 @@ const TextCard: React.FC<TextCardProps> = ({
                     {/* Custo de Mana */}
                     <Paper sx={{ p: { xs: 2, sm: 3 }, backgroundColor: '#f8f9fa', textAlign: 'center', borderRadius: 2, boxShadow: 2 }}>
                         <Typography variant="subtitle1" color="primary" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
-                            💎 Custo de Mana
+                            {t('textcard.manaTitle', locale)}
                         </Typography>
                         
                         {showCard || showManaCost ? (
@@ -145,7 +149,7 @@ const TextCard: React.FC<TextCardProps> = ({
                                     {loadingManaCost ? (
                                         <CircularProgress size={24} color="inherit" />
                                     ) : (
-                                        'Revelar custo de mana'
+                                        t('textcard.manaReveal', locale)
                                     )}
                                 </Button>
                                 <Typography 
@@ -157,7 +161,7 @@ const TextCard: React.FC<TextCardProps> = ({
                                         textAlign: 'center'
                                     }}
                                 >
-                                    (Custa 10 moedas)
+                                    {t('textcard.manaCostNote', locale)}
                                 </Typography>
                             </Box>
                         )}
@@ -166,7 +170,7 @@ const TextCard: React.FC<TextCardProps> = ({
                     {/* Tipo da Carta */}
                     <Paper sx={{ p: { xs: 2, sm: 3 }, backgroundColor: '#f8f9fa', textAlign: 'center', borderRadius: 2, boxShadow: 2 }}>
                         <Typography variant="subtitle1" color="primary" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
-                            🏷️ Tipo da Carta
+                            {t('textcard.cardTypeTitle', locale)}
                         </Typography>
                         
                         {showCard || showCardType ? (
@@ -201,7 +205,7 @@ const TextCard: React.FC<TextCardProps> = ({
                                     {loadingCardType ? (
                                         <CircularProgress size={24} color="inherit" />
                                     ) : (
-                                        'Revelar tipo da carta'
+                                        t('textcard.cardTypeReveal', locale)
                                     )}
                                 </Button>
                                 <Typography 
@@ -213,7 +217,7 @@ const TextCard: React.FC<TextCardProps> = ({
                                         textAlign: 'center'
                                     }}
                                 >
-                                    (Custa 10 moedas)
+                                    {t('textcard.manaCostNote', locale)}
                                 </Typography>
                             </Box>
                         )}
@@ -230,7 +234,7 @@ const TextCard: React.FC<TextCardProps> = ({
                     }}
                 >
                     <Typography variant="h6" color="primary" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
-                        📖 Texto da Carta {!showCard}
+                        {t('textcard.textTitle', locale)} {!showCard}
                     </Typography>
                     
                     {!showCard && hasCensoredContent && (
@@ -265,14 +269,14 @@ const TextCard: React.FC<TextCardProps> = ({
                                 justifyContent: 'center'
                             }}
                         >
-                            {displayText || 'Esta carta não possui texto de habilidade.'}
+                            {displayText || t('textcard.textEmpty', locale)}
                         </Typography>
                     </Paper>
                     
                     {!showCard && (
                         <Box sx={{ mt: 3, p: 2, backgroundColor: '#e3f2fd', borderRadius: 1 }}>
                             <Typography variant="body2" sx={{ color: '#1565c0', fontStyle: 'italic', textAlign: 'center' }}>
-                                💡 Dica: Use as informações de tipo, custo de mana e habilidades para adivinhar a carta!
+                                {t('textcard.hintTip', locale)}
                             </Typography>
                         </Box>
                     )}
@@ -294,10 +298,10 @@ const TextCard: React.FC<TextCardProps> = ({
                         🎉 {cardName} 🎉
                     </Typography>
                     <Typography variant="h6" sx={{ color: '#2e7d32', mb: 1 }}>
-                        Parabéns! Você adivinhou baseado no texto da carta!
+                        {t('textcard.congrats', locale)}
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                        Modo Texto concluído com sucesso! ✨
+                        {t('textcard.completed', locale)}
                     </Typography>
                 </Paper>
             )}

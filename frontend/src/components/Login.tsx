@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 import { Box, Button, TextField, Typography, CircularProgress } from '@mui/material';
 
 interface LoginProps {
@@ -10,6 +12,7 @@ const AUTH0_CLIENT_ID = process.env.REACT_APP_AUTH0_CLIENT_ID || '';
 const AUTH0_AUDIENCE = process.env.REACT_APP_AUTH0_AUDIENCE || '';
 
 const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
+  const { locale } = useLocale();
   // Função para trocar o código de autorização pelo token
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -28,7 +31,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             }),
           });
           const data = await res.json();
-          if (!res.ok) throw new Error(data.error_description || 'Erro ao autenticar');
+          if (!res.ok) throw new Error(data.error_description || t('login.unknownError', locale || 'pt'));
           const { access_token, id_token } = data;
           // Decodifica o id_token para pegar userId, name, email
           const payload = id_token ? JSON.parse(atob(id_token.split('.')[1])) : {};
@@ -66,7 +69,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error_description || 'Erro ao autenticar');
+          if (!res.ok) throw new Error(data.error_description || t('login.unknownError', locale || 'pt'));
       const { access_token, id_token } = data;
       // Decodifica o id_token para pegar userId, name, email
       const payload = id_token ? JSON.parse(atob(id_token.split('.')[1])) : {};
@@ -91,10 +94,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight={300}>
-      <Typography variant="h5" mb={2}>Login</Typography>
+      <Typography variant="h5" mb={2}>{t('login.title', locale || 'pt')}</Typography>
       <form onSubmit={handleLogin} style={{ width: '100%', maxWidth: 320 }}>
         <TextField
-          label="Email"
+          label={t('login.email', locale || 'pt')}
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
@@ -103,7 +106,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           required
         />
         <TextField
-          label="Senha"
+          label={t('login.password', locale || 'pt')}
           type="password"
           value={password}
           onChange={e => setPassword(e.target.value)}
@@ -120,7 +123,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           disabled={loading}
           sx={{ mt: 2 }}
         >
-          {loading ? <CircularProgress size={24} /> : 'Entrar'}
+          {loading ? <CircularProgress size={24} /> : t('login.submit', locale || 'pt')}
         </Button>
       </form>
       <Button
@@ -130,7 +133,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         sx={{ mt: 2 }}
         onClick={handleSocialLogin}
       >
-        Entrar com rede social
+        {t('login.social', locale || 'pt')}
       </Button>
       <Button
         variant="text"
@@ -139,7 +142,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         sx={{ mt: 2 }}
         onClick={handleGuest}
       >
-        Jogar como visitante
+        {t('login.guest', locale || 'pt')}
       </Button>
     </Box>
   );

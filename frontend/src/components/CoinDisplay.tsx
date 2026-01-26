@@ -2,6 +2,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Box, Typography, CircularProgress, Tooltip, Chip } from '@mui/material';
 import coinsApi, { UserCoins } from '../services/coinsApi';
 import { useCoins } from '../contexts/CoinsContext';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 interface CoinDisplayProps {
     userId: string;
@@ -55,6 +57,8 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', o
         return null;
     }
 
+    const { locale } = useLocale();
+
     // Usar saldo do contexto ou fallback local
     const displayBalance = balance || localUserCoins?.balance || 0;
 
@@ -71,7 +75,7 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', o
             }}
         >
             <Tooltip 
-                title={loading ? 'Carregando moedas...' : `Clique para ver extrato - Saldo: ${displayBalance?.toLocaleString() || '0'} moedas`}
+                title={loading ? t('coin.loading', locale) : t('coin.clickToView', locale).replace('{{balance}}', displayBalance?.toLocaleString() || '0')}
                 placement="bottom"
             >
                 <Chip

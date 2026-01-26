@@ -1,5 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 interface BlurredCardProps {
     imageUrl: string;
@@ -37,6 +39,8 @@ const BlurredCard: React.FC<BlurredCardProps> = ({
 
     const blurAmount = calculateBlur();
 
+    const { locale } = useLocale();
+
     return (
         <Box 
             sx={{ 
@@ -47,7 +51,7 @@ const BlurredCard: React.FC<BlurredCardProps> = ({
             }}
         >
             <Typography variant="h6" gutterBottom color="primary">
-                {showCard ? '🎉 Carta Revelada!' : '🔍 Adivinhe a Carta'}
+                {showCard ? t('blurred.revealedTitle', locale) : t('blurred.guessTitle', locale)}
             </Typography>
             
             <Box
@@ -59,17 +63,20 @@ const BlurredCard: React.FC<BlurredCardProps> = ({
                     transition: 'all 0.5s ease-in-out',
                 }}
             >
-                <img
-                    src={imageUrl}
-                    alt={showCard ? cardName : "Carta misteriosa"}
-                    style={{
-                        width: '250px',
-                        height: 'auto',
-                        display: 'block',
-                        filter: `blur(${blurAmount}px)`,
-                        transition: 'filter 0.5s ease-in-out',
-                    }}
-                />
+                    <img
+                        src={imageUrl}
+                        alt={showCard ? cardName : t('blurred.mysteryAlt', locale)}
+                        role="img"
+                        tabIndex={0}
+                        style={{
+                            width: 'min(420px, 90vw)',
+                            height: 'auto',
+                            display: 'block',
+                            filter: `blur(${blurAmount}px)`,
+                            transition: 'filter 450ms cubic-bezier(.2,.8,.2,1), transform 450ms ease',
+                            transform: showCard ? 'scale(1.03)' : 'scale(1)'
+                        }}
+                    />
                 
                 {/* Overlay com informações do blur */}
                 {!showCard && (

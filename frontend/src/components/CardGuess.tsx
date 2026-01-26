@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { guessCard } from '../services/mtgApi';
 import { fetchCardNames } from '../services/mtgAutocomplete';
 import { Box, Button, Stack, Autocomplete, TextField } from '@mui/material';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 type CardGuessProps = {
   onGuess: (result: any) => void;
@@ -18,6 +20,7 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
     const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState<string[]>([]);
     const [fetching, setFetching] = useState(false);
+    const { locale } = useLocale();
 
     const handleInputChange = async (_: any, value: string) => {
         setInput(value);
@@ -71,8 +74,10 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
                     renderInput={(params) => (
                         <TextField
                             {...params}
-                            placeholder="Nome da carta"
+                            placeholder={t('guess.placeholder', locale)}
+                            aria-label={t('guess.placeholder', locale)}
                             disabled={loading}
+                            autoFocus
                             size={window.innerWidth < 600 ? "small" : "medium"}
                             variant="outlined"
                             sx={{ 
@@ -101,7 +106,7 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
                         whiteSpace: 'nowrap'
                     }}
                 >
-                    {loading ? 'Enviando...' : 'Enviar'}
+                    {loading ? t('guess.sending', locale) : t('guess.submit', locale)}
                 </Button>
             </Stack>
         </Box>

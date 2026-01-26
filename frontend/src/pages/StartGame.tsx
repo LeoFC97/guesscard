@@ -5,6 +5,8 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 import CheckIcon from '@mui/icons-material/Check';
 import { useDailyPlayedDates } from '../hooks/useDailyPlayedDates';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 
 type StartGameProps = {
@@ -24,6 +26,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
     const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const playedDates = useDailyPlayedDates(userId);
+    const { locale } = useLocale();
 
     const handleStart = async () => {
         setLoading(true);
@@ -34,11 +37,11 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ difficulty }),
             });
-            if (!response.ok) throw new Error('Erro ao iniciar novo jogo');
+            if (!response.ok) throw new Error(t('errors.newGame', locale));
             const data = await response.json();
             onGameStarted(data.cardName, data.gameId);
         } catch (err: any) {
-            setError(err.message || 'Erro desconhecido');
+            setError(err.message || t('login.unknownError', locale));
         } finally {
             setLoading(false);
         }
@@ -53,11 +56,11 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ difficulty }),
             });
-            if (!response.ok) throw new Error('Erro ao iniciar novo jogo blur');
+            if (!response.ok) throw new Error(t('errors.newBlurGame', locale));
             const data = await response.json();
             onGameStarted(data.cardName, data.gameId, data);
         } catch (err: any) {
-            setError(err.message || 'Erro desconhecido');
+            setError(err.message || t('login.unknownError', locale));
         } finally {
             setLoadingBlur(false);
         }
@@ -72,11 +75,11 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ difficulty }),
             });
-            if (!response.ok) throw new Error('Erro ao iniciar novo jogo texto');
+            if (!response.ok) throw new Error(t('errors.newTextGame', locale));
             const data = await response.json();
             onGameStarted(data.cardName, data.gameId, data);
         } catch (err: any) {
-            setError(err.message || 'Erro desconhecido');
+            setError(err.message || t('login.unknownError', locale));
         } finally {
             setLoadingText(false);
         }
@@ -138,7 +141,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
     const handleStartDaily = async () => {
         // Validação no frontend para datas futuras
         if (isDateInFuture(selectedDate)) {
-            setError('Não é possível jogar cartas do futuro. Escolha uma data de hoje ou anterior.');
+            setError(t('errors.futureDate', locale));
             return;
         }
 
@@ -151,11 +154,11 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
             
             if (!response.ok) {
                 if (response.status === 403) {
-                    setError(`Você já jogou a carta do dia ${selectedDateStr}. Escolha uma data diferente.`);
+                    setError(t('errors.dailyAlreadyPlayed', locale).replace('{{date}}', selectedDateStr));
                 } else if (response.status === 404) {
-                    setError(`Nenhuma carta foi definida para o dia ${selectedDateStr}.`);
+                    setError(t('errors.dailyNotDefined', locale).replace('{{date}}', selectedDateStr));
                 } else {
-                    setError(data.message || 'Erro ao iniciar modo diário');
+                    setError(data.message || t('errors.dailyStartError', locale));
                 }
                 return;
             }
@@ -188,7 +191,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     textAlign: 'center'
                 }}
             >
-                Guess the card
+                {t('start.title', locale)}
             </Typography>
             <ToggleButtonGroup
                 value={difficulty}
@@ -205,9 +208,9 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     }
                 }}
             >
-                <ToggleButton value="easy">Fácil</ToggleButton>
-                <ToggleButton value="medium">Intermediário</ToggleButton>
-                <ToggleButton value="hard">Difícil</ToggleButton>
+                <ToggleButton value="easy">{t('start.difficulty.easy', locale)}</ToggleButton>
+                <ToggleButton value="medium">{t('start.difficulty.medium', locale)}</ToggleButton>
+                <ToggleButton value="hard">{t('start.difficulty.hard', locale)}</ToggleButton>
             </ToggleButtonGroup>
             <Typography 
                 variant="body2" 
@@ -221,7 +224,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                 }}
             >
                 <span style={{ color: '#9c27b0', fontWeight: 700 }}>
-                    A dificuldade escolhida vale para todos os modos, inclusive o modo Blur!
+                    {t('start.difficultyNote', locale)}
                 </span>
             </Typography>
             <Button 
@@ -237,7 +240,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     fontSize: { xs: '0.9rem', sm: '1rem' }
                 }}
             >
-                {loading ? <CircularProgress size={24} /> : 'Iniciar Novo Jogo'}
+                {loading ? <CircularProgress size={24} /> : t('start.startNewGame', locale)}
             </Button>
 
             {/* Modo Texto */}
@@ -256,7 +259,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         fontSize: { xs: '1.1rem', sm: '1.25rem' }
                     }}
                 >
-                    📜 Modo Texto
+                    {t('start.textMode.title', locale)}
                 </Typography>
                 <Typography 
                     variant="body2" 
@@ -268,7 +271,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         lineHeight: 1.4
                     }}
                 >
-                    Adivinhe a carta pelo seu texto e habilidades! O nome fica censurado.
+                    {t('start.textMode.description', locale)}
                     <br />
                     <span style={{ color: '#ed6c02', fontWeight: 700 }}>
                         Desafio para conhecedores das mecânicas de MTG!
@@ -289,7 +292,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         fontSize: { xs: '0.9rem', sm: '1rem' }
                     }}
                 >
-                    {loadingText ? <CircularProgress size={24} /> : '📖 Jogar Modo Texto'}
+                    {loadingText ? <CircularProgress size={24} /> : t('start.textMode.play', locale)}
                 </Button>
             </Box>
 
@@ -309,7 +312,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         fontSize: { xs: '1.1rem', sm: '1.25rem' }
                     }}
                 >
-                    🔍 Modo Blur
+                    {t('start.blurMode.title', locale)}
                 </Typography>
                 <Typography 
                     variant="body2" 
@@ -321,7 +324,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         lineHeight: 1.4
                     }}
                 >
-                    A carta começa levemente borrada e vai ficando mais nítida a cada palpite!
+                    {t('start.blurMode.description', locale)}
                     <br />
                     <span style={{ color: '#9c27b0', fontWeight: 700 }}>
                         Sem limite de tentativas - o blur reduz 10% a cada palpite.
@@ -342,7 +345,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         fontSize: { xs: '0.9rem', sm: '1rem' }
                     }}
                 >
-                    {loadingBlur ? <CircularProgress size={24} /> : '🎯 Jogar Modo Blur'}
+                    {loadingBlur ? <CircularProgress size={24} /> : t('start.blurMode.play', locale)}
                 </Button>
             </Box>
             
@@ -361,7 +364,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         fontSize: { xs: '1.1rem', sm: '1.25rem' }
                     }}
                 >
-                    Modo Carta do Dia
+                    {t('start.dailyMode.title', locale)}
                 </Typography>
                 <Typography 
                     variant="body2" 
@@ -371,11 +374,11 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                         fontSize: { xs: '0.8rem', sm: '0.875rem' }
                     }}
                 >
-                    Escolha uma data para jogar:
+                    {t('start.dailyMode.chooseDate', locale)}
                 </Typography>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                        label="Data do desafio"
+                        label={t('start.dailyMode.dateLabel', locale)}
                         value={selectedDate}
                         onChange={(newValue: Date | null) => {
                             if (newValue) {
@@ -399,7 +402,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                                     mb: 2 
                                 },
                                 error: isDateInFuture(selectedDate),
-                                helperText: isDateInFuture(selectedDate) ? 'Não é possível selecionar datas futuras' : ''
+                                helperText: isDateInFuture(selectedDate) ? t('start.dailyMode.futureDateHelper', locale) : ''
                             }
                         }}
                     />
@@ -422,8 +425,8 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     px: { xs: 2, sm: 3 }
                 }}
             >
-                {loadingDaily ? <CircularProgress size={24} /> : 
-                 `Jogar carta do dia (${getLocalDateStr(selectedDate)})`}
+                 {loadingDaily ? <CircularProgress size={24} /> : 
+                  t('start.dailyMode.playWithDate', locale).replace('{{date}}', getLocalDateStr(selectedDate))}
             </Button>
 
             {/* Botão de Leaderboards */}
@@ -432,7 +435,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     mt: { xs: 3, sm: 4 },
                     px: { xs: 1, sm: 0 }
                 }}>
-                    <Button
+                        <Button
                         variant="contained"
                         color="success"
                         size="large"
@@ -448,7 +451,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                             minWidth: { xs: 'auto', sm: 180 }
                         }}
                     >
-                        🏆 Ver Rankings
+                        {t('home.viewRankings', locale)}
                     </Button>
                 </Box>
             )}
