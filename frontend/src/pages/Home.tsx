@@ -96,16 +96,6 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
             // Processar recompensa de moedas se houver
             if (result.coinReward && userId && userId !== 'guest') {
                 console.log('🪙 Moedas ganhas:', result.coinReward);
-                <PlayActionBar
-                    onHint={handleHint}
-                    onFlavorHint={handleFlavorHint}
-                    hintDisabled={textShown || wrongCount < 5}
-                    flavorDisabled={flavorShown || wrongCount < 2}
-                    onShowLeaderboards={() => setShowLeaderboards(true)}
-                    onExit={() => { setGameStarted(false); setVictory(false); }}
-                    attempts={guesses.length}
-                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
-                />
                 animateCoinsGain(result.coinReward);
             }
 
@@ -115,16 +105,6 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         // Só reseta o tempo se não foi vitória
         if (!result.isCorrect) {
             setStartTime(Date.now());
-                <PlayActionBar
-                    onHint={handleHint}
-                    onFlavorHint={handleFlavorHint}
-                    hintDisabled={textShown || wrongCount < 5}
-                    flavorDisabled={flavorShown || wrongCount < 2}
-                    onShowLeaderboards={() => setShowLeaderboards(true)}
-                    onExit={() => { setGameStarted(false); setVictory(false); }}
-                    attempts={guesses.length}
-                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
-                />
             setEndTime(null);
         }
     };
@@ -134,16 +114,6 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
         setTargetCard(cardName);
         setGameId(gameId);
         setGuesses([]);
-                <PlayActionBar
-                    onHint={handleHint}
-                    onFlavorHint={handleFlavorHint}
-                    hintDisabled={textShown || wrongCount < 5}
-                    flavorDisabled={flavorShown || wrongCount < 2}
-                    onShowLeaderboards={() => setShowLeaderboards(true)}
-                    onExit={() => { setGameStarted(false); setVictory(false); }}
-                    attempts={guesses.length}
-                    timeSec={startTime ? Math.round(((endTime || Date.now()) - startTime) / 1000) : 0}
-                />
         setTextReady(null);
         setTextShown(false);
         setFlavorReady(null);

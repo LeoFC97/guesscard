@@ -52,12 +52,11 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', o
         }
     }, [userId, balance, loading]);
 
+    const { locale } = useLocale();
     // Se for guest, não mostra nada
     if (!userId || userId === 'guest') {
         return null;
     }
-
-    const { locale } = useLocale();
 
     // Usar saldo do contexto ou fallback local
     const displayBalance = balance || localUserCoins?.balance || 0;
