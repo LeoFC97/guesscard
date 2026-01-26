@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Tooltip, Chip } from '@mui/material';
 import coinsApi, { UserCoins } from '../services/coinsApi';
 import { useCoins } from '../contexts/CoinsContext';
@@ -14,6 +14,7 @@ interface CoinDisplayProps {
 const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', onClick }) => {
     const { balance, loading, setUserId, refreshBalance, coinAnimation } = useCoins();
     const [localUserCoins, setLocalUserCoins] = useState<UserCoins | null>(null);
+    const { locale } = useLocale();
 
     // Quando o userId mudar, atualizar o contexto
     useEffect(() => {
@@ -56,8 +57,6 @@ const CoinDisplay: React.FC<CoinDisplayProps> = ({ userId, themeMode = 'dark', o
     if (!userId || userId === 'guest') {
         return null;
     }
-
-    const { locale } = useLocale();
 
     // Usar saldo do contexto ou fallback local
     const displayBalance = balance || localUserCoins?.balance || 0;
