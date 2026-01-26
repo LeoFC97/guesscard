@@ -35,6 +35,7 @@ const TextCard: React.FC<TextCardProps> = ({
     const [loadingManaCost, setLoadingManaCost] = useState(false);
     const [loadingCardType, setLoadingCardType] = useState(false);
     const { refreshBalance, balance } = useCoins();
+    const { locale } = useLocale();
 
     // Função para censurar o nome da carta no texto
     const censorCardName = (text: string, name: string): string => {
@@ -56,7 +57,7 @@ const TextCard: React.FC<TextCardProps> = ({
             onHintPurchased?.(); // Callback para atualizar o estado do jogo
         } catch (error) {
             console.error('Erro ao solicitar dica de custo de mana:', error);
-            alert(error instanceof Error ? error.message : 'Erro ao solicitar dica');
+            alert(error instanceof Error ? error.message : t('errors.hintRequestFailed', locale));
         } finally {
             setLoadingManaCost(false);
         }
@@ -73,7 +74,7 @@ const TextCard: React.FC<TextCardProps> = ({
             onHintPurchased?.(); // Callback para atualizar o estado do jogo
         } catch (error) {
             console.error('Erro ao solicitar dica de tipo:', error);
-            alert(error instanceof Error ? error.message : 'Erro ao solicitar dica');
+            alert(error instanceof Error ? error.message : t('errors.hintRequestFailed', locale));
         } finally {
             setLoadingCardType(false);
         }
@@ -82,8 +83,6 @@ const TextCard: React.FC<TextCardProps> = ({
     // O texto já vem censurado do backend quando não showCard
     // Aplica censura local para substituir por <card_name> se necessário
     const displayText = showCard ? cardText : censorCardName(cardText, cardName || '');
-
-    const { locale } = useLocale();
 
     return (
         <Box 
@@ -240,7 +239,7 @@ const TextCard: React.FC<TextCardProps> = ({
                     {!showCard && hasCensoredContent && (
                         <Box sx={{ mb: 2, p: 2, backgroundColor: '#ffecb3', borderRadius: 1, border: '1px solid #ffc107' }}>
                             <Typography variant="body2" sx={{ color: '#e65100', fontWeight: 'bold', textAlign: 'center' }}>
-                                ⚠️ Referências ao nome da carta foram censuradas com █
+                                ⚠️ {t('textcard.censoredWarning', locale)}
                             </Typography>
                         </Box>
                     )}

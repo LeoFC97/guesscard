@@ -167,7 +167,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
             const gameId = data.gameId || 'daily';
             onGameStarted(data.cardName, gameId);
         } catch (err: any) {
-            setError('Erro de conexão. Verifique sua internet e tente novamente.');
+            setError(t('errors.connectionError', locale));
         } finally {
             setLoadingDaily(false);
         }
@@ -274,7 +274,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     {t('start.textMode.description', locale)}
                     <br />
                     <span style={{ color: '#ed6c02', fontWeight: 700 }}>
-                        Desafio para conhecedores das mecânicas de MTG!
+                        {t('start.textMode.challengeNote', locale)}
                     </span>
                 </Typography>
                 <Button 
@@ -327,7 +327,7 @@ const StartGame: React.FC<StartGameProps> = ({ onGameStarted, userId, name, emai
                     {t('start.blurMode.description', locale)}
                     <br />
                     <span style={{ color: '#9c27b0', fontWeight: 700 }}>
-                        Sem limite de tentativas - o blur reduz 10% a cada palpite.
+                        {t('start.blurMode.note', locale)}
                     </span>
                 </Typography>
                 <Button 

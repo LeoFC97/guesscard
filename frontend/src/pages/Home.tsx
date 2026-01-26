@@ -28,17 +28,21 @@ interface HomeProps {
     setThemeMode: React.Dispatch<React.SetStateAction<'light' | 'dark'>>;
 }
 
-const ThemeToggle: React.FC<{ themeMode: 'light' | 'dark'; setThemeMode: React.Dispatch<React.SetStateAction<'light' | 'dark'>> }> = ({ themeMode, setThemeMode }) => (
-    <Tooltip title={themeMode === 'dark' ? 'Modo claro' : 'Modo escuro'}>
-        <IconButton
-            sx={{ position: 'fixed', top: 16, left: 24, zIndex: 2100 }}
-            color="secondary"
-            onClick={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')}
-        >
-            {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-        </IconButton>
-    </Tooltip>
-);
+const ThemeToggle: React.FC<{ themeMode: 'light' | 'dark'; setThemeMode: React.Dispatch<React.SetStateAction<'light' | 'dark'>> }> = ({ themeMode, setThemeMode }) => {
+    const { locale } = useLocale();
+
+    return (
+        <Tooltip title={themeMode === 'dark' ? t('global.lightMode', locale) : t('global.darkMode', locale)}>
+            <IconButton
+                sx={{ position: 'fixed', top: 16, left: 24, zIndex: 2100 }}
+                color="secondary"
+                onClick={() => setThemeMode(themeMode === 'dark' ? 'light' : 'dark')}
+            >
+                {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButton>
+        </Tooltip>
+    );
+};
 const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMode }) => {
     const { animateCoinsGain } = useCoins();
     const { locale } = useLocale();
@@ -208,7 +212,7 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
                 <Container maxWidth="lg" sx={{ py: 4 }}>
                     <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
                         <Typography variant="h4" component="h1" color="primary">
-                            🏆 Leaderboards
+                            🏆 {t('leaderboards.title', locale)}
                         </Typography>
                         <Button
                             variant="outlined"
@@ -271,12 +275,12 @@ const Home: React.FC<HomeProps> = ({ userId, name, email, themeMode, setThemeMod
 
 const handleHint = () => {
     setTextShown(true);
-    if (!textReady) setTextReady('Nenhum texto disponível para esta carta.');
+    if (!textReady) setTextReady(t('home_extra.noTextAvailable', locale));
 };
 
     const handleFlavorHint = () => {
         setFlavorShown(true);
-        if (!flavorReady) setFlavorReady('Nenhum flavor disponível para esta carta.');
+        if (!flavorReady) setFlavorReady(t('home_extra.noFlavorAvailable', locale));
     };
 
     // Tela especial para modo Carta do Dia
@@ -618,7 +622,7 @@ const handleHint = () => {
                     px={{ xs: 1, sm: 0 }}
                 >
                     <Tooltip
-                        title={wrongCount < 2 ? 'A dica de flavor ficará disponível após 2 erros' : ''}
+                        title={wrongCount < 2 ? t('home.flavorHintTooltip', locale).replace('{{count}}', '2') : ''}
                         disableHoverListener={wrongCount >= 2}
                     >
                         <span style={{ width: '100%' }}>

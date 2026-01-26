@@ -41,6 +41,8 @@ import {
     BlurSpeedLeaderboardEntry,
     BlurPerfectLeaderboardEntry
 } from '../services/leaderboardApi';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 interface LeaderboardsProps {
     themeMode?: 'light' | 'dark';
@@ -50,6 +52,7 @@ type LeaderboardType = 'normal' | 'daily' | 'speed' | 'perfect' | 'blur' | 'blur
 type GameType = 'normal' | 'daily';
 
 const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
+    const { locale } = useLocale();
     const [selectedType, setSelectedType] = useState<LeaderboardType>('blur');
     const [gameType, setGameType] = useState<GameType>('daily');
     const [loading, setLoading] = useState(false);
@@ -128,13 +131,13 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
             <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogos</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Média Tentativas</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Média Tempo</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Melhor Tempo</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Melhores Tentativas</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.position', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.player', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.games', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.avgAttempts', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.avgTime', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.bestTime', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.bestAttempts', locale)}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -165,13 +168,13 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
             <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Dias Jogados</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Sequência Atual</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Maior Sequência</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Média Tentativas</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Melhor Tempo</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.position', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.player', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.daysPlayed', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.currentStreak', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.longestStreak', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.avgAttempts', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.bestTime', locale)}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -210,12 +213,12 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
             <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Melhor Tempo</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Tentativas</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Total Jogos</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Data</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.position', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.player', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.bestTime', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.attempts', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.totalGames', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.date', locale)}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -247,12 +250,12 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
             <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Melhores Tentativas</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Tempo</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Total Jogos</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Data</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.position', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.player', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.bestAttempts', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.time', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.totalGames', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.date', locale)}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -284,12 +287,12 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
             <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogos Blur</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Média Tentativas</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Média Blur</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Tempo Médio</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.position', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.player', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.blurGames', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.avgAttempts', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.avgBlur', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.avgTime', locale)}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -319,11 +322,11 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
             <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Melhor Tempo</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Tempo Médio</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogos Blur</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.position', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.player', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.bestTime', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.avgTime', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.blurGames', locale)}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -352,11 +355,11 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
             <Table stickyHeader>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Posição</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogador</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Jogos Perfeitos</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Melhor Tempo</TableCell>
-                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>Tempo Médio</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.position', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.player', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.perfectGames', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.bestTime', locale)}</TableCell>
+                        <TableCell sx={{ backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', color: isDark ? '#fff' : '#000' }}>{t('leaderboards.headers.avgTime', locale)}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -383,7 +386,7 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
     return (
         <Box sx={{ p: 3, backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', minHeight: '100vh' }}>
             <Typography variant="h4" gutterBottom sx={{ color: isDark ? '#fff' : '#000', textAlign: 'center', mb: 4 }}>
-                🏆 Leaderboards {selectedType.includes('blur') && '🔍'}
+                🏆 {t('leaderboards.title', locale)} {selectedType.includes('blur') && '🔍'}
             </Typography>
 
             <Card sx={{ mb: 3, backgroundColor: isDark ? '#2a2a2a' : '#fff' }}>
@@ -394,13 +397,13 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
                         centered
                         sx={{ mb: 2 }}
                     >
-                        <Tab label="Jogos Normais" value="normal" icon={<TrophyIcon />} />
-                        <Tab label="Jogos Diários" value="daily" icon={<DailyIcon />} />
-                        <Tab label="Modo Blur" value="blur" icon={<BlurIcon />} />
-                        <Tab label="Blur - Velocidade" value="blur-speed" icon={<SpeedIcon />} />
-                        <Tab label="Blur - Perfeitos" value="blur-perfect" icon={<PerfectIcon />} />
-                        <Tab label="Melhores Tempos" value="speed" icon={<SpeedIcon />} />
-                        <Tab label="Menos Tentativas" value="perfect" />
+                        <Tab label={t('leaderboards.tabs.normal', locale)} value="normal" icon={<TrophyIcon />} />
+                        <Tab label={t('leaderboards.tabs.daily', locale)} value="daily" icon={<DailyIcon />} />
+                        <Tab label={t('leaderboards.tabs.blur', locale)} value="blur" icon={<BlurIcon />} />
+                        <Tab label={t('leaderboards.tabs.blurSpeed', locale)} value="blur-speed" icon={<SpeedIcon />} />
+                        <Tab label={t('leaderboards.tabs.blurPerfect', locale)} value="blur-perfect" icon={<PerfectIcon />} />
+                        <Tab label={t('leaderboards.tabs.speed', locale)} value="speed" icon={<SpeedIcon />} />
+                        <Tab label={t('leaderboards.tabs.perfect', locale)} value="perfect" />
                     </Tabs>
 
                     {(selectedType === 'speed' || selectedType === 'perfect') && (
@@ -411,8 +414,8 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
                                 onChange={(_, newGameType) => newGameType && setGameType(newGameType)}
                                 size="small"
                             >
-                                <ToggleButton value="normal">Jogos Normais</ToggleButton>
-                                <ToggleButton value="daily">Jogos Diários</ToggleButton>
+                                <ToggleButton value="normal">{t('leaderboards.tabs.normal', locale)}</ToggleButton>
+                                <ToggleButton value="daily">{t('leaderboards.tabs.daily', locale)}</ToggleButton>
                             </ToggleButtonGroup>
                         </Box>
                     )}
@@ -428,7 +431,7 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
                     {selectedType.includes('blur') && (
                         <Box sx={{ mb: 2, p: 2, backgroundColor: isDark ? '#2a2a4a' : '#f0f0ff', borderRadius: 2 }}>
                             <Typography variant="body2" sx={{ color: isDark ? '#bb86fc' : '#6200ea', textAlign: 'center' }}>
-                                🔍 Rankings do Modo Blur - Cartas que ficam mais nítidas a cada palpite!
+                                🔍 {t('leaderboards.blurInfo', locale)}
                             </Typography>
                         </Box>
                     )}

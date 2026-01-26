@@ -37,7 +37,7 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!gameId) {
-            alert('Jogo não iniciado.');
+            alert(t('errors.gameNotStarted', locale));
             return;
         }
         setLoading(true);
@@ -46,7 +46,7 @@ export function CardGuess({ onGuess, gameId, userId, name, email, attempts, time
             onGuess(data);
             setInput('');
         } catch (err) {
-            alert('Erro ao consultar a API');
+            alert(t('errors.guessFailed', locale));
         } finally {
             setLoading(false);
         }

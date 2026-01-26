@@ -16,15 +16,17 @@
   },
   "global": {
     "switchToEnglish": "Switch to English",
-    "switchToPortuguese": "Switch to Portuguese"
+    "switchToPortuguese": "Switch to Portuguese",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode"
   },
   "start": {
     "title": "Guess the card",
     "difficulty": { "easy": "Easy", "medium": "Medium", "hard": "Hard" },
     "difficultyNote": "The chosen difficulty applies to all modes, including Blur!",
     "startNewGame": "Start New Game",
-    "textMode": { "title": "📜 Text Mode", "description": "Guess the card by its text and abilities! Name is censored.", "play": "📖 Play Text Mode" },
-    "blurMode": { "title": "🔍 Blur Mode", "description": "The card starts slightly blurred and becomes clearer with each guess!", "play": "🎯 Play Blur Mode" },
+    "textMode": { "title": "📜 Text Mode", "description": "Guess the card by its text and abilities! Name is censored.", "play": "📖 Play Text Mode", "challengeNote": "Challenge for players who know MTG mechanics!" },
+    "blurMode": { "title": "🔍 Blur Mode", "description": "The card starts slightly blurred and becomes clearer with each guess!", "play": "🎯 Play Blur Mode", "note": "No attempt limit - blur decreases 10% each guess." },
     "dailyMode": { "title": "Daily Card", "chooseDate": "Choose a date to play:", "dateLabel": "Challenge date", "playWithDate": "Play daily card ({{date}})", "futureDateHelper": "You cannot select future dates" }
   },
   "errors": {
@@ -35,7 +37,10 @@
     "dailyNotDefined": "No card was defined for {{date}}.",
     "dailyStartError": "Error starting daily mode",
     "futureDate": "You cannot play cards from the future. Choose today or a past date.",
-    "connectionError": "Connection error. Check your internet and try again."
+    "connectionError": "Connection error. Check your internet and try again.",
+    "gameNotStarted": "Game not started.",
+    "guessFailed": "Error contacting the API.",
+    "hintRequestFailed": "Error requesting hint."
   },
   "textcard": {
     "revealedTitle": "🎉 Card Revealed!",
@@ -49,7 +54,8 @@
     "textEmpty": "This card has no ability text.",
     "hintTip": "💡 Tip: Use type, mana cost and abilities to guess the card!",
     "congrats": "Congratulations! You guessed based on the card text!",
-    "completed": "Text Mode completed successfully! ✨"
+    "completed": "Text Mode completed successfully! ✨",
+    "censoredWarning": "Card name references were censored with █"
   },
   "blurred": {
     "revealedTitle": "🎉 Card Revealed!",
@@ -63,7 +69,8 @@
     "submit": "Sign In",
     "social": "Sign in with social",
     "guest": "Play as guest",
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "guestName": "Guest"
   },
   "profile": {
     "title": "My Profile",
@@ -82,7 +89,13 @@
     "totalEarned": "Total earned:",
     "totalSpent": "Total spent:",
     "earnedToday": "Earned today:",
-    "spentToday": "Spent today:"
+    "spentToday": "Spent today:",
+    "dailyGames": "Daily games: {{count}}",
+    "avgAttemptsNormal": "Avg attempts (normal): {{count}}",
+    "avgTimeNormal": "Avg time (normal): {{time}}",
+    "avgAttemptsDaily": "Avg attempts (daily): {{count}}",
+    "avgTimeDaily": "Avg time (daily): {{time}}",
+    "coinUnit": "coins"
   },
   "coin": {
     "loading": "Loading coins...",
@@ -106,5 +119,103 @@
   "home_extra": {
     "noTextAvailable": "No text available for this card.",
     "noFlavorAvailable": "No flavor available for this card."
+  },
+  "leaderboards": {
+    "title": "Leaderboards",
+    "tabs": {
+      "normal": "Normal Games",
+      "daily": "Daily Games",
+      "blur": "Blur Mode",
+      "blurSpeed": "Blur - Speed",
+      "blurPerfect": "Blur - Perfect",
+      "speed": "Best Times",
+      "perfect": "Fewest Attempts"
+    },
+    "headers": {
+      "position": "Position",
+      "player": "Player",
+      "games": "Games",
+      "avgAttempts": "Avg Attempts",
+      "avgTime": "Avg Time",
+      "bestTime": "Best Time",
+      "bestAttempts": "Best Attempts",
+      "daysPlayed": "Days Played",
+      "currentStreak": "Current Streak",
+      "longestStreak": "Longest Streak",
+      "attempts": "Attempts",
+      "totalGames": "Total Games",
+      "date": "Date",
+      "blurGames": "Blur Games",
+      "avgBlur": "Avg Blur",
+      "perfectGames": "Perfect Games",
+      "time": "Time"
+    },
+    "blurInfo": "Blur mode rankings - cards get clearer with each guess!"
+  },
+  "history": {
+    "title": "Guesses",
+    "columns": {
+      "card": "Card",
+      "color": "Color",
+      "type": "Type",
+      "cmc": "CMC",
+      "edition": "Edition",
+      "rarity": "Rarity",
+      "artist": "Artist"
+    },
+    "labels": {
+      "color": "Color",
+      "type": "Type",
+      "cmc": "CMC",
+      "edition": "Edition",
+      "rarity": "Rarity",
+      "artist": "Artist"
+    },
+    "emptyLong": "No guesses yet. Make your first guess!",
+    "emptyShort": "No guesses yet.",
+    "legend": {
+      "title": "Icons:",
+      "correct": "✔️ Correct",
+      "partial": "🟡 Partial",
+      "incorrect": "❌ Incorrect",
+      "higher": "⬆️ Higher / Rarer",
+      "lower": "⬇️ Lower / Less rare"
+    }
+  },
+  "coinStatement": {
+    "title": "Coin Statement",
+    "guestPrompt": "Log in to view your coin statement",
+    "loading": "Loading statement...",
+    "empty": "No transactions found",
+    "earningsByCategory": "Earnings by Category",
+    "recentTransactions": "Recent Transactions",
+    "fullHistory": "Full History",
+    "summary": {
+      "currentBalance": "Current Balance",
+      "totalEarned": "Total Earned",
+      "totalSpent": "Total Spent",
+      "earnedToday": "Earned Today"
+    },
+    "errors": {
+      "loadFailed": "Error loading coin statement"
+    },
+    "reasons": {
+      "easyWin": "Easy Win",
+      "mediumWin": "Medium Win",
+      "hardWin": "Hard Win",
+      "dailyCurrent": "Daily (Same Day)",
+      "dailyRetroactive": "Daily (Retroactive)",
+      "blurWin": "Blur Mode",
+      "textWin": "Text Mode",
+      "hintPurchase": "Hint Purchase",
+      "extraAttempts": "Extra Attempts",
+      "dailyBonus": "Daily Bonus",
+      "speedBonus": "Speed Bonus",
+      "streakBonus": "Streak Bonus"
+    },
+    "transactionCount": {
+      "one": "{{count}} transaction",
+      "other": "{{count}} transactions"
+    }
   }
 }

@@ -20,6 +20,8 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import coinsApi from '../services/coinsApi';
+import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 interface CoinStatementProps {
     userId: string;
@@ -27,6 +29,7 @@ interface CoinStatementProps {
 }
 
 const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark' }) => {
+    const { locale } = useLocale();
     const [statement, setStatement] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -45,18 +48,19 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                 setStatement(data.statement);
             } catch (err: any) {
                 console.error('Error loading coin statement:', err);
-                setError('Erro ao carregar extrato de moedas');
+                setError(t('coinStatement.errors.loadFailed', locale));
             } finally {
                 setLoading(false);
             }
         };
 
         loadStatement();
-    }, [userId]);
+    }, [userId, locale]);
 
     const formatDate = (dateStr: string): string => {
         const date = new Date(dateStr);
-        return date.toLocaleDateString('pt-BR', { 
+        const dateLocale = locale === 'pt' ? 'pt-BR' : 'en-US';
+        return date.toLocaleDateString(dateLocale, { 
             day: '2-digit', 
             month: '2-digit', 
             year: 'numeric' 
@@ -65,7 +69,8 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
 
     const formatDateTime = (dateStr: string): string => {
         const date = new Date(dateStr);
-        return date.toLocaleString('pt-BR', {
+        const dateLocale = locale === 'pt' ? 'pt-BR' : 'en-US';
+        return date.toLocaleString(dateLocale, {
             day: '2-digit',
             month: '2-digit', 
             year: 'numeric',
@@ -91,27 +96,34 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
 
     const getReasonLabel = (reason: string): string => {
         const labelMap: Record<string, string> = {
-            'easy_win': 'Vitória Fácil',
-            'medium_win': 'Vitória Médio',
-            'hard_win': 'Vitória Difícil',
-            'daily_current': 'Diário (Mesmo Dia)',
-            'daily_retroactive': 'Diário (Retroativo)', 
-            'blur_win': 'Modo Blur',
-            'text_win': 'Modo Texto',
-            'hint_purchase': 'Compra de Dica',
-            'extra_attempts': 'Tentativas Extra',
-            'daily_bonus': 'Bônus Diário',
-            'speed_bonus': 'Bônus Velocidade',
-            'streak_bonus': 'Bônus Sequência'
+            'easy_win': t('coinStatement.reasons.easyWin', locale),
+            'medium_win': t('coinStatement.reasons.mediumWin', locale),
+            'hard_win': t('coinStatement.reasons.hardWin', locale),
+            'daily_current': t('coinStatement.reasons.dailyCurrent', locale),
+            'daily_retroactive': t('coinStatement.reasons.dailyRetroactive', locale), 
+            'blur_win': t('coinStatement.reasons.blurWin', locale),
+            'text_win': t('coinStatement.reasons.textWin', locale),
+            'hint_purchase': t('coinStatement.reasons.hintPurchase', locale),
+            'extra_attempts': t('coinStatement.reasons.extraAttempts', locale),
+            'daily_bonus': t('coinStatement.reasons.dailyBonus', locale),
+            'speed_bonus': t('coinStatement.reasons.speedBonus', locale),
+            'streak_bonus': t('coinStatement.reasons.streakBonus', locale)
         };
         return labelMap[reason] || reason;
+    };
+
+    const getTransactionCountLabel = (count: number): string => {
+        if (count === 1) {
+            return t('coinStatement.transactionCount.one', locale).replace('{{count}}', String(count));
+        }
+        return t('coinStatement.transactionCount.other', locale).replace('{{count}}', String(count));
     };
 
     if (!userId || userId === 'guest') {
         return (
             <Box p={3} textAlign="center">
                 <Typography variant="h6" color="text.secondary">
-                    Faça login para ver seu extrato de moedas
+                    {t('coinStatement.guestPrompt', locale)}
                 </Typography>
             </Box>
         );
@@ -122,7 +134,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
             <Box p={4} display="flex" justifyContent="center" alignItems="center" minHeight="300px">
                 <CircularProgress sx={{ color: '#ffd700' }} />
                 <Typography variant="body1" sx={{ ml: 2, color: 'text.secondary' }}>
-                    Carregando extrato...
+                    {t('coinStatement.loading', locale)}
                 </Typography>
             </Box>
         );
@@ -140,7 +152,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
         return (
             <Box p={3} textAlign="center">
                 <Typography variant="h6" color="text.secondary">
-                    Nenhuma transação encontrada
+                    {t('coinStatement.empty', locale)}
                 </Typography>
             </Box>
         );
@@ -161,7 +173,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                     fontSize: { xs: '2rem', sm: '3rem' }
                 }}
             >
-                💰 Extrato de Moedas
+                💰 {t('coinStatement.title', locale)}
             </Typography>
 
             {/* Resumo - Layout em Grid Organizado */}
@@ -187,7 +199,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                             {summary.currentBalance.toLocaleString()}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            Saldo Atual
+                            {t('coinStatement.summary.currentBalance', locale)}
                         </Typography>
                     </CardContent>
                 </Card>
@@ -202,7 +214,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                             +{summary.totalEarned.toLocaleString()}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            Total Ganho
+                            {t('coinStatement.summary.totalEarned', locale)}
                         </Typography>
                     </CardContent>
                 </Card>
@@ -217,7 +229,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                             -{summary.totalSpent.toLocaleString()}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            Total Gasto
+                            {t('coinStatement.summary.totalSpent', locale)}
                         </Typography>
                     </CardContent>
                 </Card>
@@ -232,7 +244,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                             +{summary.earnedToday.toLocaleString()}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            Ganho Hoje
+                            {t('coinStatement.summary.earnedToday', locale)}
                         </Typography>
                     </CardContent>
                 </Card>
@@ -258,7 +270,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                         mb: 3
                     }}
                 >
-                    📊 Ganhos por Categoria
+                    📊 {t('coinStatement.earningsByCategory', locale)}
                 </Typography>
                 <Box 
                     sx={{ 
@@ -316,7 +328,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                         mb: 3
                     }}
                 >
-                    🕐 Transações Recentes
+                    🕐 {t('coinStatement.recentTransactions', locale)}
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {recentTransactions.map((transaction: any, index: number) => (
@@ -389,7 +401,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                             gap: 1
                         }}
                     >
-                        📅 Histórico Completo
+                        📅 {t('coinStatement.fullHistory', locale)}
                     </Typography>
                 </Box>
                 {Object.entries(transactionsByDate)
@@ -419,7 +431,7 @@ const CoinStatement: React.FC<CoinStatementProps> = ({ userId, themeMode = 'dark
                                         {formatDate(date)}
                                     </Typography>
                                     <Chip
-                                        label={`${transactions.length} transaç${transactions.length === 1 ? 'ão' : 'ões'}`}
+                                        label={getTransactionCountLabel(transactions.length)}
                                         size="small"
                                         sx={{
                                             backgroundColor: themeMode === 'dark' ? '#3a4354' : '#e0e0e0',

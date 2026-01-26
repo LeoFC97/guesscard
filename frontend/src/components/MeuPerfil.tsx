@@ -160,31 +160,31 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, the
         </ListItem>
         <ListItem>
           <ListItemText 
-            primary={`Partidas diárias: ${safeStats.totalDaily}`}
+            primary={t('profile.dailyGames', locale).replace('{{count}}', String(safeStats.totalDaily))}
             sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
           />
         </ListItem>
         <ListItem>
           <ListItemText 
-            primary={`Média tentativas (normal): ${safeStats.avgTriesNormal}`}
+            primary={t('profile.avgAttemptsNormal', locale).replace('{{count}}', String(safeStats.avgTriesNormal))}
             sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
           />
         </ListItem>
         <ListItem>
           <ListItemText 
-            primary={`Média tempo (normal): ${safeStats.avgTimeNormal !== '-' ? `${safeStats.avgTimeNormal}s` : '-'}`}
+            primary={t('profile.avgTimeNormal', locale).replace('{{time}}', safeStats.avgTimeNormal !== '-' ? `${safeStats.avgTimeNormal}s` : '-')}
             sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
           />
         </ListItem>
         <ListItem>
           <ListItemText 
-            primary={`Média tentativas (daily): ${safeStats.avgTriesDaily}`}
+            primary={t('profile.avgAttemptsDaily', locale).replace('{{count}}', String(safeStats.avgTriesDaily))}
             sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
           />
         </ListItem>
         <ListItem>
           <ListItemText 
-            primary={`Média tempo (daily): ${safeStats.avgTimeDaily !== '-' ? `${safeStats.avgTimeDaily}s` : '-'}`}
+            primary={t('profile.avgTimeDaily', locale).replace('{{time}}', safeStats.avgTimeDaily !== '-' ? `${safeStats.avgTimeDaily}s` : '-')}
             sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#e0e0e0' : '#23283a' } }}
           />
         </ListItem>
@@ -204,7 +204,7 @@ const MeuPerfil: React.FC<PerfilProps> = ({ userId, name, email, dailyDates, the
           <List dense>
             <ListItem>
               <ListItemText 
-                primary={`💰 ${t('profile.balance', locale)} ${coinStats.balance.toLocaleString()} moedas`}
+                primary={`💰 ${t('profile.balance', locale)} ${coinStats.balance.toLocaleString()} ${t('profile.coinUnit', locale)}`}
                 sx={{ '& .MuiListItemText-primary': { color: themeMode === 'dark' ? '#ffd700' : '#ff9800', fontWeight: 600 } }}
               />
             </ListItem>

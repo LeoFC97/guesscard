@@ -13,6 +13,10 @@ const AUTH0_AUDIENCE = process.env.REACT_APP_AUTH0_AUDIENCE || '';
 
 const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const { locale } = useLocale();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   // Função para trocar o código de autorização pelo token
   React.useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -39,16 +43,12 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           // Limpa o código da URL
           window.history.replaceState({}, document.title, window.location.pathname);
         } catch (err: any) {
-          setError(err.message || 'Erro desconhecido');
+          setError(err.message || t('login.unknownError', locale || 'pt'));
         }
       };
       fetchToken();
     }
   }, []);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +75,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       const payload = id_token ? JSON.parse(atob(id_token.split('.')[1])) : {};
       onLoginSuccess(access_token, payload.sub || '', payload.name || '', payload.email || email);
     } catch (err: any) {
-      setError(err.message || 'Erro desconhecido');
+      setError(err.message || t('login.unknownError', locale || 'pt'));
     } finally {
       setLoading(false);
     }
@@ -89,7 +89,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   const handleGuest = () => {
-    onLoginSuccess('guest', 'guest', 'Visitante', '');
+    onLoginSuccess('guest', 'guest', t('login.guestName', locale || 'pt'), '');
   };
 
   return (

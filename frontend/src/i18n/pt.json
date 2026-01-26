@@ -17,15 +17,17 @@
   },
   "global": {
     "switchToEnglish": "Switch to English",
-    "switchToPortuguese": "Mudar para Português"
+    "switchToPortuguese": "Mudar para Português",
+    "lightMode": "Modo claro",
+    "darkMode": "Modo escuro"
   },
   "start": {
     "title": "Guess the card",
     "difficulty": { "easy": "Fácil", "medium": "Intermediário", "hard": "Difícil" },
     "difficultyNote": "A dificuldade escolhida vale para todos os modos, inclusive o modo Blur!",
     "startNewGame": "Iniciar Novo Jogo",
-    "textMode": { "title": "📜 Modo Texto", "description": "Adivinhe a carta pelo seu texto e habilidades! O nome fica censurado.", "play": "📖 Jogar Modo Texto" },
-    "blurMode": { "title": "🔍 Modo Blur", "description": "A carta começa levemente borrada e vai ficando mais nítida a cada palpite!", "play": "🎯 Jogar Modo Blur" },
+    "textMode": { "title": "📜 Modo Texto", "description": "Adivinhe a carta pelo seu texto e habilidades! O nome fica censurado.", "play": "📖 Jogar Modo Texto", "challengeNote": "Desafio para conhecedores das mecânicas de MTG!" },
+    "blurMode": { "title": "🔍 Modo Blur", "description": "A carta começa levemente borrada e vai ficando mais nítida a cada palpite!", "play": "🎯 Jogar Modo Blur", "note": "Sem limite de tentativas - o blur reduz 10% a cada palpite." },
     "dailyMode": { "title": "Modo Carta do Dia", "chooseDate": "Escolha uma data para jogar:", "dateLabel": "Data do desafio", "playWithDate": "Jogar carta do dia ({{date}})", "futureDateHelper": "Não é possível selecionar datas futuras" }
   },
   "errors": {
@@ -36,7 +38,10 @@
     "dailyNotDefined": "Nenhuma carta foi definida para o dia {{date}}.",
     "dailyStartError": "Erro ao iniciar modo diário",
     "futureDate": "Não é possível jogar cartas do futuro. Escolha uma data de hoje ou anterior.",
-    "connectionError": "Erro de conexão. Verifique sua internet e tente novamente."
+    "connectionError": "Erro de conexão. Verifique sua internet e tente novamente.",
+    "gameNotStarted": "Jogo não iniciado.",
+    "guessFailed": "Erro ao consultar a API.",
+    "hintRequestFailed": "Erro ao solicitar dica."
   },
   "textcard": {
     "revealedTitle": "🎉 Carta Revelada!",
@@ -50,7 +55,8 @@
     "textEmpty": "Esta carta não possui texto de habilidade.",
     "hintTip": "💡 Dica: Use as informações de tipo, custo de mana e habilidades para adivinhar a carta!",
     "congrats": "Parabéns! Você adivinhou baseado no texto da carta!",
-    "completed": "Modo Texto concluído com sucesso! ✨"
+    "completed": "Modo Texto concluído com sucesso! ✨",
+    "censoredWarning": "Referências ao nome da carta foram censuradas com █"
   },
   "blurred": {
     "revealedTitle": "🎉 Carta Revelada!",
@@ -64,7 +70,8 @@
     "submit": "Entrar",
     "social": "Entrar com rede social",
     "guest": "Jogar como visitante",
-    "unknownError": "Erro desconhecido"
+    "unknownError": "Erro desconhecido",
+    "guestName": "Visitante"
   },
   "profile": {
     "title": "Meu Perfil",
@@ -83,7 +90,13 @@
     "totalEarned": "Total ganho:",
     "totalSpent": "Total gasto:",
     "earnedToday": "Ganho hoje:",
-    "spentToday": "Gasto hoje:"
+    "spentToday": "Gasto hoje:",
+    "dailyGames": "Partidas diárias: {{count}}",
+    "avgAttemptsNormal": "Média tentativas (normal): {{count}}",
+    "avgTimeNormal": "Média tempo (normal): {{time}}",
+    "avgAttemptsDaily": "Média tentativas (daily): {{count}}",
+    "avgTimeDaily": "Média tempo (daily): {{time}}",
+    "coinUnit": "moedas"
   },
   "coin": {
     "loading": "Carregando moedas...",
@@ -96,9 +109,114 @@
     "time": "Tempo:",
     "playAgain": "Jogar Novamente"
   },
+  "app": {
+    "guestPlaying": "Você está jogando como visitante. Nenhum dado de perfil será salvo."
+  },
   "guess": {
     "placeholder": "Nome da carta",
     "submit": "Enviar",
     "sending": "Enviando..."
+  },
+  "home_extra": {
+    "noTextAvailable": "Nenhum texto disponível para esta carta.",
+    "noFlavorAvailable": "Nenhum flavor disponível para esta carta."
+  },
+  "leaderboards": {
+    "title": "Rankings",
+    "tabs": {
+      "normal": "Jogos Normais",
+      "daily": "Jogos Diários",
+      "blur": "Modo Blur",
+      "blurSpeed": "Blur - Velocidade",
+      "blurPerfect": "Blur - Perfeitos",
+      "speed": "Melhores Tempos",
+      "perfect": "Menos Tentativas"
+    },
+    "headers": {
+      "position": "Posição",
+      "player": "Jogador",
+      "games": "Jogos",
+      "avgAttempts": "Média Tentativas",
+      "avgTime": "Média Tempo",
+      "bestTime": "Melhor Tempo",
+      "bestAttempts": "Melhores Tentativas",
+      "daysPlayed": "Dias Jogados",
+      "currentStreak": "Sequência Atual",
+      "longestStreak": "Maior Sequência",
+      "attempts": "Tentativas",
+      "totalGames": "Total Jogos",
+      "date": "Data",
+      "blurGames": "Jogos Blur",
+      "avgBlur": "Média Blur",
+      "perfectGames": "Jogos Perfeitos",
+      "time": "Tempo"
+    },
+    "blurInfo": "Rankings do Modo Blur - Cartas que ficam mais nítidas a cada palpite!"
+  },
+  "history": {
+    "title": "Palpites",
+    "columns": {
+      "card": "Carta",
+      "color": "Cor",
+      "type": "Tipo",
+      "cmc": "CMC",
+      "edition": "Edição",
+      "rarity": "Raridade",
+      "artist": "Artista"
+    },
+    "labels": {
+      "color": "Cor",
+      "type": "Tipo",
+      "cmc": "CMC",
+      "edition": "Edição",
+      "rarity": "Raridade",
+      "artist": "Artista"
+    },
+    "emptyLong": "Nenhum palpite ainda. Faça seu primeiro palpite!",
+    "emptyShort": "Nenhum palpite ainda.",
+    "legend": {
+      "title": "Ícones:",
+      "correct": "✔️ Correto",
+      "partial": "🟡 Parcial",
+      "incorrect": "❌ Incorreto",
+      "higher": "⬆️ Maior / Mais raro",
+      "lower": "⬇️ Menor / Menos raro"
+    }
+  },
+  "coinStatement": {
+    "title": "Extrato de Moedas",
+    "guestPrompt": "Faça login para ver seu extrato de moedas",
+    "loading": "Carregando extrato...",
+    "empty": "Nenhuma transação encontrada",
+    "earningsByCategory": "Ganhos por Categoria",
+    "recentTransactions": "Transações Recentes",
+    "fullHistory": "Histórico Completo",
+    "summary": {
+      "currentBalance": "Saldo Atual",
+      "totalEarned": "Total Ganho",
+      "totalSpent": "Total Gasto",
+      "earnedToday": "Ganho Hoje"
+    },
+    "errors": {
+      "loadFailed": "Erro ao carregar extrato de moedas"
+    },
+    "reasons": {
+      "easyWin": "Vitória Fácil",
+      "mediumWin": "Vitória Média",
+      "hardWin": "Vitória Difícil",
+      "dailyCurrent": "Diário (Mesmo Dia)",
+      "dailyRetroactive": "Diário (Retroativo)",
+      "blurWin": "Modo Blur",
+      "textWin": "Modo Texto",
+      "hintPurchase": "Compra de Dica",
+      "extraAttempts": "Tentativas Extra",
+      "dailyBonus": "Bônus Diário",
+      "speedBonus": "Bônus Velocidade",
+      "streakBonus": "Bônus Sequência"
+    },
+    "transactionCount": {
+      "one": "{{count}} transação",
+      "other": "{{count}} transações"
+    }
   }
 }

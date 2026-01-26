@@ -1,6 +1,7 @@
 import React from 'react';
 import { IconButton, Tooltip, Box } from '@mui/material';
 import { useLocale } from '../contexts/LocaleContext';
+import { t } from '../utils/translate';
 
 const LanguageToggle: React.FC = () => {
   const { locale, setLocale } = useLocale();
@@ -8,7 +9,7 @@ const LanguageToggle: React.FC = () => {
   const next = locale === 'pt' ? 'en' : 'pt';
 
   return (
-    <Tooltip title={locale === 'pt' ? 'Switch to English' : 'Mudar para Português'}>
+    <Tooltip title={locale === 'pt' ? t('global.switchToEnglish', locale) : t('global.switchToPortuguese', locale)}>
       <IconButton
         color="secondary"
         onClick={() => setLocale(next as 'pt' | 'en')}

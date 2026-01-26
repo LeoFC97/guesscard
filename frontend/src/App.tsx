@@ -15,6 +15,8 @@ import LanguageToggle from './components/LanguageToggle';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { fetchUserProfile } from './services/mtgApi';
 import { CoinsProvider } from './contexts/CoinsContext';
+import { useLocale } from './contexts/LocaleContext';
+import { t } from './utils/translate';
 
 const getTheme = (mode: 'light' | 'dark') => createTheme({
     breakpoints: {
@@ -146,6 +148,7 @@ const domain = process.env.REACT_APP_AUTH0_DOMAIN || '';
 const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID || '';
 
 const App: React.FC = () => {
+    const { locale } = useLocale();
     // Estado do tema
     const [themeMode, setThemeMode] = useState<'light' | 'dark'>(() => {
         // Sempre inicia como dark
@@ -226,7 +229,7 @@ const App: React.FC = () => {
                         : 'linear-gradient(135deg, #e3e6f3 0%, #f5f5f5 100%)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative'
                 }}>
-                    <Tooltip title={themeMode === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+                    <Tooltip title={themeMode === 'dark' ? t('global.lightMode', locale) : t('global.darkMode', locale)}>
                         <IconButton
                             sx={{ position: 'absolute', top: 16, right: 24, zIndex: 2100 }}
                             color="secondary"
@@ -254,7 +257,7 @@ const App: React.FC = () => {
                     : 'linear-gradient(135deg, #e3e6f3 0%, #f5f5f5 100%)',
                 position: 'relative'
             }}>
-                <Tooltip title={themeMode === 'dark' ? 'Modo claro' : 'Modo escuro'}>
+                <Tooltip title={themeMode === 'dark' ? t('global.lightMode', locale) : t('global.darkMode', locale)}>
                     <IconButton
                         sx={{ 
                             position: 'fixed', 
@@ -302,7 +305,7 @@ const App: React.FC = () => {
                 <Dialog open={perfilOpen} onClose={() => setPerfilOpen(false)}>
                     {isGuest ? (
                         <Box minWidth={320} maxWidth={400} p={3} borderRadius={3} bgcolor="background.paper" boxShadow={4} display="flex" alignItems="center" justifyContent="center" height={200}>
-                            <span>Você está jogando como visitante. Nenhum dado de perfil será salvo.</span>
+                            <span>{t('app.guestPlaying', locale)}</span>
                         </Box>
                     ) : (
                         <MeuPerfil userId={userId} name={name} email={email} dailyDates={perfilStats.dailyDates || []} stats={perfilStats.stats || {}} themeMode={themeMode} />
