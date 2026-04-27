@@ -12,6 +12,12 @@
     "showEffectHint": "Mostrar Dica (Efeito)",
     "flavorHintTooltip": "A dica de flavor ficará disponível após {{count}} erros",
     "effectHintTooltip": "A dica do efeito ficará disponível após {{count}} erros",
+    "flavorHintShort": "🌸 Flavor",
+    "effectHintShort": "✨ Efeito",
+    "flavorHintLockedShort": "🔒 Flavor ({{count}})",
+    "effectHintLockedShort": "🔒 Efeito ({{count}})",
+    "flavorUnavailable": "Esta carta não tem flavor",
+    "effectUnavailable": "Esta carta não tem texto",
     "backToMenu": "Voltar ao Menu",
     "viewLeaderboards": "Ver Rankings"
   },
@@ -20,6 +26,18 @@
     "switchToPortuguese": "Mudar para Português",
     "lightMode": "Modo claro",
     "darkMode": "Modo escuro"
+  },
+  "shell": {
+    "tabs": {
+      "classic": "Clássico",
+      "daily": "Diário",
+      "text": "Texto",
+      "blur": "Blur",
+      "leaderboards": "Rankings"
+    },
+    "tagline": "Adivinhe a carta de Magic do dia por cor, tipo, custo e mais.",
+    "guessesCount": "{{count}} palpites",
+    "guessesCountOne": "1 palpite"
   },
   "start": {
     "title": "Guess the card",

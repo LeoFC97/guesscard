@@ -231,7 +231,7 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
                                 <Typography variant="body2" fontWeight={600}>{entry.name}</Typography>
                             </TableCell>
                             <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
-                                <Chip label={formatTime(entry.bestTime)} color="error" size="small" />
+                                <Chip label={formatTime(entry.bestTime)} color="info" size="small" />
                             </TableCell>
                             <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{entry.bestAttempts}</TableCell>
                             <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{entry.totalGames}</TableCell>
@@ -339,7 +339,7 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
                                 <Typography variant="body2" fontWeight={600}>{entry.name}</Typography>
                             </TableCell>
                             <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>
-                                <Chip label={formatTime(entry.fastestTime)} color="error" size="small" />
+                                <Chip label={formatTime(entry.fastestTime)} color="info" size="small" />
                             </TableCell>
                             <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{formatTime(Math.round(entry.avgTime))}</TableCell>
                             <TableCell sx={{ color: isDark ? '#fff' : '#000' }}>{entry.games}</TableCell>
@@ -384,18 +384,28 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ themeMode = 'dark' }) => {
     );
 
     return (
-        <Box sx={{ p: 3, backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5', minHeight: '100vh' }}>
-            <Typography variant="h4" gutterBottom sx={{ color: isDark ? '#fff' : '#000', textAlign: 'center', mb: 4 }}>
+        <Box sx={{ p: { xs: 1, sm: 3 }, backgroundColor: 'transparent', minHeight: '100vh' }}>
+            <Typography variant="h4" gutterBottom sx={{ color: isDark ? '#fff' : '#000', textAlign: 'center', mb: { xs: 2, sm: 4 }, fontSize: { xs: '1.5rem', sm: '2rem' }, fontWeight: 200, letterSpacing: 0.5 }}>
                 🏆 {t('leaderboards.title', locale)} {selectedType.includes('blur') && '🔍'}
             </Typography>
 
-            <Card sx={{ mb: 3, backgroundColor: isDark ? '#2a2a2a' : '#fff' }}>
-                <CardContent>
-                    <Tabs 
-                        value={selectedType} 
+            <Card sx={{ mb: 3, backgroundColor: isDark ? '#16242c' : '#fff', border: '1px solid #2d3c45' }}>
+                <CardContent sx={{ p: { xs: 1, sm: 2 }, '&:last-child': { pb: { xs: 1, sm: 2 } } }}>
+                    <Tabs
+                        value={selectedType}
                         onChange={(_, newValue) => setSelectedType(newValue)}
-                        centered
-                        sx={{ mb: 2 }}
+                        variant="scrollable"
+                        scrollButtons="auto"
+                        allowScrollButtonsMobile
+                        sx={{
+                            mb: 2,
+                            '& .MuiTab-root': {
+                                minWidth: { xs: 88, sm: 110 },
+                                px: { xs: 1, sm: 2 },
+                                fontSize: { xs: '0.72rem', sm: '0.875rem' },
+                                textTransform: 'none',
+                            },
+                        }}
                     >
                         <Tab label={t('leaderboards.tabs.normal', locale)} value="normal" icon={<TrophyIcon />} />
                         <Tab label={t('leaderboards.tabs.daily', locale)} value="daily" icon={<DailyIcon />} />

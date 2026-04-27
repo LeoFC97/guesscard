@@ -98,17 +98,18 @@ app.listen(PORT, async () => {
       'Wasteland',
       'Yawgmoth\'s Will',
     ];
-    const startDate = new Date('2025-10-16');
-    const endDate = new Date('2026-02-25');
     const seededDates = new Set(dailyCards.map(({ date }) => date));
     const toIsoDate = (date: Date) => date.toISOString().slice(0, 10);
-    let cardIndex = 0;
     const dayMs = 24 * 60 * 60 * 1000;
-    for (let cursor = new Date(startDate); cursor <= endDate; cursor = new Date(cursor.getTime() + dayMs)) {
+
+    // Always extend the seed window forward from the earliest historical date
+    // through today + 180 days, so the daily mode never returns 404 for "today".
+    const startDate = new Date('2025-10-16');
+    const horizonDate = new Date(Date.now() + 180 * dayMs);
+    let cardIndex = 0;
+    for (let cursor = new Date(startDate); cursor <= horizonDate; cursor = new Date(cursor.getTime() + dayMs)) {
       const date = toIsoDate(cursor);
-      if (seededDates.has(date)) {
-        continue;
-      }
+      if (seededDates.has(date)) continue;
       const cardName = extraCards[cardIndex % extraCards.length];
       dailyCards.push({ date, cardName });
       cardIndex += 1;
@@ -116,5 +117,5 @@ app.listen(PORT, async () => {
     for (const { date, cardName } of dailyCards) {
       await dailyCardRepo.setDailyCard(date, cardName);
     }
-    console.log('Daily cards seeded');
+    console.log(`Daily cards seeded (${dailyCards.length} entries through ${toIsoDate(horizonDate)})`);
 });

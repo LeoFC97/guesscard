@@ -12,6 +12,12 @@
     "showEffectHint": "Show Hint (Effect)",
     "flavorHintTooltip": "Flavor hint will be available after {{count}} mistakes",
     "effectHintTooltip": "Effect hint will be available after {{count}} mistakes",
+    "flavorHintShort": "🌸 Flavor",
+    "effectHintShort": "✨ Effect",
+    "flavorHintLockedShort": "🔒 Flavor ({{count}})",
+    "effectHintLockedShort": "🔒 Effect ({{count}})",
+    "flavorUnavailable": "No flavor on this card",
+    "effectUnavailable": "No rules text on this card",
     "backToMenu": "Back to Menu"
   },
   "global": {
@@ -19,6 +25,18 @@
     "switchToPortuguese": "Switch to Portuguese",
     "lightMode": "Light mode",
     "darkMode": "Dark mode"
+  },
+  "shell": {
+    "tabs": {
+      "classic": "Classic",
+      "daily": "Daily",
+      "text": "Text",
+      "blur": "Blur",
+      "leaderboards": "Leaderboards"
+    },
+    "tagline": "Daily guess MTG cards by colors, type, mana cost and more.",
+    "guessesCount": "{{count}} guesses",
+    "guessesCountOne": "1 guess"
   },
   "start": {
     "title": "Guess the card",

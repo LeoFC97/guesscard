@@ -84,8 +84,8 @@ export async function processGuessCard(params: GuessCardParams) {
         if (!dailyCard) {
             throw new Error(`No daily card set for ${gameDate}.`);
         }
-        const cards = await scryfallService.fetchCardByParam('name', dailyCard.cardName);
-        targetCard = cards.length > 0 ? scryfallService.convertToLegacyFormat(cards[0]) : null;
+        const raw = await scryfallService.fetchCanonicalCardByName(dailyCard.cardName);
+        targetCard = raw ? scryfallService.convertToLegacyFormat(raw) : null;
         if (!targetCard) {
             throw new Error(`Could not fetch card: ${dailyCard.cardName}`);
         }
@@ -111,8 +111,10 @@ export async function processGuessCard(params: GuessCardParams) {
     if (!guess || typeof guess !== 'string') {
         throw new Error('Guess must be a string (card name)');
     }
-    const guessedCards = await scryfallService.fetchCardByParam('name', guess);
-    const guessedCard = guessedCards.length > 0 ? scryfallService.convertToLegacyFormat(guessedCards[0]) : null;
+    // For the GUESSED card we also use canonical so a user typing "Demonic Tutor"
+    // matches a target stored as "Demonic Tutor" rather than the rebalanced face name.
+    const rawGuess = await scryfallService.fetchCanonicalCardByName(guess);
+    const guessedCard = rawGuess ? scryfallService.convertToLegacyFormat(rawGuess) : null;
     if (!guessedCard) {
         throw new Error('Guessed card not found');
     }

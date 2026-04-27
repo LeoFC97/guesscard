@@ -94,8 +94,9 @@ export class MtgController {
     public static async getDailyPlayedDates(req: Request, res: Response): Promise<void> {
         try {
             const { userId } = req.params;
-            if (!userId) {
-                res.status(400).json({ message: 'userId obrigatório' });
+            // Guest sessions have no persisted matches; return empty list rather than 404.
+            if (!userId || userId === 'guest') {
+                res.status(200).json({ dates: [] });
                 return;
             }
             const dates = await dailyMatchRepo.getPlayedDates(userId);
@@ -143,8 +144,9 @@ export class MtgController {
                 res.status(404).json({ message: 'Nenhuma carta definida para este dia.' });
                 return;
             }
-            const cards = await (new ScryfallService()).fetchCardByParam('name', dailyCardDoc.cardName);
-            const card = cards.length > 0 ? (new ScryfallService()).convertToLegacyFormat(cards[0]) : null;
+            const svc = new ScryfallService();
+            const raw = await svc.fetchCanonicalCardByName(dailyCardDoc.cardName);
+            const card = raw ? svc.convertToLegacyFormat(raw) : null;
             if (!card) {
                 res.status(500).json({ message: 'Could not fetch card for this day' });
                 return;
@@ -230,15 +232,16 @@ export class MtgController {
             }
             const randomIndex = Math.floor(Math.random() * cardList.length);
             const cardName = cardList[randomIndex];
-            const cards = await (new ScryfallService()).fetchCardByParam('name', cardName);
-            const targetCard = cards.length > 0 ? (new ScryfallService()).convertToLegacyFormat(cards[0]) : null;
+            const svc = new ScryfallService();
+            const raw = await svc.fetchCanonicalCardByName(cardName);
+            const targetCard = raw ? svc.convertToLegacyFormat(raw) : null;
             if (!targetCard) {
                 res.status(500).json({ message: 'Could not pick a new card' });
                 return;
             }
             const gameId = randomUUID();
-            games[gameId] = { 
-                ...targetCard, 
+            games[gameId] = {
+                ...targetCard,
                 difficulty,
                 gameMode: 'normal',
                 startTime: Date.now()
@@ -264,8 +267,9 @@ export class MtgController {
             }
             const randomIndex = Math.floor(Math.random() * cardList.length);
             const cardName = cardList[randomIndex];
-            const cards = await (new ScryfallService()).fetchCardByParam('name', cardName);
-            const targetCard = cards.length > 0 ? (new ScryfallService()).convertToLegacyFormat(cards[0]) : null;
+            const svc = new ScryfallService();
+            const raw = await svc.fetchCanonicalCardByName(cardName);
+            const targetCard = raw ? svc.convertToLegacyFormat(raw) : null;
             if (!targetCard) {
                 res.status(500).json({ message: 'Could not pick a new card' });
                 return;
@@ -314,8 +318,9 @@ export class MtgController {
             }
             const randomIndex = Math.floor(Math.random() * cardList.length);
             const cardName = cardList[randomIndex];
-            const cards = await (new ScryfallService()).fetchCardByParam('name', cardName);
-            const targetCard = cards.length > 0 ? (new ScryfallService()).convertToLegacyFormat(cards[0]) : null;
+            const svc = new ScryfallService();
+            const raw = await svc.fetchCanonicalCardByName(cardName);
+            const targetCard = raw ? svc.convertToLegacyFormat(raw) : null;
             if (!targetCard) {
                 res.status(500).json({ message: 'Could not pick a new card' });
                 return;
@@ -326,21 +331,21 @@ export class MtgController {
                 ...targetCard, 
                 difficulty,
                 gameMode: 'blur',
-                maxBlurAttempts: -1, // Sem limite de tentativas
-                currentBlurAttempts: 0, // Rastrear tentativas atuais do modo blur
-                initialBlur: 20, // Começa com blur mais fraco (20px)
-                blurReduction: 0.25, // Reduz 15% a cada palpite
-                startTime: Date.now() // Timestamp do início do jogo
+                maxBlurAttempts: -1,
+                currentBlurAttempts: 0,
+                initialBlur: 8, // px — heavy enough to obscure detail, light enough to keep silhouette
+                blurReduction: 0.18, // ~18% reduction per guess
+                startTime: Date.now()
             };
-            res.status(200).json({ 
-                message: 'New blur game started', 
-                cardName: targetCard.name, 
+            res.status(200).json({
+                message: 'New blur game started',
+                cardName: targetCard.name,
                 gameId,
                 gameMode: 'blur',
                 cardImage: targetCard.imageUrl || targetCard.image_uris?.normal,
-                maxBlurAttempts: -1, // Sem limite
-                initialBlur: 20, // Blur inicial mais fraco
-                blurReduction: 0.25 // Redução de 15% por palpite
+                maxBlurAttempts: -1,
+                initialBlur: 8,
+                blurReduction: 0.18
             });
         } catch (error) {
             res.status(500).json({ message: 'Error starting new blur game', error });

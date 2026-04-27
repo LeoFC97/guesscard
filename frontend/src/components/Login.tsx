@@ -93,8 +93,29 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight={300}>
-      <Typography variant="h5" mb={2}>{t('login.title', locale || 'pt')}</Typography>
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      sx={{
+        bgcolor: '#16242c',
+        border: '1px solid #2d3c45',
+        borderRadius: 3,
+        p: { xs: 2.5, sm: 5 },
+        width: { xs: 'calc(100vw - 32px)', sm: 380 },
+        maxWidth: 380,
+        mx: { xs: 2, sm: 0 },
+        boxShadow: '0 16px 40px rgba(0,0,0,0.5)',
+      }}
+    >
+      <Box sx={{
+        width: 48, height: 48, borderRadius: 2,
+        background: 'linear-gradient(135deg, #08c3bd, #06a7ac)',
+        color: '#062227', display: 'grid', placeItems: 'center',
+        fontWeight: 800, fontSize: '1.4rem', mb: 2,
+      }}>G</Box>
+      <Typography variant="h5" mb={2} sx={{ fontWeight: 200, letterSpacing: 0.5 }}>{t('login.title', locale || 'pt')}</Typography>
       <form onSubmit={handleLogin} style={{ width: '100%', maxWidth: 320 }}>
         <TextField
           label={t('login.email', locale || 'pt')}

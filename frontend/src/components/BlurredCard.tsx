@@ -1,5 +1,4 @@
-import React from 'react';
-import { Box, Typography } from '@mui/material';
+import React, { useState } from 'react';
 import { useLocale } from '../contexts/LocaleContext';
 import { t } from '../utils/translate';
 
@@ -7,101 +6,74 @@ interface BlurredCardProps {
     imageUrl: string;
     attempts: number;
     maxAttempts: number;
-    cardName?: string; // Para debug ou quando acertar
-    showCard?: boolean; // Se deve mostrar a carta sem blur (quando acerta)
-    blurLevel?: number; // Nível de blur calculado pelo backend
+    cardName?: string;
+    showCard?: boolean;
+    blurLevel?: number;
 }
 
-const BlurredCard: React.FC<BlurredCardProps> = ({ 
-    imageUrl, 
-    attempts, 
-    maxAttempts, 
-    cardName, 
-    showCard = false,
-    blurLevel
-}) => {
-    // Calcular o nível de blur baseado nas tentativas ou usar valor do backend
-    const calculateBlur = (): number => {
-        if (showCard) return 0; // Sem blur quando acerta
-        
-        // Se o backend forneceu blurLevel, usar esse valor
-        if (typeof blurLevel === 'number') {
-            return blurLevel;
-        }
-        
-        // Fallback: novo cálculo com blur inicial mais fraco e redução de 10%
-        const initialBlur = 5; // Blur inicial mais fraco
-        const blurReduction = 0.10; // Redução de 10% por tentativa
-        const currentBlur = Math.max(0, initialBlur * Math.pow(1 - blurReduction, attempts));
-        
-        return currentBlur;
-    };
-
-    const blurAmount = calculateBlur();
-
+const BlurredCard: React.FC<BlurredCardProps> = ({ imageUrl, attempts, cardName, showCard = false, blurLevel }) => {
     const { locale } = useLocale();
+    const [loaded, setLoaded] = useState(false);
+
+    const blurAmount = (() => {
+        if (showCard) return 0;
+        if (typeof blurLevel === 'number') return blurLevel;
+        const initial = 5;
+        return Math.max(0, initial * Math.pow(0.9, attempts));
+    })();
 
     return (
-        <Box 
-            sx={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center',
-                mb: 3
-            }}
-        >
-            <Typography variant="h6" gutterBottom color="primary">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+            <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--gc-accent)', fontWeight: 700 }}>
                 {showCard ? t('blurred.revealedTitle', locale) : t('blurred.guessTitle', locale)}
-            </Typography>
-            
-            <Box
-                sx={{
+            </div>
+            <div
+                style={{
                     position: 'relative',
-                    borderRadius: 3,
+                    borderRadius: 16,
                     overflow: 'hidden',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                    transition: 'all 0.5s ease-in-out',
+                    boxShadow: '0 16px 40px rgba(0,0,0,0.5)',
+                    background: 'var(--gc-bg-1)',
+                    border: '1px solid var(--gc-border)',
+                    padding: 8,
+                    width: 'min(360px, 86vw)',
+                    aspectRatio: '5 / 7',
                 }}
             >
-                    <img
-                        src={imageUrl}
-                        alt={showCard ? cardName : t('blurred.mysteryAlt', locale)}
-                        role="img"
-                        tabIndex={0}
+                {/* Skeleton placeholder while the image loads */}
+                {!loaded && (
+                    <div
+                        aria-hidden
                         style={{
-                            width: 'min(420px, 90vw)',
-                            height: 'auto',
-                            display: 'block',
-                            filter: `blur(${blurAmount}px)`,
-                            transition: 'filter 450ms cubic-bezier(.2,.8,.2,1), transform 450ms ease',
-                            transform: showCard ? 'scale(1.03)' : 'scale(1)'
+                            position: 'absolute',
+                            inset: 8,
+                            borderRadius: 8,
+                            background: 'linear-gradient(110deg, var(--gc-bg-2) 30%, var(--gc-bg-3) 50%, var(--gc-bg-2) 70%)',
+                            backgroundSize: '200% 100%',
+                            animation: 'gcShimmer 1.4s ease-in-out infinite',
                         }}
                     />
-                
-                {/* Overlay com informações do blur */}
-                {!showCard && (
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            background: 'linear-gradient(transparent, rgba(0,0,0,0.8))',
-                            color: '#fff',
-                            p: 1,
-                            textAlign: 'center'
-                        }}
-                    >
-                    </Box>
                 )}
-            </Box>
-
+                <img
+                    src={imageUrl}
+                    alt={showCard ? cardName : t('blurred.mysteryAlt', locale)}
+                    onLoad={() => setLoaded(true)}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                        borderRadius: 8,
+                        filter: `blur(${blurAmount}px)`,
+                        transition: 'filter 480ms cubic-bezier(.2,.8,.2,1), opacity 240ms ease',
+                        opacity: loaded ? 1 : 0,
+                    }}
+                />
+            </div>
             {showCard && cardName && (
-                <Typography variant="h5" sx={{ mt: 2, color: 'success.main', fontWeight: 'bold' }}>
-                    {cardName}
-                </Typography>
+                <div style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--gc-good-strong)' }}>{cardName}</div>
             )}
-        </Box>
+        </div>
     );
 };
 

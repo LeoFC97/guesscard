@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Button, CircularProgress } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import { requestHint } from '../services/mtgApi';
 import { useCoins } from '../contexts/CoinsContext';
 import { useLocale } from '../contexts/LocaleContext';
@@ -9,303 +9,143 @@ interface TextCardProps {
     cardText: string;
     cardType: string;
     manaCost: number;
-    cardName?: string; // Para debug ou quando acertar
-    showCard?: boolean; // Se deve mostrar a carta sem censura (quando acerta)
-    hasCensoredContent?: boolean; // Se o texto contém conteúdo censurado
-    gameId?: string; // ID do jogo para solicitar dicas
-    userId?: string; // ID do usuário para cobrar moedas
-    showManaCost?: boolean; // Se deve mostrar o custo de mana
-    showCardType?: boolean; // Se deve mostrar o tipo da carta
-    onHintPurchased?: () => void; // Callback quando uma dica é comprada
+    cardName?: string;
+    showCard?: boolean;
+    hasCensoredContent?: boolean;
+    gameId?: string;
+    userId?: string;
+    showManaCost?: boolean;
+    showCardType?: boolean;
+    onHintPurchased?: () => void;
 }
 
-const TextCard: React.FC<TextCardProps> = ({ 
-    cardText,
-    cardType,
-    manaCost,
-    cardName, 
-    showCard = false,
-    hasCensoredContent = false,
-    gameId,
-    userId,
-    showManaCost = false,
-    showCardType = false,
-    onHintPurchased
+const TextCard: React.FC<TextCardProps> = ({
+    cardText, cardType, manaCost, cardName,
+    showCard = false, hasCensoredContent = false,
+    gameId, userId, showManaCost = false, showCardType = false,
+    onHintPurchased,
 }) => {
-    const [loadingManaCost, setLoadingManaCost] = useState(false);
-    const [loadingCardType, setLoadingCardType] = useState(false);
+    const [loadingMana, setLoadingMana] = useState(false);
+    const [loadingType, setLoadingType] = useState(false);
     const { refreshBalance, balance } = useCoins();
     const { locale } = useLocale();
 
-    // Função para censurar o nome da carta no texto
     const censorCardName = (text: string, name: string): string => {
         if (!name || !text) return text;
-        
-        // Substituir o nome exato da carta por <card_name>
         const regex = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
-        return text.replace(regex, '<card_name>');
+        return text.replace(regex, '█████');
     };
 
-    // Função para solicitar dica do custo de mana
-    const handleManaCostHint = async () => {
-        if (!gameId || !userId || showManaCost) return;
-
-        setLoadingManaCost(true);
+    const handleHint = async (which: 'mana_cost' | 'card_type') => {
+        if (!gameId || !userId) return;
+        const setLoading = which === 'mana_cost' ? setLoadingMana : setLoadingType;
+        setLoading(true);
         try {
-            await requestHint(gameId, 'mana_cost', userId);
-            await refreshBalance(); // Atualizar saldo de moedas
-            onHintPurchased?.(); // Callback para atualizar o estado do jogo
+            await requestHint(gameId, which, userId);
+            await refreshBalance();
+            onHintPurchased?.();
         } catch (error) {
-            console.error('Erro ao solicitar dica de custo de mana:', error);
             alert(error instanceof Error ? error.message : t('errors.hintRequestFailed', locale));
         } finally {
-            setLoadingManaCost(false);
+            setLoading(false);
         }
     };
 
-    // Função para solicitar dica do tipo da carta
-    const handleCardTypeHint = async () => {
-        if (!gameId || !userId || showCardType) return;
-
-        setLoadingCardType(true);
-        try {
-            await requestHint(gameId, 'card_type', userId);
-            await refreshBalance(); // Atualizar saldo de moedas
-            onHintPurchased?.(); // Callback para atualizar o estado do jogo
-        } catch (error) {
-            console.error('Erro ao solicitar dica de tipo:', error);
-            alert(error instanceof Error ? error.message : t('errors.hintRequestFailed', locale));
-        } finally {
-            setLoadingCardType(false);
-        }
-    };
-
-    // O texto já vem censurado do backend quando não showCard
-    // Aplica censura local para substituir por <card_name> se necessário
     const displayText = showCard ? cardText : censorCardName(cardText, cardName || '');
 
     return (
-        <Box 
-            sx={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center',
-                mb: 3,
-                maxWidth: 600,
-                mx: 'auto'
-            }}
-        >
-            <Typography variant="h6" gutterBottom color="secondary" sx={{ fontWeight: 'bold' }}>
+        <div className="gc-panel" style={{ maxWidth: 720, margin: '0 auto 24px' }}>
+            <div style={{ textAlign: 'center', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--gc-accent)', fontWeight: 700, marginBottom: 16 }}>
                 {showCard ? t('textcard.revealedTitle', locale) : t('textcard.guessTitle', locale)}
-            </Typography>
-            
-            {/* Layout centralizado apenas com informações de texto */}
-            <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>
-                {/* Grid responsivo para as informações */}
-                <Box 
-                    sx={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-                        gap: 2,
-                        mb: 3
-                    }}
-                >
-                    {/* Custo de Mana */}
-                    <Paper sx={{ p: { xs: 2, sm: 3 }, backgroundColor: '#f8f9fa', textAlign: 'center', borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', mb: 2, color: '#1976d2' }}>
-                            {t('textcard.manaTitle', locale)}
-                        </Typography>
-                        
-                        {showCard || showManaCost ? (
-                            <Typography variant="h4" sx={{ color: '#1976d2', fontWeight: 'bold' }}>
-                                {manaCost}
-                            </Typography>
-                        ) : (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleManaCostHint}
-                                    disabled={loadingManaCost || balance < 10}
-                                    sx={{ 
-                                        minWidth: 180,
-                                        height: 56,
-                                        fontSize: { xs: '0.875rem', sm: '1rem' },
-                                        fontWeight: 'bold',
-                                        textTransform: 'none',
-                                        borderRadius: 2,
-                                        boxShadow: 3,
-                                        '&:hover': {
-                                            boxShadow: 6,
-                                            transform: 'translateY(-1px)'
-                                        },
-                                        '&.Mui-disabled': {
-                                            backgroundColor: '#e0e0e0',
-                                            color: '#9e9e9e'
-                                        }
-                                    }}
-                                >
-                                    {loadingManaCost ? (
-                                        <CircularProgress size={24} color="inherit" />
-                                    ) : (
-                                        t('textcard.manaReveal', locale)
-                                    )}
-                                </Button>
-                                <Typography 
-                                    variant="body2" 
-                                    sx={{ 
-                                        color: balance < 10 ? '#d32f2f' : '#333333',
-                                        fontWeight: balance < 10 ? 'bold' : '500',
-                                        fontSize: '0.875rem',
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    {t('textcard.manaCostNote', locale)}
-                                </Typography>
-                            </Box>
-                        )}
-                    </Paper>
+            </div>
 
-                    {/* Tipo da Carta */}
-                    <Paper sx={{ p: { xs: 2, sm: 3 }, backgroundColor: '#f8f9fa', textAlign: 'center', borderRadius: 2, boxShadow: 2 }}>
-                        <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 'bold', mb: 2, color: '#1976d2' }}>
-                            {t('textcard.cardTypeTitle', locale)}
-                        </Typography>
-                        
-                        {showCard || showCardType ? (
-                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
-                                {cardType}
-                            </Typography>
-                        ) : (
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    onClick={handleCardTypeHint}
-                                    disabled={loadingCardType || balance < 10}
-                                    sx={{ 
-                                        minWidth: 180,
-                                        height: 56,
-                                        fontSize: { xs: '0.875rem', sm: '1rem' },
-                                        fontWeight: 'bold',
-                                        textTransform: 'none',
-                                        borderRadius: 2,
-                                        boxShadow: 3,
-                                        '&:hover': {
-                                            boxShadow: 6,
-                                            transform: 'translateY(-1px)'
-                                        },
-                                        '&.Mui-disabled': {
-                                            backgroundColor: '#e0e0e0',
-                                            color: '#9e9e9e'
-                                        }
-                                    }}
-                                >
-                                    {loadingCardType ? (
-                                        <CircularProgress size={24} color="inherit" />
-                                    ) : (
-                                        t('textcard.cardTypeReveal', locale)
-                                    )}
-                                </Button>
-                                <Typography 
-                                    variant="body2" 
-                                    sx={{ 
-                                        color: balance < 10 ? '#d32f2f' : '#333333',
-                                        fontWeight: balance < 10 ? 'bold' : '500',
-                                        fontSize: '0.875rem',
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    {t('textcard.manaCostNote', locale)}
-                                </Typography>
-                            </Box>
-                        )}
-                    </Paper>
-                </Box>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12, marginBottom: 16 }}>
+                <HintBox
+                    title={t('textcard.manaTitle', locale)}
+                    revealed={showCard || showManaCost}
+                    revealedValue={String(manaCost)}
+                    revealLabel={t('textcard.manaReveal', locale)}
+                    note={t('textcard.manaCostNote', locale)}
+                    onClick={() => handleHint('mana_cost')}
+                    disabled={loadingMana || balance < 10}
+                    loading={loadingMana}
+                />
+                <HintBox
+                    title={t('textcard.cardTypeTitle', locale)}
+                    revealed={showCard || showCardType}
+                    revealedValue={cardType}
+                    revealLabel={t('textcard.cardTypeReveal', locale)}
+                    note={t('textcard.manaCostNote', locale)}
+                    onClick={() => handleHint('card_type')}
+                    disabled={loadingType || balance < 10}
+                    loading={loadingType}
+                />
+            </div>
 
-                {/* Texto da Carta - Destaque principal */}
-                <Paper 
-                    sx={{ 
-                        p: 4, 
-                        backgroundColor: '#f9f9f9',
-                        border: '3px solid #2196f3',
-                        borderRadius: 2
-                    }}
-                >
-                    <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 3, color: '#1976d2' }}>
-                        {t('textcard.textTitle', locale)} {!showCard}
-                    </Typography>
-                    
-                    {!showCard && hasCensoredContent && (
-                        <Box sx={{ mb: 2, p: 2, backgroundColor: '#ffecb3', borderRadius: 1, border: '1px solid #ffc107' }}>
-                            <Typography variant="body2" sx={{ color: '#e65100', fontWeight: 'bold', textAlign: 'center' }}>
-                                ⚠️ {t('textcard.censoredWarning', locale)}
-                            </Typography>
-                        </Box>
-                    )}
-                    
-                    <Paper 
-                        elevation={2}
-                        sx={{ 
-                            p: 3,
-                            backgroundColor: showCard ? 'transparent' : '#ffffff',
-                            border: '1px solid #ddd'
-                        }}
-                    >
-                        <Typography 
-                            variant="body1" 
-                            sx={{ 
-                                lineHeight: 1.8,
-                                fontFamily: 'Georgia, serif',
-                                color: showCard ? 'inherit' : '#1a1a1a',
-                                fontWeight: showCard ? 'normal' : 'bold',
-                                fontSize: { xs: '1rem', sm: '1.1rem' },
-                                whiteSpace: 'pre-wrap',
-                                textAlign: 'justify',
-                                minHeight: '120px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            {displayText || t('textcard.textEmpty', locale)}
-                        </Typography>
-                    </Paper>
-                    
-                    {!showCard && (
-                        <Box sx={{ mt: 3, p: 2, backgroundColor: '#e3f2fd', borderRadius: 1 }}>
-                            <Typography variant="body2" sx={{ color: '#1565c0', fontStyle: 'italic', textAlign: 'center' }}>
-                                {t('textcard.hintTip', locale)}
-                            </Typography>
-                        </Box>
-                    )}
-                </Paper>
-            </Box>
+            <div style={{
+                background: 'var(--gc-bg-2)',
+                border: '1px solid var(--gc-border)',
+                borderRadius: 12,
+                padding: 20,
+            }}>
+                <div style={{ textAlign: 'center', color: 'var(--gc-accent)', fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 12 }}>
+                    {t('textcard.textTitle', locale)}
+                </div>
+                {!showCard && hasCensoredContent && (
+                    <div style={{ background: 'rgba(231,195,113,0.12)', border: '1px solid rgba(231,195,113,0.4)', color: 'var(--gc-gold)', padding: '8px 12px', borderRadius: 8, textAlign: 'center', fontSize: '0.85rem', marginBottom: 12 }}>
+                        ⚠️ {t('textcard.censoredWarning', locale)}
+                    </div>
+                )}
+                <p style={{ fontFamily: 'Georgia, serif', color: 'var(--gc-text)', lineHeight: 1.7, whiteSpace: 'pre-wrap', fontSize: '1rem', margin: 0 }}>
+                    {displayText || t('textcard.textEmpty', locale)}
+                </p>
+                {!showCard && (
+                    <p style={{ marginTop: 12, color: 'var(--gc-text-dim)', fontStyle: 'italic', textAlign: 'center', fontSize: '0.85rem' }}>
+                        {t('textcard.hintTip', locale)}
+                    </p>
+                )}
+            </div>
 
             {showCard && cardName && (
-                <Paper 
-                    sx={{ 
-                        mt: 4, 
-                        p: 4, 
-                        textAlign: 'center',
-                        backgroundColor: '#e8f5e8',
-                        border: '3px solid #4caf50',
-                        borderRadius: 2
-                    }}
-                >
-                    <Typography variant="h3" sx={{ color: 'success.main', fontWeight: 'bold', mb: 2 }}>
-                        🎉 {cardName} 🎉
-                    </Typography>
-                    <Typography variant="h6" sx={{ color: '#2e7d32', mb: 1 }}>
-                        {t('textcard.congrats', locale)}
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary">
-                        {t('textcard.completed', locale)}
-                    </Typography>
-                </Paper>
+                <div style={{ marginTop: 16, padding: 16, textAlign: 'center', background: 'rgba(31,159,80,0.12)', border: '1px solid rgba(31,159,80,0.4)', borderRadius: 12 }}>
+                    <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--gc-good-strong)' }}>{cardName}</div>
+                    <div style={{ color: 'var(--gc-text-dim)', marginTop: 4 }}>{t('textcard.congrats', locale)}</div>
+                </div>
             )}
-        </Box>
+        </div>
     );
 };
+
+const HintBox: React.FC<{
+    title: string;
+    revealed: boolean;
+    revealedValue: string;
+    revealLabel: string;
+    note: string;
+    onClick: () => void;
+    disabled: boolean;
+    loading: boolean;
+}> = ({ title, revealed, revealedValue, revealLabel, note, onClick, disabled, loading }) => (
+    <div style={{
+        background: 'var(--gc-bg-2)',
+        border: '1px solid var(--gc-border)',
+        borderRadius: 12,
+        padding: 16,
+        textAlign: 'center',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
+    }}>
+        <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--gc-accent)', fontWeight: 700 }}>{title}</div>
+        {revealed ? (
+            <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--gc-text)' }}>{revealedValue}</div>
+        ) : (
+            <>
+                <button className="gc-btn gc-btn-primary" onClick={onClick} disabled={disabled}>
+                    {loading ? <CircularProgress size={16} color="inherit" /> : revealLabel}
+                </button>
+                <div style={{ color: 'var(--gc-text-dim)', fontSize: '0.78rem' }}>{note}</div>
+            </>
+        )}
+    </div>
+);
 
 export default TextCard;

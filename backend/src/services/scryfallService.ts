@@ -119,6 +119,23 @@ export class ScryfallService {
     }
 
     /**
+     * Canonical exact-name lookup via Scryfall's /cards/named endpoint.
+     * Unlike /cards/search?q=!"Name" this avoids returning rebalanced/face-name
+     * cards (e.g. "Emeritus of Woe // Demonic Tutor" when you wanted "Demonic Tutor").
+     * Returns null if no card matches.
+     */
+    public async fetchCanonicalCardByName(cardName: string): Promise<ScryfallCard | null> {
+        try {
+            const url = `${this.apiUrl}/named?exact=${encodeURIComponent(cardName)}`;
+            const response = await axios.get<ScryfallCard>(url);
+            return response.data || null;
+        } catch (error: any) {
+            if (error.response?.status === 404) return null;
+            throw new Error('Error fetching canonical card by name: ' + error.message);
+        }
+    }
+
+    /**
      * Busca cartas usando parâmetros genéricos (mantém compatibilidade com API antiga)
      */
     public async fetchCardByParam(param: string, valueOfParam: string): Promise<ScryfallCard[]> {

@@ -3,13 +3,33 @@ import { IconButton, Tooltip, Box } from '@mui/material';
 import { useLocale } from '../contexts/LocaleContext';
 import { t } from '../utils/translate';
 
-const LanguageToggle: React.FC = () => {
-  const { locale, setLocale } = useLocale();
+interface Props {
+  /** When `inline`, render as a small inline button (used in the new app header). */
+  inline?: boolean;
+}
 
+const LanguageToggle: React.FC<Props> = ({ inline = false }) => {
+  const { locale, setLocale } = useLocale();
   const next = locale === 'pt' ? 'en' : 'pt';
+  const tooltip = locale === 'pt' ? t('global.switchToEnglish', locale) : t('global.switchToPortuguese', locale);
+
+  if (inline) {
+    return (
+      <Tooltip title={tooltip}>
+        <button
+          type="button"
+          onClick={() => setLocale(next as 'pt' | 'en')}
+          className="gc-icon-btn"
+          aria-label={tooltip}
+        >
+          <span style={{ fontSize: 18 }}>{locale === 'pt' ? '🇧🇷' : '🇺🇸'}</span>
+        </button>
+      </Tooltip>
+    );
+  }
 
   return (
-    <Tooltip title={locale === 'pt' ? t('global.switchToEnglish', locale) : t('global.switchToPortuguese', locale)}>
+    <Tooltip title={tooltip}>
       <IconButton
         color="secondary"
         onClick={() => setLocale(next as 'pt' | 'en')}
